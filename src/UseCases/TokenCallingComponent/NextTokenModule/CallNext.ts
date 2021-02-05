@@ -1,17 +1,17 @@
 import NextTokenStrategy from './NextTokenStrategy';
 
 export default class CallNext {
-  private strategy: NextTokenStrategy;
+  private _strategy: NextTokenStrategy;
 
-  public setStrategy(strategy: NextTokenStrategy): void {
-    this.strategy = strategy;
+  public set strategy(strategy: NextTokenStrategy) {
+    this._strategy = strategy;
   }
 
-  public getStrategy(): NextTokenStrategy {
-    return this.strategy;
+  public get strategy(): NextTokenStrategy {
+    return this._strategy;
   }
 
   public callToken(tokenNumber: number): void {
-    this.strategy.callNextToken(tokenNumber);
+    this._strategy.callNextToken(tokenNumber);
   }
 }
