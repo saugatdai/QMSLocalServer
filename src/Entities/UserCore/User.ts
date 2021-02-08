@@ -7,9 +7,13 @@ export interface UserData {
 }
 
 export default class User {
-  constructor(private userInfo: UserData) {}
+  constructor(private _userInfo: UserData) {}
 
   public getUserInfo(): UserData {
-    return this.userInfo;
+    return this._userInfo;
+  }
+
+  public set userInfo(userInfo: UserData){
+    this._userInfo = userInfo;
   }
 }
