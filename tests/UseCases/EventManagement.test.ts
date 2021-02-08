@@ -1,4 +1,3 @@
-import * as EventEmitter from 'events';
 import EventManagerSingleton from '../../src/UseCases/EventManagementComponent/EventManagerSingleton';
 import EventTypes from '../../src/UseCases/EventManagementComponent/EventTypes';
 
