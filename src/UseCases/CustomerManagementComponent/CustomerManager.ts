@@ -44,7 +44,7 @@ export default class CustomerManager {
     this._customerStorageInteractorAdapter.deleteCustomerById(this._customer.customerId);
   }
 
-  public addProperty<T>(propertyName: string, value: T){
+  public addCustomerInfo<T>(propertyName: string, value: T){
     this[propertyName] = value;
   }
 }

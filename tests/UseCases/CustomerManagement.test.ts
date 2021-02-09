@@ -81,4 +81,14 @@ describe('Testing of customer management compoenent', () => {
         customerStorageInteractorAdapter.getCustomerById = (id: number) => null;
         expect(() => {customerManager.validateInfo()}).toThrow('Customer not found');
     });
+
+    it('Should add new property to customer', () => {
+        customerManager.addCustomerInfo<string>('purpose', "visit");
+        expect(customerManager['purpose']).toBe('visit');
+    }); 
+
+    it('Should add a new method to customer', () => {
+        customerManager.addCustomerInfo<Function>('laugh', ()=>"Hahahaha");
+        expect(customerManager['laugh']()).toBe('Hahahaha');
+    });
 });

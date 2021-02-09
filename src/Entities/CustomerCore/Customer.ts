@@ -5,3 +5,4 @@ export default interface Customer {
   token: Token;
   remarks: string;
 }
+
