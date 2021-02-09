@@ -17,13 +17,13 @@ describe('Testing of customer management compoenent', () => {
     }
 
     const token2: Token = {
-        tokenId: 1,
+        tokenId: 2,
         date: new Date(),
         tokenNumber: 2
     }
 
     const customer2 : Customer = {
-        customerId: 123,
+        customerId: 124,
         token: token2,
         remarks: "-"
     }
@@ -31,8 +31,7 @@ describe('Testing of customer management compoenent', () => {
     const addCustomerMockFunction = jest.fn();
     const addCustomerFunction = (customer: Customer) => {addCustomerMockFunction()};
 
-    const getCustomerByIdMockFunction = jest.fn();
-    const getCustomerByIdFunction = (id: number) => customer2;
+    const getCustomerByIdFunction = (id: number) => customer1;
 
     const updateCustomerMockFunction = jest.fn();
     const updateCustomerFunction = (customer: Customer) => {updateCustomerMockFunction()};
@@ -73,5 +72,13 @@ describe('Testing of customer management compoenent', () => {
 
     });
 
+    it('Should throw Custmer data did not match exception', () => {
+        customerManager.customer = customer2;
+        expect(() => {customerManager.validateInfo()}).toThrow('Custmer data did not match');
+    });
 
+    it('Should throw customer not found exception', () => {
+        customerStorageInteractorAdapter.getCustomerById = (id: number) => null;
+        expect(() => {customerManager.validateInfo()}).toThrow('Customer not found');
+    });
 });
