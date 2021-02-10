@@ -17,7 +17,7 @@ describe('Testing of token count management component', () => {
         clearCurrentTokenCountMockFunction();
     }
 
-    const tokenCountStorageInteractorAdapter: tokenCountStorageInteractorAdapter = {
+    const tokenCountStorageInteractorAdapter: TokenCountStorageInteractorAdapter = {
         updateCurrentTokenCount: updateTokenCurrentCountFunction,
         getCurrentTokenCount: getCurrentTokenCountFunction,
         clearCurrentTokenCount: clearCurrentTokenCountFunction
