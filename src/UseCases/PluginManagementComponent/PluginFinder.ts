@@ -1,6 +1,13 @@
 import Plugin from "./Plugin";
-import { readdirSync } from "fs";
-import * as path from "path";
+import PluginInfoValidator from './PluginInfoValidator';
+
+export interface PluginInfo {
+  name: string;
+  version?: string;
+  minCoreVersion?: string;
+  pluginId: number;
+  pluginValidatorId: string;
+}
 
 export default class PluginFinder {
   private plugins: Plugin[];
@@ -8,24 +15,16 @@ export default class PluginFinder {
   constructor(private pluginPath: string) {}
 
   public scanForPlugins(): Plugin[] {
-    const pluginDirectories = this.getPluginDirectories();
-    
-    pluginDirectories.forEach(directory => {
-      
-    });
-    
+    const pluginInfoValidator = new PluginInfoValidator(this.pluginPath);
+    const pluginInfo: PluginInfo[] = pluginInfoValidator.getValidPluginInfos();
+    console.log(pluginInfo);
     return this.plugins;
   }
-  private getPluginDirectories(): string[] {
-    const pluginDirectories = readdirSync(this.pluginPath, {
-      withFileTypes: true,
-    })
-      .filter((gotFile) => gotFile.isDirectory())
-      .map((directoryObject) => directoryObject.name);
 
-    const absolutePluginDirectories = pluginDirectories.map((pluginDirectory) => {
-      return path.join(this.pluginPath, `/${pluginDirectory}`);
-    });
-    return absolutePluginDirectories;
+  public scanForValidDirectories(): string[] {
+    const pluginInfoValidator = new PluginInfoValidator(this.pluginPath);
+    const validDirectories = pluginInfoValidator.getValidPluginInfoDirectories();
+    console.log(validDirectories);
+    return validDirectories;
   }
 }
