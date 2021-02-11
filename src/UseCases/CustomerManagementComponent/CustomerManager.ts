@@ -28,7 +28,7 @@ export default class CustomerManager {
     );
     
     if (!obtainedCustomer) {
-      throw new Error(`Customer id ${this._customer.customerId} did not match`);
+      throw new Error(`Customer not found`);
     }
     const validity =
       obtainedCustomer.customerId === this._customer.customerId &&
@@ -42,5 +42,9 @@ export default class CustomerManager {
 
   public delete(): void {
     this._customerStorageInteractorAdapter.deleteCustomerById(this._customer.customerId);
+  }
+
+  public addCustomerInfo<T>(propertyName: string, value: T){
+    this[propertyName] = value;
   }
 }
