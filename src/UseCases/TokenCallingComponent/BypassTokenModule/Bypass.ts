@@ -1,17 +1,17 @@
 import BypassTokenStrategy from './BypassTokenStrategy';
 
 export default class Bypass {
-  private strategy: BypassTokenStrategy;
+  private _strategy: BypassTokenStrategy;
 
-  public setStrategy(strategy: BypassTokenStrategy) {
-    this.strategy = strategy;
+  public set strategy(strategy: BypassTokenStrategy) {
+    this._strategy = strategy;
   }
 
-  public getStrategy(): BypassTokenStrategy {
-    return this.strategy;
+  public get strategy(): BypassTokenStrategy {
+    return this._strategy;
   }
 
   public callToken(tokenNumber: number): void {
-    this.strategy.bypassToken(tokenNumber);
+    this._strategy.bypassToken(tokenNumber);
   }
 }

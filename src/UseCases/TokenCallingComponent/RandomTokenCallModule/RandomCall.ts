@@ -1,17 +1,17 @@
 import RandomTokenCallStrategy from './RandomTokenCallStrategy';
 
 export default class RamdomCall {
-  private strategy: RandomTokenCallStrategy;
+  private _strategy: RandomTokenCallStrategy;
 
-  public setStrategy(strategy: RandomTokenCallStrategy): void {
-    this.strategy = strategy;
+  public set strategy(strategy: RandomTokenCallStrategy) {
+    this._strategy = strategy;
   }
 
-  public getStrategy(): RandomTokenCallStrategy {
-    return this.strategy;
+  public get strategy(): RandomTokenCallStrategy {
+    return this._strategy;
   }
 
   public callToken(tokenNumber: number) {
-    this.strategy.callRandomToken(tokenNumber);
+    this._strategy.callRandomToken(tokenNumber);
   }
 }

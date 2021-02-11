@@ -1,17 +1,17 @@
 import CallAgainStrategy from './CallAgainStrategy';
 
 export default class CallAgain {
-  private strategy: CallAgainStrategy;
+  private _strategy: CallAgainStrategy;
 
-  public setStrategy(strategy: CallAgainStrategy) {
-    this.strategy = strategy;
+  public set strategy(strategy: CallAgainStrategy) {
+    this._strategy = strategy;
   }
 
   public callToken(tokenNumber: number): void {
-    this.strategy.callAgainToken(tokenNumber);
+    this._strategy.callAgainToken(tokenNumber);
   }
 
-  public getStrategy(): CallAgainStrategy {
-    return this.strategy;
+  public get strategy(): CallAgainStrategy {
+    return this._strategy;
   }
 }
