@@ -1,8 +1,10 @@
 import PluginFinder from "../../../src/UseCases/PluginManagementComponent/PluginFinder";
+import PluginInfoValidator from "../../../src/UseCases/PluginManagementComponent/PluginInfoValidator";
+
 import * as path from "path";
 
 describe("Test of plugin finder class", () => {
-  const expectedPlugins = [
+  const expectedPluginInfos = [
     {
       name: "Plugin 1",
       version: "1.0.0",
@@ -19,11 +21,25 @@ describe("Test of plugin finder class", () => {
     },
     { name: "Plugin 3", pluginId: 35, minCoreVersion: "1.2.0" },
   ];
+  
   const pluginPath = path.join(__dirname, "/plugins");
-  const pluginFinder = new PluginFinder(pluginPath);
-  const directories = pluginFinder.scanForValidDirectories();
-  const infos = pluginFinder.scanForPlugins();
-  it("should always be true", () => {
-    expect(true).toBeTruthy();
+
+  const expectedDirectoriesWithValidPluginInfo = [
+    `${pluginPath}/plugin1`,
+    `${pluginPath}/plugin2`,
+    `${pluginPath}/plugin3`,
+  ];
+  
+  const pluginInfoValidator = new PluginInfoValidator(pluginPath);
+  const validDirectories = pluginInfoValidator.getValidPluginInfoDirectories();
+  const validPluginInfos = pluginInfoValidator.getValidPluginInfos();
+
+  describe('Testing of PluginINfoValidator class', () => {
+    it('Should get the expected plugin directories', () => {
+      expect(validDirectories).toEqual(expectedDirectoriesWithValidPluginInfo);
+    });
+    it('Should get the expected plugin infos', () => {
+      expect(validPluginInfos).toEqual(expectedPluginInfos);
+    });
   });
 });
