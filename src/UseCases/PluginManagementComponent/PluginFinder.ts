@@ -1,5 +1,5 @@
 import Plugin from "./Plugin";
-import PluginInfoValidator from './PluginInfoValidator';
+import PluginInfoValidator from "./PluginInfoValidator";
 
 export interface PluginInfo {
   name: string;
@@ -11,20 +11,17 @@ export interface PluginInfo {
 
 export default class PluginFinder {
   private plugins: Plugin[];
-
+  private pluginInfos : PluginInfo[]
+  
   constructor(private pluginPath: string) {}
 
   public scanForPlugins(): Plugin[] {
     const pluginInfoValidator = new PluginInfoValidator(this.pluginPath);
-    const pluginInfo: PluginInfo[] = pluginInfoValidator.getValidPluginInfos();
-    console.log(pluginInfo);
+    const validPluginDirectories = pluginInfoValidator.getValidPluginInfoDirectories();
+    
+    validPluginDirectories.forEach(async directory => {
+      // TODO import plugins
+    });
     return this.plugins;
-  }
-
-  public scanForValidDirectories(): string[] {
-    const pluginInfoValidator = new PluginInfoValidator(this.pluginPath);
-    const validDirectories = pluginInfoValidator.getValidPluginInfoDirectories();
-    console.log(validDirectories);
-    return validDirectories;
   }
 }
