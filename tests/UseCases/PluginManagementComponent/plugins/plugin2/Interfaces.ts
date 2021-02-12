@@ -7,12 +7,13 @@ export interface EventHandler {
   handleEvent: () => void;
 }
 
-export interface PipelineExecutors {
+export interface PipelineExecutor {
   features: Feature[];
   pipelineType: string;
 }
 
 export interface Plugin {
   EventHandlers: EventHandler[];
+  pipelineExecutors: PipelineExecutor[];
   priority: number;
 }

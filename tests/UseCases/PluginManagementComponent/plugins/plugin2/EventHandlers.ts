@@ -1,6 +1,6 @@
 import { EventHandler } from './Interfaces';
 
-class Plugin1EventHandlerParent {
+class Plugin2EventHandlerParent {
   eventType: string;
   constructor(eventType: string) {}
 
@@ -9,8 +9,8 @@ class Plugin1EventHandlerParent {
   }
 }
 
-class Plugin1EventHandler1
-  extends Plugin1EventHandlerParent
+class Plugin2EventHandler1
+  extends Plugin2EventHandlerParent
   implements EventHandler {
   constructor(eventType: string) {
     super(eventType);
@@ -21,8 +21,8 @@ class Plugin1EventHandler1
   }
 }
 
-class Plugin1EventHandler2
-  extends Plugin1EventHandlerParent
+class Plugin2EventHandler2
+  extends Plugin2EventHandlerParent
   implements EventHandler {
   constructor(eventType: string) {
     super(eventType);
@@ -33,5 +33,5 @@ class Plugin1EventHandler2
   }
 }
 
-export const plugin1EventHandler1 = new Plugin1EventHandler1('Holus');
-export const plugin1EventHandler2 = new Plugin1EventHandler2('Mondus');
+export const plugin2EventHandler1 = new Plugin2EventHandler1('Plugin2Holus');
+export const plugin2EventHandler2 = new Plugin2EventHandler2('Plugin2Mondus');
