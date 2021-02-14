@@ -1,4 +1,7 @@
-import Plugin from "./Plugin";
+import * as fs from 'fs';
+import * as path from 'path';
+
+import Plugin from './Plugin';
 import PluginInfoValidator from './PluginInfoValidator';
 
 export interface PluginInfo {
@@ -10,21 +13,36 @@ export interface PluginInfo {
 }
 
 export default class PluginFinder {
-  private plugins: Plugin[];
+  private _plugins: Plugin[] = [];
+  public findingProcessCompleted = false;
 
   constructor(private pluginPath: string) {}
 
-  public scanForPlugins(): Plugin[] {
+  public async scanForPlugins(): Promise<Plugin[]> {
     const pluginInfoValidator = new PluginInfoValidator(this.pluginPath);
-    const pluginInfo: PluginInfo[] = pluginInfoValidator.getValidPluginInfos();
-    console.log(pluginInfo);
-    return this.plugins;
+    const validPluginDirectories = pluginInfoValidator.getValidPluginInfoDirectories();
+
+    const scannedPluginsPromises = validPluginDirectories.map(
+      async (directory) => {
+        try {
+          if (fs.existsSync(path.join(directory, '/index.ts'))) {
+            const plugin: { default: Plugin } = await import(
+              path.join(directory, '/index.ts')
+            );
+            if (plugin.default) {
+              return plugin.default;
+            }
+          }
+        } catch (error) {
+          console.log(error.toString());
+        }
+      }
+    );
+    const scannedPlugins = await Promise.all(scannedPluginsPromises);
+    return scannedPlugins.filter((plugin) => plugin !== undefined);
   }
 
-  public scanForValidDirectories(): string[] {
-    const pluginInfoValidator = new PluginInfoValidator(this.pluginPath);
-    const validDirectories = pluginInfoValidator.getValidPluginInfoDirectories();
-    console.log(validDirectories);
-    return validDirectories;
+  public get plugins(): Plugin[] {
+    return this._plugins;
   }
 }
