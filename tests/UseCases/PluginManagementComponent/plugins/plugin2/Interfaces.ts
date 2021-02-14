@@ -10,10 +10,11 @@ export interface EventHandler {
 export interface PipelineExecutor {
   features: Feature[];
   pipelineType: string;
+  addFeature: (feature: Feature) => void;
 }
 
 export interface Plugin {
-  EventHandlers: EventHandler[];
+  eventHandlers: EventHandler[];
   pipelineExecutors: PipelineExecutor[];
   priority: number;
 }

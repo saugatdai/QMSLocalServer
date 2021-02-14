@@ -25,12 +25,24 @@ const pipeline2Feature2: Feature = {
   },
 };
 
-export const Pipeline1: PipelineExecutor = {
-  features: [pipeline1Feature1, pipeline1Feature2],
-  pipelineType: 'CallAgainToken',
-};
+class PipelineExecutorClass implements PipelineExecutor{
+  public features : Feature[] = [];
+  public pipelineType: string;
+  constructor(pipelineType: string){
+    this.pipelineType = pipelineType;
+  }
 
-export const Pipeline2: PipelineExecutor = {
-  features: [pipeline2Feature1, pipeline2Feature2],
-  pipelineType: 'CallNextToken',
-};
+  public addFeature(feature: Feature): void{
+    this.features.push(feature);
+  }
+}
+
+const pipeline1 = new PipelineExecutorClass("CallAgainToken");
+const pipeline2 = new PipelineExecutorClass("CallNextToken");
+
+pipeline1.addFeature(pipeline1Feature1);
+pipeline1.addFeature(pipeline1Feature2);
+pipeline2.addFeature(pipeline2Feature1);
+pipeline2.addFeature(pipeline2Feature2);
+
+export {pipeline1, pipeline2};

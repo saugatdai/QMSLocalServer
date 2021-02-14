@@ -3,7 +3,7 @@ import { plugin1EventHandler2 } from './EventHandlers';
 import { Plugin } from './Interfaces';
 
 const plugin1: Plugin = {
-  EventHandlers: [plugin1EventHandler1, plugin1EventHandler2],
+  eventHandlers: [plugin1EventHandler1, plugin1EventHandler2],
   priority: 2,
 };
 
