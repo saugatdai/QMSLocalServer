@@ -3,10 +3,12 @@ import * as path from 'path';
 
 import Plugin from '../PluginModule/Plugin';
 import DirectoryPluginInfoValidator from './DirectoryPluginInfoValidator';
-import {PluginFinderInterface} from '../PluginLoader';
+import { PluginFinderInterface } from '../PluginLoader';
+import PluginInfo from '../PluginInfo';
 
-export interface PluginInfoValidatorInterface {
-  getValidPluginInfoDirectories : () => string[];
+export interface DirectoryPluginInfoValidatorInterface {
+  getValidPluginInfoDirectories: () => string[];
+  getValidPluginInfoForADirectory: (string) => PluginInfo;
 }
 
 export default class PluginFinder implements PluginFinderInterface {
@@ -16,19 +18,27 @@ export default class PluginFinder implements PluginFinderInterface {
   constructor(private pluginPath: string) {}
 
   public async scanForPlugins(): Promise<Plugin[]> {
-    const pluginInfoValidator: PluginInfoValidatorInterface = new DirectoryPluginInfoValidator(this.pluginPath);
-    const validPluginDirectories = pluginInfoValidator.getValidPluginInfoDirectories();
- 
+    const directoryPluginInfoValidator: DirectoryPluginInfoValidatorInterface = new DirectoryPluginInfoValidator(
+      this.pluginPath
+    );
+    const validPluginDirectories = directoryPluginInfoValidator.getValidPluginInfoDirectories();
+
     const scannedPluginsPromises = validPluginDirectories.map(
-      async directory => {
+      async (directory) => {
         try {
           if (fs.existsSync(path.join(directory, '/index.ts'))) {
             const plugin: { default: Plugin } = await import(
               path.join(directory, '/index.ts')
             );
             if (plugin.default) {
-              // TODO PluginInfo Property adding remaining..
-              const validPlugin = plugin.default;
+              try {
+                const pluginInfo: PluginInfo = directoryPluginInfoValidator.getValidPluginInfoForADirectory(
+                  directory
+                );
+                plugin.default.pluginInfo = pluginInfo;
+              } catch (error) {
+                console.log(error.toString());
+              }
               return plugin.default;
             }
           }
