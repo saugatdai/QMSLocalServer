@@ -1,7 +1,19 @@
-import PluginFinder from './PluginFinder';
+import PluginFinder from './PluginScannerModule/PluginFinder';
+import Plugin from './PluginModule/Plugin';
+
+export interface PluginFinderInterface{
+    scanForPlugins : () => Promise<Plugin[]>;
+}
 
 export default class PluginLoader{
-    public getPlugins(){
-        
-    }
+    constructor(private pluginPath: string){}
+    
+    public initializePlugins(): void{
+        const pluginFinder: PluginFinderInterface = new PluginFinder(this.pluginPath);
+        pluginFinder.scanForPlugins().then(plugins => {
+            plugins.forEach(plugin => {
+                console.log(plugin);
+            });
+        });
+    }    
 }
