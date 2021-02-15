@@ -17,9 +17,9 @@ describe('Test for plugin management component', () => {
   describe('Testing of PluginDirectoryScanner', () => {
     it('Should list all the directories inside plugin folder', () => {
       const expectedDirectories = [
-        '/home/embeddedsaugat/Documents/Projects/QMS/SourceCode/LocalServer/tests/UseCases/PluginManagementComponent/plugins/plugin1',
-        '/home/embeddedsaugat/Documents/Projects/QMS/SourceCode/LocalServer/tests/UseCases/PluginManagementComponent/plugins/plugin2',
-        '/home/embeddedsaugat/Documents/Projects/QMS/SourceCode/LocalServer/tests/UseCases/PluginManagementComponent/plugins/plugin3',
+        `${pluginPath}/plugin1`,
+        `${pluginPath}/plugin2`,
+        `${pluginPath}/plugin3`,
       ];
       const directories = pluginDirectoryScanner.getPluginDirectories();
       expect(directories).toEqual(expectedDirectories);
@@ -31,8 +31,8 @@ describe('Test for plugin management component', () => {
       const validDirectories = directoryPluginInfoValidator.getValidPluginInfoDirectories();
 
       const expectedValidDirectories = [
-        '/home/embeddedsaugat/Documents/Projects/QMS/SourceCode/LocalServer/tests/UseCases/PluginManagementComponent/plugins/plugin1',
-        '/home/embeddedsaugat/Documents/Projects/QMS/SourceCode/LocalServer/tests/UseCases/PluginManagementComponent/plugins/plugin2',
+        `${pluginPath}/plugin1`,
+        `${pluginPath}/plugin2`,
       ];
 
       expect(validDirectories).toEqual(expectedValidDirectories);
