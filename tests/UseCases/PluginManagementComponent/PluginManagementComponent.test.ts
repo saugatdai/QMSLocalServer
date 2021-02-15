@@ -1,12 +1,12 @@
-import * as path from 'path';
+import * as path from "path";
 
-import PluginDirectoryScanner from '../../../src/UseCases/PluginManagementComponent/PluginScannerModule/PluginDirectoryScanner';
-import PluginFinder from '../../../src/UseCases/PluginManagementComponent/PluginScannerModule/PluginFinder';
-import DirectoryPluginInfoValidator from '../../../src/UseCases/PluginManagementComponent/PluginScannerModule/DirectoryPluginInfoValidator';
-import PluginInfo from '../../../src/UseCases/PluginManagementComponent/PluginInfo';
+import PluginDirectoryScanner from "../../../src/UseCases/PluginManagementComponent/PluginScannerModule/PluginDirectoryScanner";
+import PluginFinder from "../../../src/UseCases/PluginManagementComponent/PluginScannerModule/PluginFinder";
+import DirectoryPluginInfoValidator from "../../../src/UseCases/PluginManagementComponent/PluginScannerModule/DirectoryPluginInfoValidator";
+import PluginInfo from "../../../src/UseCases/PluginManagementComponent/PluginInfo";
 
-describe('Test for plugin management component', () => {
-  const pluginPath = path.join(__dirname, '/plugins');
+describe("Test for plugin management component", () => {
+  const pluginPath = path.join(__dirname, "/plugins");
 
   const pluginDirectoryScanner = new PluginDirectoryScanner(pluginPath);
   const directoryPluginInfoValidator = new DirectoryPluginInfoValidator(
@@ -14,8 +14,8 @@ describe('Test for plugin management component', () => {
   );
   const pluginFinder = new PluginFinder(pluginPath);
 
-  describe('Testing of PluginDirectoryScanner', () => {
-    it('Should list all the directories inside plugin folder', () => {
+  describe("Testing of PluginDirectoryScanner", () => {
+    it("Should list all the directories inside plugin folder", () => {
       const expectedDirectories = [
         `${pluginPath}/plugin1`,
         `${pluginPath}/plugin2`,
@@ -26,8 +26,8 @@ describe('Test for plugin management component', () => {
     });
   });
 
-  describe('Testing of DirectoryPluginInfoValidator', () => {
-    it('Should list only valid directories', () => {
+  describe("Testing of DirectoryPluginInfoValidator", () => {
+    it("Should list only valid directories", () => {
       const validDirectories = directoryPluginInfoValidator.getValidPluginInfoDirectories();
 
       const expectedValidDirectories = [
@@ -38,16 +38,16 @@ describe('Test for plugin management component', () => {
       expect(validDirectories).toEqual(expectedValidDirectories);
     });
 
-    it('Should return pluginInfo of a given valid directory', () => {
+    it("Should return pluginInfo of a given valid directory", () => {
       const expectedPluginInfo = {
-        name: 'Plugin 1',
-        version: '1.0.0',
-        minCoreVersion: '1.0.0',
+        name: "Plugin 1",
+        version: "1.0.0",
+        minCoreVersion: "1.0.0",
         pluginId: 123,
-        pluginValidatorID: '123abc',
+        pluginValidatorID: "123abc",
       };
 
-      const directory = path.join(__dirname, '/plugins/plugin1');
+      const directory = path.join(__dirname, "/plugins/plugin1");
       const pluginInfo: PluginInfo = directoryPluginInfoValidator.getValidPluginInfoForADirectory(
         directory
       );
@@ -55,17 +55,35 @@ describe('Test for plugin management component', () => {
       expect(expectedPluginInfo).toEqual(pluginInfo);
     });
 
-    it('Should throw an error for an invalid plugin directory', () => {
-      const directory = path.join(__dirname, '/plugins/plugin3');
+    it("Should throw an error for an invalid plugin directory", () => {
+      const directory = path.join(__dirname, "/plugins/plugin3");
       expect(() => {
         directoryPluginInfoValidator.getValidPluginInfoForADirectory(directory);
       }).toThrow();
     });
   });
 
-  describe('Testing of PluginFinder', () => {
-    pluginFinder.scanForPlugins().then((plugin) => {
-      console.log(plugin);
+  describe("Testing of PluginFinder", () => {
+    it("Should get the valid plugins", () => {
+      const pluginInfo1 = {
+        name: "Plugin 1",
+        version: "1.0.0",
+        minCoreVersion: "1.0.0",
+        pluginId: 123,
+        pluginValidatorID: "123abc",
+      };
+
+      const pluginInfo2 = {
+        name: "Plugin 2",
+        version: "1.0.0",
+        minCoreVersion: "1.0.0",
+        pluginId: 124,
+        pluginValidatorID: "124abc",
+      };
+      pluginFinder.scanForPlugins().then((plugins) => {
+        expect(plugins[0].pluginInfo).toEqual(pluginInfo1);
+        expect(plugins[1].pluginInfo).toEqual(pluginInfo2);
+      });
     });
   });
 });
