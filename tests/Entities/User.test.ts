@@ -9,16 +9,19 @@ describe('Test of Entities', () => {
       id: 1,
       username: 'saugatdai',
       role: UserRoles.ADMIN,
+      password: "holus"
     };
     const operatorInfo = {
       id: 1,
       username: 'saugatdai',
       role: UserRoles.OPERATOR,
+      password: "123"
     };
     const registratorInfo = {
       id: 1,
       username: 'saugatdai',
       role: UserRoles.REGISTRATOR,
+      password: "123"
     };
 
     describe('Test for operator', () => {

@@ -4,6 +4,7 @@ export interface UserData {
   id: number;
   username: string;
   role: UserRoles;
+  password: string;
 }
 
 export default class User {

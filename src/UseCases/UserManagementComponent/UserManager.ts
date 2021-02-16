@@ -1,5 +1,6 @@
 import UserStorageInteractorAdapter from "./UserStorageInteractorAdapter";
 import User from "../../Entities/UserCore/User";
+import Operator from '../../Entities/UserCore/Operator';
 
 export default class UserManager {
   private _userStorageInteractorAdapter: UserStorageInteractorAdapter;
@@ -44,7 +45,7 @@ export default class UserManager {
     );
   }
 
-  public setCounter(user: User) {
-    this._userStorageInteractorAdapter.setCounterForOperator(this._user);
+  public setCounter() {
+    this._userStorageInteractorAdapter.setCounterForOperator(this._user as Operator);
   }
 }

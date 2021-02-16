@@ -4,6 +4,7 @@ import PluginDirectoryScanner from "../../../src/UseCases/PluginManagementCompon
 import PluginFinder from "../../../src/UseCases/PluginManagementComponent/PluginScannerModule/PluginFinder";
 import DirectoryPluginInfoValidator from "../../../src/UseCases/PluginManagementComponent/PluginScannerModule/DirectoryPluginInfoValidator";
 import PluginInfo from "../../../src/UseCases/PluginManagementComponent/PluginInfo";
+import PluginLoader from "../../../src/UseCases/PluginManagementComponent/PluginLoader";
 
 describe("Test for plugin management component", () => {
   const pluginPath = path.join(__dirname, "/plugins");
@@ -85,5 +86,10 @@ describe("Test for plugin management component", () => {
         expect(plugins[1].pluginInfo).toEqual(pluginInfo2);
       });
     });
+  });
+
+  describe('Testing of PluginLoader class', () => {
+    const pluginLoader = new PluginLoader(pluginPath);
+    pluginLoader.initializePlugins();
   });
 });

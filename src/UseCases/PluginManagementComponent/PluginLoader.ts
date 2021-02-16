@@ -12,7 +12,7 @@ export default class PluginLoader{
         const pluginFinder: PluginFinderInterface = new PluginFinder(this.pluginPath);
         pluginFinder.scanForPlugins().then(plugins => {
             plugins.forEach(plugin => {
-                console.log(plugin);
+                // TODO initialization part remaining...
             });
         });
     }    

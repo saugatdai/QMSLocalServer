@@ -35,4 +35,9 @@ export default class PluginInfoValidator
     });
     return validDirectories;
   }
+
+  public hasPluginInfoValidPluginValidatorId(pluginInfo: PluginInfo): boolean{
+    // TODO validation task remaining
+    return false;
+  }
 }
