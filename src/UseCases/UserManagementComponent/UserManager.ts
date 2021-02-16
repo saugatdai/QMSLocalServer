@@ -1,12 +1,12 @@
-import UserStorageInteractorAdapter from "./UserStorageInteractorAdapter";
-import User from "../../Entities/UserCore/User";
+import UserStorageInteractorAdapter from './UserStorageInteractorAdapter';
+import User from '../../Entities/UserCore/User';
 import Operator from '../../Entities/UserCore/Operator';
 
 export default class UserManager {
   private _userStorageInteractorAdapter: UserStorageInteractorAdapter;
   constructor(private _user: User) {}
 
-  public set user(user: User){
+  public set user(user: User) {
     this._user = user;
   }
 
@@ -23,19 +23,20 @@ export default class UserManager {
     this._userStorageInteractorAdapter.updateUser(this._user);
   }
 
-  public validateInfo(): void {
-    const user = this._userStorageInteractorAdapter.getUserById(
+  public async validateInfo() {
+    const user = await this._userStorageInteractorAdapter.getUserById(
       this._user.getUserInfo().id
     );
     if (!user) {
-      throw new Error("User not found");
+      throw new Error('User not found');
     }
     const comparisonResult =
       user.getUserInfo().username === this._user.getUserInfo().username &&
       user.getUserInfo().role === this._user.getUserInfo().role &&
       user.getUserInfo().id === this._user.getUserInfo().id;
+
     if (!comparisonResult) {
-      throw new Error("User Unmatched");
+      throw new Error('User Unmatched');
     }
   }
 
@@ -46,6 +47,8 @@ export default class UserManager {
   }
 
   public setCounter() {
-    this._userStorageInteractorAdapter.setCounterForOperator(this._user as Operator);
+    this._userStorageInteractorAdapter.setCounterForOperator(
+      this._user as Operator
+    );
   }
 }
