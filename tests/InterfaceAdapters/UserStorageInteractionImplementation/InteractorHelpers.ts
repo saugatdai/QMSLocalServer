@@ -1,15 +1,18 @@
-import * as path from "path";
-import * as fs from "fs";
-import * as util from "util";
+import * as path from 'path';
+import * as fs from 'fs';
+import * as util from 'util';
 
-import { UserData } from "../../../src/Entities/UserCore/User";
-import User from "../../../src/Entities/UserCore/User";
-import Operator from "../../../src/Entities/UserCore/Operator";
+import { UserData } from '../../../src/Entities/UserCore/User';
+import User from '../../../src/Entities/UserCore/User';
+import Operator from '../../../src/Entities/UserCore/Operator';
+import UserRoles from '../../../src/Entities/UserCore/UserRoles';
 
-export const readFile = (filename: string) => util.promisify(fs.readFile)(filename, "utf-8");
-export const writeFile = (filename: string, data: string) => util.promisify(fs.writeFile)(filename, data, "utf-8");
+export const readFile = (filename: string) =>
+  util.promisify(fs.readFile)(filename, 'utf-8');
+export const writeFile = (filename: string, data: string) =>
+  util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
-const testStoragePath = path.join(__dirname, "/users.json");
+const testStoragePath = path.join(__dirname, '/users.json');
 
 const getAllUserDatas = async (): Promise<UserData[]> => {
   const userDatasJson = await readFile(testStoragePath);
@@ -55,30 +58,36 @@ const readUser = async (userId: number): Promise<User> => {
 const updateUser = async (user: User): Promise<void> => {
   const initialUserDataGroup = await getAllUserDatas();
 
-  const finalUserDataGroup: UserData[] = initialUserDataGroup.map((loopUserData) => {
-    if (loopUserData.id === user.getUserInfo().id) {
-      loopUserData = user.getUserInfo();
+  const finalUserDataGroup: UserData[] = initialUserDataGroup.map(
+    (loopUserData) => {
+      if (loopUserData.id === user.getUserInfo().id) {
+        loopUserData = user.getUserInfo();
+      }
+      return loopUserData;
     }
-    return loopUserData;
-  }
   );
 
   await writeFile(testStoragePath, JSON.stringify(finalUserDataGroup));
 };
 
-const checkUserExistsWithUsername = async (username: string): Promise<boolean> => {
-  const users = await getAllUserDatas();
-  return users.some((user) => user.username === username);
+const checkUserExistsWithUsername = async (user: User | Operator): Promise<boolean> => {
+  const userDatas = await getAllUserDatas();
+  return userDatas.some(userData => {
+    return (
+      userData.username === user.getUserInfo().username &&
+      userData.id !== user.getUserInfo().id
+    );
+  });
 };
 
-const checkUserExistsWithId = async (userId: number) : Promise<boolean> => {
+const checkUserExistsWithId = async (userId: number): Promise<boolean> => {
   const users = await getAllUserDatas();
-  return users.some(user => user.id === userId);
-}
+  return users.some((user) => user.id === userId);
+};
 
 const setCounter = async (operator: Operator | User) => {
   let allUserDatas: UserData[] = await getAllUserDatas();
-  allUserDatas = allUserDatas.map(userData => {
+  allUserDatas = allUserDatas.map((userData) => {
     if (userData.id === operator.getUserInfo().id) {
       userData.counter = operator.getUserInfo().counter;
     }
@@ -89,8 +98,15 @@ const setCounter = async (operator: Operator | User) => {
 
 const isCounterOccupied = async (counter: string): Promise<boolean> => {
   const allUserDatas = await getAllUserDatas();
-  return allUserDatas.some(userData => userData.counter === counter);
-}
+  return counter && allUserDatas.some((userData) => {
+    return userData.counter && userData.counter === counter;
+  });
+};
+
+const getUsersByRole = async (role: UserRoles) => {
+  const allUsers = await getUsers();
+  return allUsers.filter((user) => user.getUserInfo().role === role);
+};
 
 export {
   getAllUserDatas,
@@ -102,5 +118,6 @@ export {
   checkUserExistsWithUsername,
   setCounter,
   isCounterOccupied,
-  checkUserExistsWithId
+  checkUserExistsWithId,
+  getUsersByRole,
 };
