@@ -97,18 +97,15 @@ describe('Testing of UserManagementComponent', () => {
   });
 
   it('should validate the user successfully', async () => {
-    //   TODO validate test case resolving remaining
     const resultPromise = await userManager.validateInfo();
-    console.log(resultPromise);
+    expect(resultPromise).toBeUndefined();
   });
 
-  it('Should throw user does not exist error', () => {
-    //   TODO validate test case resolving remaining
-
+  it('Should throw user does not exist error', async () => {
     userManager.user = user2;
-    expect(() => {
-      userManager.validateInfo();
-    }).toThrow('User Unmatched');
+    await expect(async () => {
+      await userManager.validateInfo();
+    }).rejects.toThrow(Error);
   });
 
   it('Should set counter of user', () => {

@@ -3,29 +3,32 @@ import UserStorageInteractorAdapter from "../UseCases/UserManagementComponent/Us
 import Operator from "../Entities/UserCore/Operator";
 
 export interface UserStorageAdapter {
-  createUser: (user: User) => void;
+  createUser: (user: User) => Promise<void>;
   readUser: (userId: number) => Promise<User>;
   updateUser: (user: User) => void;
   deleteUser: (userId: number) => void;
   getUsers: () => Promise<User[] | Operator[]>;
-  checkUserExistsWithUsername: (userame: string) => boolean;
-  setCounter: (opearator: Operator) => void;
-  isCounterOccupied: (counterNumber: string) => boolean;
+  checkUserExistsWithUsername: (userame: string) => Promise<boolean>;
+  setCounter: (opearator: Operator) => Promise<void>;
+  isCounterOccupied: (counterNumber: string) => Promise<boolean>;
+  checkUserExistsWithId: (userId: number) => Promise<boolean>;
 }
 
 export default class UserStorageInteractorImplementation
   implements UserStorageInteractorAdapter {
-  constructor(private userStorage: UserStorageAdapter) {}
+  constructor(private userStorage: UserStorageAdapter) { }
 
   public async addUser(user: User | Operator) {
     if (
-      this.userStorage.checkUserExistsWithUsername(user.getUserInfo().username)
+      await this.userStorage.checkUserExistsWithUsername(user.getUserInfo().username) ||
+      await this.userStorage.checkUserExistsWithId(user.getUserInfo().id)
     ) {
       throw new Error(
-        `User with username : ${user.getUserInfo().username} already exists`
+        `User with username : ${user.getUserInfo().username} already exists
+        or User with id: ${user.getUserInfo().id} already exists`
       );
     }
-    this.userStorage.createUser(user);
+    await this.userStorage.createUser(user);
   }
 
   public async getUserById(userId: number) {
@@ -38,8 +41,7 @@ export default class UserStorageInteractorImplementation
       this.userStorage.checkUserExistsWithUsername(user.getUserInfo().username)
     ) {
       throw new Error(
-        `User with the given username : ${
-          user.getUserInfo().username
+        `User with the given username : ${user.getUserInfo().username
         } already exists`
       );
     }

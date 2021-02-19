@@ -8,7 +8,7 @@ import PluginInfo from '../PluginInfo';
 
 export interface DirectoryPluginInfoValidatorInterface {
   getValidPluginInfoDirectories: () => string[];
-  getValidPluginInfoForADirectory: (string) => PluginInfo;
+  getValidPluginInfoForADirectory: (directory: string) => PluginInfo;
 }
 
 export default class PluginFinder implements PluginFinderInterface {

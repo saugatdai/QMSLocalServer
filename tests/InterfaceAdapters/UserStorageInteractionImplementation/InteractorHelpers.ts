@@ -2,16 +2,12 @@ import * as path from "path";
 import * as fs from "fs";
 import * as util from "util";
 
-import UserStorageInteractorImplementation from "../../../src/InterfaceAdapters/UserStorageInteractorImplementation";
-import { UserStorageAdapter } from "../../../src/InterfaceAdapters/UserStorageInteractorImplementation";
 import { UserData } from "../../../src/Entities/UserCore/User";
 import User from "../../../src/Entities/UserCore/User";
-import UserRoles from "../../../src/Entities/UserCore/UserRoles";
+import Operator from "../../../src/Entities/UserCore/Operator";
 
-const readFile = (filename: string) =>
-  util.promisify(fs.readFile)(filename, "utf-8");
-const writeFile = (filename: string, data: string) =>
-  util.promisify(fs.writeFile)(filename, data, "utf-8");
+export const readFile = (filename: string) => util.promisify(fs.readFile)(filename, "utf-8");
+export const writeFile = (filename: string, data: string) => util.promisify(fs.writeFile)(filename, data, "utf-8");
 
 const testStoragePath = path.join(__dirname, "/users.json");
 
@@ -59,17 +55,52 @@ const readUser = async (userId: number): Promise<User> => {
 const updateUser = async (user: User): Promise<void> => {
   const initialUserDataGroup = await getAllUserDatas();
 
-  const finalUserDataGroup: UserData[] = initialUserDataGroup.map(
-    (loopUserData) => {
-      if (loopUserData.id === user.getUserInfo().id) {
-        loopUserData = user.getUserInfo();
-      }
-
-      return loopUserData;
+  const finalUserDataGroup: UserData[] = initialUserDataGroup.map((loopUserData) => {
+    if (loopUserData.id === user.getUserInfo().id) {
+      loopUserData = user.getUserInfo();
     }
+    return loopUserData;
+  }
   );
 
   await writeFile(testStoragePath, JSON.stringify(finalUserDataGroup));
 };
 
-export { getAllUserDatas, createUser, getUsers, deleteUser, readUser, updateUser };
+const checkUserExistsWithUsername = async (username: string): Promise<boolean> => {
+  const users = await getAllUserDatas();
+  return users.some((user) => user.username === username);
+};
+
+const checkUserExistsWithId = async (userId: number) : Promise<boolean> => {
+  const users = await getAllUserDatas();
+  return users.some(user => user.id === userId);
+}
+
+const setCounter = async (operator: Operator | User) => {
+  let allUserDatas: UserData[] = await getAllUserDatas();
+  allUserDatas = allUserDatas.map(userData => {
+    if (userData.id === operator.getUserInfo().id) {
+      userData.counter = operator.getUserInfo().counter;
+    }
+    return userData;
+  });
+  await writeFile(testStoragePath, JSON.stringify(allUserDatas));
+};
+
+const isCounterOccupied = async (counter: string): Promise<boolean> => {
+  const allUserDatas = await getAllUserDatas();
+  return allUserDatas.some(userData => userData.counter === counter);
+}
+
+export {
+  getAllUserDatas,
+  createUser,
+  getUsers,
+  deleteUser,
+  readUser,
+  updateUser,
+  checkUserExistsWithUsername,
+  setCounter,
+  isCounterOccupied,
+  checkUserExistsWithId
+};

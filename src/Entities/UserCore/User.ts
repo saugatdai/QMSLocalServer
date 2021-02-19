@@ -5,6 +5,7 @@ export interface UserData {
   username: string;
   role: UserRoles;
   password: string;
+  counter?: string
 }
 
 export default class User {
