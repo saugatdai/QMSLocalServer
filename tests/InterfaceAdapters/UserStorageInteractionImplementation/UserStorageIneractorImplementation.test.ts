@@ -5,6 +5,7 @@ import { UserStorageAdapter } from '../../../src/InterfaceAdapters/UserStorageIn
 import { UserData } from '../../../src/Entities/UserCore/User';
 import User from '../../../src/Entities/UserCore/User';
 import UserRoles from '../../../src/Entities/UserCore/UserRoles';
+import UserFactory from '../../../src/Entities/UserCore/UserFactory';
 
 import {
   getAllUserDatas,
@@ -100,7 +101,7 @@ describe('Testing of UserStorageInteractorImplementation', () => {
         role: UserRoles.OPERATOR,
         password: 'holusmolus',
       };
-      const user = new User(userData);
+      const user = new UserFactory().getUser(userData);
 
       await createUser(user);
       const newUserGroup = await getAllUserDatas();
@@ -152,7 +153,7 @@ describe('Testing of UserStorageInteractorImplementation', () => {
       role: UserRoles.ADMIN,
       password: "holusmolus"
     }
-    const user = new User(userData);
+    const user = new UserFactory().getUser(userData);
     const checkResult = await checkUserExistsWithUsername(user);
     expect(checkResult).toBeTruthy();
   });
@@ -199,7 +200,7 @@ describe('Testing of UserStorageInteractorImplementation', () => {
         password: 'holus',
         role: UserRoles.ADMIN,
       };
-      const user = new User(userData);
+      const user = new UserFactory().getUser(userData);
       await userStorageInteractorImplementation.addUserIfIdUsernameCounterAvailable(user);
       const addedUser = await readUser(14);
       expect(addedUser).toEqual(user);
@@ -241,7 +242,7 @@ describe('Testing of UserStorageInteractorImplementation', () => {
         password: 'Nepal',
         role: UserRoles.ADMIN,
       };
-      const user = new User(userData);
+      const user = new UserFactory().getUser(userData);
       await expect(async () => {
         await userStorageInteractorImplementation.addUserIfIdUsernameCounterAvailable(user);
       }).rejects.toThrow();
@@ -254,7 +255,7 @@ describe('Testing of UserStorageInteractorImplementation', () => {
         password: 'Nepal',
         role: UserRoles.ADMIN,
       };
-      const user = new User(userData);
+      const user = new UserFactory().getUser(userData);
       await expect(async () => {
         await userStorageInteractorImplementation.addUserIfIdUsernameCounterAvailable(user);
       }).rejects.toThrow();

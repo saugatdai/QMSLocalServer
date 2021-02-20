@@ -1,8 +1,8 @@
 import User from '../../src/Entities/UserCore/User';
 import UserManager from '../../src/UseCases/UserManagementComponent/UserManager';
 import UserRoles from '../../src/Entities/UserCore/UserRoles';
-import UserStorageInteractorAdapter from '../../src/UseCases/UserManagementComponent/UserStorageInteractorAdapter';
 import * as util from 'util';
+import UserFactory from '../../src/Entities/UserCore/UserFactory';
 
 describe('Testing of UserManagementComponent', () => {
   const userData = {
@@ -19,8 +19,8 @@ describe('Testing of UserManagementComponent', () => {
     password: 'dabrakaabra',
   };
 
-  const user = new User(userData);
-  const user2 = new User(userData2);
+  const user = new UserFactory().getUser(userData);
+  const user2 = new UserFactory().getUser(userData2);
 
   const userManager = new UserManager(user);
 
@@ -52,8 +52,7 @@ describe('Testing of UserManagementComponent', () => {
   );
 
   const getAllUsersFunction = async (): Promise<User[]> => {
-    const users = await getAllUsersMockFunction();
-    return users;
+    return getAllUsersMockFunction();
   };
 
   const setCounterForOperatorMockFunction = jest.fn();
@@ -61,16 +60,14 @@ describe('Testing of UserManagementComponent', () => {
     setCounterForOperatorMockFunction();
   };
 
-  const userStorageInterface: UserStorageInteractorAdapter = {
-    addUser: addUserFunction,
+  userManager.userStorageInteractorAdapter = {
+    addUserIfIdUsernameCounterAvailable: addUserFunction,
     getUserById: getUserByIdFunction,
-    updateUser: updateUserFunction,
+    updateUserIfUsernameAndCounterAvailable: updateUserFunction,
     deleteUserById: deleteUserByIdFunction,
     getAllUsers: getAllUsersFunction,
     setCounterForOperator: setCounterForOperator,
   };
-
-  userManager.userStorageInteractorAdapter = userStorageInterface;
 
   it('should add user to storage', () => {
     userManager.store();

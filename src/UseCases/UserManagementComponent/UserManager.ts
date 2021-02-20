@@ -15,12 +15,12 @@ export default class UserManager {
   ) {
     this._userStorageInteractorAdapter = userStorageInteractorAdapter;
   }
-  public store() {
-    this._userStorageInteractorAdapter.addUser(this._user);
+  public async store() {
+    this._userStorageInteractorAdapter.addUserIfIdUsernameCounterAvailable(this._user);
   }
 
-  public update() {
-    this._userStorageInteractorAdapter.updateUser(this._user);
+  public async update() {
+    this._userStorageInteractorAdapter.updateUserIfUsernameAndCounterAvailable(this._user);
   }
 
   public async validateInfo() {

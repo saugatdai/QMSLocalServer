@@ -6,6 +6,7 @@ import { UserData } from '../../../src/Entities/UserCore/User';
 import User from '../../../src/Entities/UserCore/User';
 import Operator from '../../../src/Entities/UserCore/Operator';
 import UserRoles from '../../../src/Entities/UserCore/UserRoles';
+import UserFactory from '../../../src/Entities/UserCore/UserFactory';
 
 export const readFile = (filename: string) =>
   util.promisify(fs.readFile)(filename, 'utf-8');
@@ -31,7 +32,7 @@ const getUsers = async (): Promise<User[]> => {
   const allUserDatas = await getAllUserDatas();
 
   users = allUserDatas.map((userData) => {
-    return new User(userData);
+    return new UserFactory().getUser(userData);
   });
 
   return users;
