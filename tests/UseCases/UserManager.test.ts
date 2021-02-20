@@ -25,7 +25,7 @@ describe('Testing of UserManagementComponent', () => {
   const userManager = new UserManager(user);
 
   const addUserMockFunction = jest.fn();
-  const addUserFunction = (user: User) => {
+  const addUserFunction = async (user: User) => {
     addUserMockFunction();
   };
 
@@ -34,12 +34,12 @@ describe('Testing of UserManagementComponent', () => {
   };
 
   const updateUserMockFunction = jest.fn();
-  const updateUserFunction = (user: User) => {
+  const updateUserFunction = async (user: User) => {
     updateUserMockFunction();
   };
 
   const deleteUserByIdMockFunction = jest.fn();
-  const deleteUserByIdFunction = (id: number) => {
+  const deleteUserByIdFunction = async (id: number) => {
     deleteUserByIdMockFunction();
   };
 
@@ -56,9 +56,14 @@ describe('Testing of UserManagementComponent', () => {
   };
 
   const setCounterForOperatorMockFunction = jest.fn();
-  const setCounterForOperator = (user: User) => {
+  const setCounterForOperator = async (user: User) => {
     setCounterForOperatorMockFunction();
   };
+
+  const createANewUserMockFunction = jest.fn();
+  const createANewUserFunction = async () => {
+    createANewUserMockFunction();
+  }
 
   userManager.userStorageInteractorAdapter = {
     addUserIfIdUsernameCounterAvailable: addUserFunction,
@@ -67,11 +72,12 @@ describe('Testing of UserManagementComponent', () => {
     deleteUserById: deleteUserByIdFunction,
     getAllUsers: getAllUsersFunction,
     setCounterForOperator: setCounterForOperator,
+    createANewUser: createANewUserFunction
   };
 
   it('should add user to storage', () => {
     userManager.store();
-    expect(addUserMockFunction.mock.calls.length).toBe(1);
+    expect(createANewUserMockFunction.mock.calls.length).toBe(1);
   });
 
   it('should update the user', () => {

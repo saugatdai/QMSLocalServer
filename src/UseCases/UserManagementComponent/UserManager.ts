@@ -4,7 +4,7 @@ import Operator from "../../Entities/UserCore/Operator";
 
 export default class UserManager {
   private _userStorageInteractorAdapter: UserStorageInteractorAdapter;
-  constructor(private _user: User) {}
+  constructor(private _user: User) { }
 
   public set user(user: User) {
     this._user = user;
@@ -16,11 +16,11 @@ export default class UserManager {
     this._userStorageInteractorAdapter = userStorageInteractorAdapter;
   }
   public async store() {
-    this._userStorageInteractorAdapter.addUserIfIdUsernameCounterAvailable(this._user);
+    await this._userStorageInteractorAdapter.createANewUser(this._user.getUserInfo());
   }
 
   public async update() {
-    this._userStorageInteractorAdapter.updateUserIfUsernameAndCounterAvailable(this._user);
+    await this._userStorageInteractorAdapter.updateUserIfUsernameAndCounterAvailable(this._user);
   }
 
   public async validateInfo() {
@@ -41,14 +41,14 @@ export default class UserManager {
       });
   }
 
-  public delete() {
-    this._userStorageInteractorAdapter.deleteUserById(
+  public async delete() {
+    await this._userStorageInteractorAdapter.deleteUserById(
       this._user.getUserInfo().id
     );
   }
 
-  public setCounter() {
-    this._userStorageInteractorAdapter.setCounterForOperator(
+  public async setCounter() {
+    await this._userStorageInteractorAdapter.setCounterForOperator(
       this._user as Operator
     );
   }
