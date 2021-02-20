@@ -20,6 +20,7 @@ import {
   writeFile,
   checkUserExistsWithId,
   getUsersByRole,
+  getNextAvailableId
 } from './InteractorHelpers';
 import Operator from '../../../src/Entities/UserCore/Operator';
 
@@ -69,6 +70,8 @@ const userStorageAdapter: UserStorageAdapter = {
   isCounterOccupied,
   checkUserExistsWithId,
   getUsersByRole,
+  getAllUserDatas,
+  getNextAvailableId
 };
 
 const firstUserData: UserData = {
@@ -94,6 +97,11 @@ describe('Testing of UserStorageInteractorImplementation', () => {
   });
 
   describe('Testing of UserStorageAdapter', () => {
+    it('Should get the next available id', async () => {
+      const nextAvailableId = await getNextAvailableId();
+      expect(nextAvailableId).toBe(6);
+    });
+
     it('Should Create a User', async () => {
       const userData: UserData = {
         id: 6,
@@ -343,13 +351,26 @@ describe('Testing of UserStorageInteractorImplementation', () => {
       await expect(async () => await userStorageInteractorImplementation.setCounterForOperator(user)).rejects.toThrow();
     });
 
-    it('Should get users by role Admin', async () => {
+    it('Should get users by different roles', async () => {
       const adminUsers = await userStorageInteractorImplementation.getUsersByRole(UserRoles.ADMIN);
       expect(adminUsers.length).toBe(1);
       const operatorUsers = await userStorageInteractorImplementation.getUsersByRole(UserRoles.OPERATOR);
       expect(operatorUsers.length).toBe(3);
       const registratorUsrs = await userStorageInteractorImplementation.getUsersByRole(UserRoles.REGISTRATOR);
       expect(registratorUsrs.length).toBe(2);
+    });
+
+    it('Should careate a new user with a vaild userId', async () => {
+      const newUserData: UserData = {
+        role: UserRoles.OPERATOR,
+        username: "holusmolus",
+        password: "holusmolus",
+        id: null
+      }
+
+      await userStorageInteractorImplementation.createANewUser(newUserData);
+      const allUsers = await getUsers();
+      expect(allUsers[allUsers.length - 1].getUserInfo().id).toBe(17);
     });
 
   });

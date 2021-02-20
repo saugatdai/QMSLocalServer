@@ -2,6 +2,7 @@ import User, { UserData } from '../Entities/UserCore/User';
 import UserStorageInteractorAdapter from '../UseCases/UserManagementComponent/UserStorageInteractorAdapter';
 import Operator from '../Entities/UserCore/Operator';
 import UserRoles from '../Entities/UserCore/UserRoles';
+import UserFactory from '../Entities/UserCore/UserFactory';
 
 export interface UserStorageAdapter {
   createUser: (user: User) => Promise<void>;
@@ -14,6 +15,8 @@ export interface UserStorageAdapter {
   isCounterOccupied: (counterNumber: string) => Promise<boolean>;
   checkUserExistsWithId: (userId: number) => Promise<boolean>;
   getUsersByRole: (role: UserRoles) => Promise<User[] | Operator[]>;
+  getAllUserDatas: () => Promise<UserData[]>;
+  getNextAvailableId: () => Promise<number>;
 }
 
 export default class UserStorageInteractorImplementation
@@ -78,5 +81,12 @@ export default class UserStorageInteractorImplementation
   public async getUsersByRole(role: UserRoles) {
     const users = await this.userStorage.getUsersByRole(role);
     return users;
+  }
+
+  public async createANewUser(userData: UserData) {
+    const nextAvailableId = await this.userStorage.getNextAvailableId();
+    userData.id = nextAvailableId;
+    const user = new UserFactory().getUser(userData);
+    await this.addUserIfIdUsernameCounterAvailable(user);
   }
 }

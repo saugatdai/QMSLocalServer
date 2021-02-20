@@ -109,6 +109,19 @@ const getUsersByRole = async (role: UserRoles) => {
   return allUsers.filter((user) => user.getUserInfo().role === role);
 };
 
+const getNextAvailableId = async () => {
+  let highestIdNumber = 0;
+
+  const allUserDatas = await getAllUserDatas();
+  allUserDatas.forEach(userData => {
+    if (highestIdNumber < userData.id) {
+      highestIdNumber = userData.id;
+    }
+  });
+
+  return highestIdNumber + 1;
+}
+
 export {
   getAllUserDatas,
   createUser,
@@ -121,4 +134,5 @@ export {
   isCounterOccupied,
   checkUserExistsWithId,
   getUsersByRole,
+  getNextAvailableId
 };
