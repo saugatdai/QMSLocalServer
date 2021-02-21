@@ -15,7 +15,7 @@ export default class CustomerManager {
   }
 
   public async store() {
-    await this._customerStorageInteractorAdapter.addCustomer(this._customer);
+    await this._customerStorageInteractorAdapter.createNewCustomer(this._customer);
   }
 
   public async update() {

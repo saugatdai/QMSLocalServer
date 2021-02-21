@@ -45,31 +45,37 @@ describe('Testing of customer management compoenent', () => {
     deleteCustomerMockFunction();
   };
 
+  const createNewCustomerMockFunction = jest.fn();
+  const createNewCustomerFunction = async (customer: Customer) => {
+    await createNewCustomerMockFunction();
+  }
+
   const getAllCustomersFunction = async () => [customer1, customer2];
 
   const customerStorageInteractorAdapter: CustomerStorageInteractorAdapter = {
-    addCustomer: addCustomerMockFunction,
+    addCustomerIfHasValidId: addCustomerFunction,
     getCustomerById: getCustomerByIdFunction,
     updateCustomer: updateCustomerFunction,
     deleteCustomerById: deleteCustomerFunction,
     getAllCustomers: getAllCustomersFunction,
+    createNewCustomer: createNewCustomerFunction
   };
 
   const customerManager = new CustomerManager(customer1);
   customerManager.customerStorageInteractorAdapter = customerStorageInteractorAdapter;
 
-  it('Should add customer in storage', () => {
-    customerManager.store();
-    expect(addCustomerMockFunction.mock.calls.length).toEqual(1);
+  it('Should add customer in storage', async () => {
+    await customerManager.store();
+    expect(createNewCustomerMockFunction.mock.calls.length).toEqual(1);
   });
 
-  it('should update customer in storage', () => {
-    customerManager.update();
+  it('should update customer in storage', async() => {
+    await customerManager.update();
     expect(updateCustomerMockFunction.mock.calls.length).toBe(1);
   });
 
-  it('should delete customer in storage', () => {
-    customerManager.delete();
+  it('should delete customer in storage', async () => {
+    await customerManager.delete();
     expect(deleteCustomerMockFunction.mock.calls.length).toBe(1);
   });
 
