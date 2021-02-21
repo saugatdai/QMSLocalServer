@@ -14,16 +14,16 @@ export default class CustomerManager {
     this._customerStorageInteractorAdapter = customerStorageInteractorAdapter;
   }
 
-  public store(): void {
-    this._customerStorageInteractorAdapter.addCustomer(this._customer);
+  public async store() {
+    await this._customerStorageInteractorAdapter.addCustomer(this._customer);
   }
 
-  public update(): void {
-    this._customerStorageInteractorAdapter.updateCustomer(this._customer);
+  public async update() {
+    await this._customerStorageInteractorAdapter.updateCustomer(this._customer);
   }
 
-  public validateInfo(): void {
-    const obtainedCustomer = this._customerStorageInteractorAdapter.getCustomerById(
+  public async validateInfo() {
+    const obtainedCustomer = await this._customerStorageInteractorAdapter.getCustomerById(
       this._customer.customerId
     );
     
@@ -40,8 +40,8 @@ export default class CustomerManager {
     }
   }
 
-  public delete(): void {
-    this._customerStorageInteractorAdapter.deleteCustomerById(this._customer.customerId);
+  public async delete() {
+    await this._customerStorageInteractorAdapter.deleteCustomerById(this._customer.customerId);
   }
 
   public addCustomerInfo<T>(propertyName: string, value: T){

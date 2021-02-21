@@ -29,23 +29,23 @@ describe('Testing of customer management compoenent', () => {
   };
 
   const addCustomerMockFunction = jest.fn();
-  const addCustomerFunction = (customer: Customer) => {
+  const addCustomerFunction = async (customer: Customer) => {
     addCustomerMockFunction();
   };
 
-  const getCustomerByIdFunction = (id: number) => customer1;
+  const getCustomerByIdFunction = async (id: number) => customer1;
 
   const updateCustomerMockFunction = jest.fn();
-  const updateCustomerFunction = (customer: Customer) => {
+  const updateCustomerFunction = async (customer: Customer) => {
     updateCustomerMockFunction();
   };
 
   const deleteCustomerMockFunction = jest.fn();
-  const deleteCustomerFunction = (id: number) => {
+  const deleteCustomerFunction = async (id: number) => {
     deleteCustomerMockFunction();
   };
 
-  const getAllCustomersFunction = () => [customer1, customer2];
+  const getAllCustomersFunction = async () => [customer1, customer2];
 
   const customerStorageInteractorAdapter: CustomerStorageInteractorAdapter = {
     addCustomer: addCustomerMockFunction,
@@ -73,22 +73,22 @@ describe('Testing of customer management compoenent', () => {
     expect(deleteCustomerMockFunction.mock.calls.length).toBe(1);
   });
 
-  it('It should validate the given customer', () => {
-    expect(customerManager.validateInfo()).toBe(undefined);
+  it('It should validate the given customer', async () => {
+    expect(await customerManager.validateInfo()).toBe(undefined);
   });
 
-  it('Should throw Custmer data did not match exception', () => {
+  it('Should throw Custmer data did not match exception', async () => {
     customerManager.customer = customer2;
-    expect(() => {
-      customerManager.validateInfo();
-    }).toThrow('Custmer data did not match');
+    await expect(async () => {
+      await customerManager.validateInfo();
+    }).rejects.toThrow('Custmer data did not match');
   });
 
   it('Should throw customer not found exception', () => {
     customerStorageInteractorAdapter.getCustomerById = (id: number) => null;
-    expect(() => {
-      customerManager.validateInfo();
-    }).toThrow('Customer not found');
+    expect(async () => {
+      await customerManager.validateInfo();
+    }).rejects.toThrow('Customer not found');
   });
 
   it('Should add new property to customer', () => {
