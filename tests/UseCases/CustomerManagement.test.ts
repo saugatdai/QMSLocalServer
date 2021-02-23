@@ -14,6 +14,7 @@ describe('Testing of customer management compoenent', () => {
     customerId: 123,
     token: token1,
     remarks: '-',
+    customerName: "Saugat Sigdel"
   };
 
   const token2: Token = {
@@ -26,6 +27,7 @@ describe('Testing of customer management compoenent', () => {
     customerId: 124,
     token: token2,
     remarks: '-',
+    customerName: "Saugat Sigdel"
   };
 
   const addCustomerMockFunction = jest.fn();

@@ -11,17 +11,38 @@ export interface CustomerStorageAdapter {
   isIdAvailable: (id: number) => Promise<boolean>;
 }
 
-export default class CustomerStorageInteractorImplementation implements CustomerStorageAdapter{
-  constructor(private customerStorageAdapter: CustomerStorageAdapter){}
+export default class CustomerStorageInteractorImplementation implements CustomerStorageInteractorAdapter {
+  constructor(private customerStorageAdapter: CustomerStorageAdapter) { }
 
-  public async addCustomerIfHasValidId(customer: Customer){
-    if(! await this.customerStorageAdapter.isIdAvailable(customer.customerId)){
+  public async addCustomerIfHasValidId(customer: Customer) {
+    if (! await this.customerStorageAdapter.isIdAvailable(customer.customerId)) {
       throw new Error(`Customer id : ${customer.customerId} already in use`);
-    }else{
+    } else {
       this.customerStorageAdapter.createCustomer(customer);
     }
   }
 
-  
+  public async getCustomerById(customerId: number) {
+    const customer = await this.customerStorageAdapter.readCustomerById(customerId);
+    return customer;
+  }
 
+  public async updateCustomer(customer: Customer) {
+    await this.customerStorageAdapter.updateCustomer(customer);
+  }
+
+  public async deleteCustomerById(customerId: number) {
+    await this.customerStorageAdapter.deleteCustomerById(customerId);
+  }
+
+  public async getAllCustomers() {
+    const customers = await this.customerStorageAdapter.getCustomers();
+    return customers;
+  }
+
+  public async createNewCustomer(customer: Customer) {
+    const id = await this.customerStorageAdapter.getNextAvailableId();
+    customer.customerId = id;
+    await this.addCustomerIfHasValidId(customer);
+  }
 }
