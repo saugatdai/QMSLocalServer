@@ -1,12 +1,12 @@
 import Customer from '../../../src/Entities/CustomerCore/Customer';
-import CustomerStorageInteractorImplemenation from '../../../src/InterfaceAdapters/CustomerStorageInteractorImplementation';
+import CustomerStorageInteractorImplemenation, { CustomerStorageAdapter } from '../../../src/InterfaceAdapters/CustomerStorageInteractorImplementation';
 import Token from '../../../src/Entities/TokenCore/Token';
 
 import {
     readFile,
     writeFile,
     customerTestStoragePath,
-    getAllCustomers,
+    getCustomers,
     createCustomer,
     readCustomerById,
     updateCustomer,
@@ -14,6 +14,16 @@ import {
     getNextAvailableId,
     isIdAvailable
 } from './InteractorHelpers';
+
+const customerStorageAdapter: CustomerStorageAdapter = {
+    getCustomers,
+    createCustomer,
+    readCustomerById,
+    updateCustomer,
+    deleteCustomerById,
+    getNextAvailableId,
+    isIdAvailable
+};
 
 const token1: Token = {
     date: new Date(),
@@ -86,7 +96,7 @@ describe('Test of CustomerStorageInteractorImplementation Interface adapter ', (
 
     describe('First testing of the CustomerStorageInteractorAdapter', () => {
         it('Should get All Customers', async () => {
-            const allcustomers = await getAllCustomers();
+            const allcustomers = await customerStorageAdapter.getCustomers();
             expect(allcustomers.length).toEqual(5);
         });
         it('Should create a customer ', async () => {
@@ -102,43 +112,43 @@ describe('Test of CustomerStorageInteractorImplementation Interface adapter ', (
                 remarks: "Holus bahadur is here",
                 token: token6
             }
-            await createCustomer(customer);
-            const allCustomers = await getAllCustomers();
+            await customerStorageAdapter.createCustomer(customer);
+            const allCustomers = await customerStorageAdapter.getCustomers();
             expect(allCustomers.length).toBe(6);
         });
 
         it('Should read a customer by id', async () => {
-            const customer = await readCustomerById(5);
+            const customer = await customerStorageAdapter.readCustomerById(5);
             expect(customer.customerId).toBe(5);
         });
 
         it('should update a customer ', async () => {
-            const customer = await readCustomerById(5);
+            const customer = await customerStorageAdapter.readCustomerById(5);
             customer.customerName = "Durga Sharma";
-            await updateCustomer(customer);
-            const updatedCustoemr = await readCustomerById(5);
+            await customerStorageAdapter.updateCustomer(customer);
+            const updatedCustoemr = await customerStorageAdapter.readCustomerById(5);
             expect(updatedCustoemr.customerName).toBe("Durga Sharma");
         });
 
         it('should delete a customer', async () => {
             await deleteCustomerById(6);
-            const deletedCustomerInfo = await readCustomerById(6);
+            const deletedCustomerInfo = await customerStorageAdapter.readCustomerById(6);
             expect(deletedCustomerInfo).toBeFalsy();
         });
 
         it('Should get the next available id ', async () => {
-            const nextAvailableId = await getNextAvailableId();
+            const nextAvailableId = await customerStorageAdapter.getNextAvailableId();
             expect(nextAvailableId).toBe(6);
         });
 
-        it('Should prove that the id 6 is not avialable', async () => {
-            const availability = await isIdAvailable(6);
-            expect(availability).toBeFalsy(); 
+        it('Should prove that the id 6 is avialable', async () => {
+            const availability = await customerStorageAdapter.isIdAvailable(6);
+            expect(availability).toBeTruthy();
         });
 
-        it('Should prove that the id 4 is availble', async () => {
-            const availability = await isIdAvailable(4);
-            expect(availability).toBeTruthy();
+        it('Should prove that the id 4 is not availble', async () => {
+            const availability = await customerStorageAdapter.isIdAvailable(4);
+            expect(availability).toBeFalsy();
         });
     });
 });
