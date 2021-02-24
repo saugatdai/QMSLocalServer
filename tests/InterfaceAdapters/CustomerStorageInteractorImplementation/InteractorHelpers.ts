@@ -61,6 +61,7 @@ const isIdAvailable = async (id: number) => {
   return !allCustomers.some(customer => customer.customerId === id);
 }
 
+
 export {
   getCustomers,
   createCustomer,

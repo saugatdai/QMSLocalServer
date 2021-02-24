@@ -94,7 +94,7 @@ describe('Test of CustomerStorageInteractorImplementation Interface adapter ', (
         await writeFile(customerTestStoragePath, '');
     });
 
-    describe('First testing of the CustomerStorageInteractorAdapter', () => {
+    describe('First testing of the CustoemrStorageAdapter', () => {
         it('Should get All Customers', async () => {
             const allcustomers = await customerStorageAdapter.getCustomers();
             expect(allcustomers.length).toEqual(5);
@@ -126,8 +126,8 @@ describe('Test of CustomerStorageInteractorImplementation Interface adapter ', (
             const customer = await customerStorageAdapter.readCustomerById(5);
             customer.customerName = "Durga Sharma";
             await customerStorageAdapter.updateCustomer(customer);
-            const updatedCustoemr = await customerStorageAdapter.readCustomerById(5);
-            expect(updatedCustoemr.customerName).toBe("Durga Sharma");
+            const updatedCustomer = await customerStorageAdapter.readCustomerById(5);
+            expect(updatedCustomer.customerName).toBe("Durga Sharma");
         });
 
         it('should delete a customer', async () => {
@@ -151,4 +151,67 @@ describe('Test of CustomerStorageInteractorImplementation Interface adapter ', (
             expect(availability).toBeFalsy();
         });
     });
+    describe('Testing of CustoemrStorageInteractorImplementation', () => {
+        const customerStorageInteractorImplementaiton = new CustomerStorageInteractorImplemenation(customerStorageAdapter);
+        it('Should create a new customer', async () => {
+            const token: Token = {
+                date: new Date(),
+                tokenId: 40,
+                tokenNumber: 45,
+                tokenCategory: 'R'
+            }
+            const customer: Customer = {
+                customerId: null,
+                customerName: "Sarala Giri",
+                token: token,
+                remarks: 'nothing'
+            }
+
+            await customerStorageInteractorImplementaiton.createNewCustomer(customer);
+            const availableId = await getNextAvailableId();
+            customer.customerId = availableId - 1;
+            const newCustomer = await customerStorageInteractorImplementaiton.getCustomerById(customer.customerId);
+            expect(newCustomer.customerName).toEqual(customer.customerName);
+        });
+
+        it('Should throw an exception saying the id is already used', async () => {
+            const token: Token = {
+                date: new Date(),
+                tokenId: 40,
+                tokenNumber: 45,
+                tokenCategory: 'R'
+            }
+            const customer: Customer = {
+                customerId: 2,
+                customerName: "Sarala Giri",
+                token: token,
+                remarks: 'nothing'
+            }
+            await expect(async() => {await customerStorageInteractorImplementaiton.addCustomerIfHasValidId(customer)}).rejects.toThrow();
+        });
+
+        it('Should get a coustomer by Id', async () => {
+            const customer = await customerStorageInteractorImplementaiton.getCustomerById(2);
+            expect(customer.customerName).toBe("Sangit Sigdel");
+        });
+
+        it('Should update a customer', async () => {
+            const customer = await customerStorageInteractorImplementaiton.getCustomerById(2);
+            customer.customerName = "Sangit Prasad Sigdel";
+            await customerStorageInteractorImplementaiton.updateCustomer(customer);
+            const udpatedCustomer = await customerStorageInteractorImplementaiton.getCustomerById(2);
+            expect(udpatedCustomer.customerName).toBe(customer.customerName);
+        });
+
+        it('Should delete a customer', async() => {
+            await customerStorageInteractorImplementaiton.deleteCustomerById(2);
+            const customer = await customerStorageInteractorImplementaiton.getCustomerById(2);
+            expect(customer).toBeFalsy();
+        });
+
+        it('Should get all customers', async() => {
+            const allCustomers = await customerStorageInteractorImplementaiton.getAllCustomers();
+            expect(allCustomers.length).toBe(5);
+        });
+    });    
 });

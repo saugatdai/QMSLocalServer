@@ -17,6 +17,12 @@ export interface UserStorageAdapter {
   getUsersByRole: (role: UserRoles) => Promise<User[] | Operator[]>;
   getAllUserDatas: () => Promise<UserData[]>;
   getNextAvailableId: () => Promise<number>;
+  getUserByUsernameAndPassword: (credentials: Credentials) => Promise<User | false>;
+}
+
+export interface Credentials{
+  username: string;
+  password: string;
 }
 
 export default class UserStorageInteractorImplementation
@@ -88,5 +94,13 @@ export default class UserStorageInteractorImplementation
     userData.id = nextAvailableId;
     const user = new UserFactory().getUser(userData);
     await this.addUserIfIdUsernameCounterAvailable(user);
+  }
+
+  public async loginAndGetUser(credentials: Credentials){
+    const user = await this.userStorage.getUserByUsernameAndPassword(credentials);
+    if(!(user instanceof User)){
+      throw new Error("Login Failed");
+    }
+    return user;
   }
 }

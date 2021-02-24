@@ -18,7 +18,7 @@ export default class CustomerStorageInteractorImplementation implements Customer
     if (! await this.customerStorageAdapter.isIdAvailable(customer.customerId)) {
       throw new Error(`Customer id : ${customer.customerId} already in use`);
     } else {
-      this.customerStorageAdapter.createCustomer(customer);
+      await this.customerStorageAdapter.createCustomer(customer);
     }
   }
 

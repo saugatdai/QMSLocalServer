@@ -7,6 +7,7 @@ import User from '../../../src/Entities/UserCore/User';
 import Operator from '../../../src/Entities/UserCore/Operator';
 import UserRoles from '../../../src/Entities/UserCore/UserRoles';
 import UserFactory from '../../../src/Entities/UserCore/UserFactory';
+import {Credentials} from '../../../src/InterfaceAdapters/UserStorageInteractorImplementation';
 
 export const readFile = (filename: string) =>
   util.promisify(fs.readFile)(filename, 'utf-8');
@@ -118,8 +119,16 @@ const getNextAvailableId = async () => {
       highestIdNumber = userData.id;
     }
   });
-
   return highestIdNumber + 1;
+}
+
+const getUserByUsernameAndPassword = async (credentials: Credentials) => {
+  const allUserDatas = await getAllUserDatas();
+  const userData = allUserDatas.find(userData => userData.username === credentials.username && userData.password === credentials.password);
+  if(userData){
+    return new UserFactory().getUser(userData);
+  }
+  return false;
 }
 
 export {
@@ -134,5 +143,6 @@ export {
   isCounterOccupied,
   checkUserExistsWithId,
   getUsersByRole,
-  getNextAvailableId
+  getNextAvailableId,
+  getUserByUsernameAndPassword
 };

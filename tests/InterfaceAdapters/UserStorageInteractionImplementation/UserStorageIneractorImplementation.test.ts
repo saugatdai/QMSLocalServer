@@ -6,6 +6,7 @@ import { UserData } from '../../../src/Entities/UserCore/User';
 import User from '../../../src/Entities/UserCore/User';
 import UserRoles from '../../../src/Entities/UserCore/UserRoles';
 import UserFactory from '../../../src/Entities/UserCore/UserFactory';
+import { Credentials } from '../../../src/InterfaceAdapters/UserStorageInteractorImplementation';
 
 import {
   getAllUserDatas,
@@ -20,7 +21,8 @@ import {
   writeFile,
   checkUserExistsWithId,
   getUsersByRole,
-  getNextAvailableId
+  getNextAvailableId,
+  getUserByUsernameAndPassword
 } from './InteractorHelpers';
 import Operator from '../../../src/Entities/UserCore/Operator';
 
@@ -71,7 +73,8 @@ const userStorageAdapter: UserStorageAdapter = {
   checkUserExistsWithId,
   getUsersByRole,
   getAllUserDatas,
-  getNextAvailableId
+  getNextAvailableId,
+  getUserByUsernameAndPassword
 };
 
 const firstUserData: UserData = {
@@ -194,6 +197,26 @@ describe('Testing of UserStorageInteractorImplementation', () => {
     registrators.forEach((registrator) => {
       expect(registrator.getUserInfo().role).toBe(UserRoles.REGISTRATOR);
     });
+  });
+
+  it('Should get a user by username and password ', async () => {
+    const credentials: Credentials = {
+      username: "saugatdai",
+      password: "123"
+    }
+    const user = await getUserByUsernameAndPassword(credentials);
+    if (user instanceof User) {
+      expect(user.getUserInfo()).toEqual(firstUserData);
+    }
+  });
+
+  it('Should get falsy value because of unmatching username and password', async () => {
+    const credentials: Credentials = {
+      username: "saugatdai",
+      password: "saugat123"
+    }
+    const user = await getUserByUsernameAndPassword(credentials);
+    expect(user).toBeFalsy();
   });
 
   describe('Testing of UserStorageInteractorImplementation', () => {
@@ -373,5 +396,25 @@ describe('Testing of UserStorageInteractorImplementation', () => {
       expect(allUsers[allUsers.length - 1].getUserInfo().id).toBe(17);
     });
 
+    it('Should login and return user', async () => {
+      const credentials: Credentials = {
+        username: "holusmolus",
+        password: "holusmolus"
+      }
+      const user = await userStorageInteractorImplementation.loginAndGetUser(credentials);
+      if (user instanceof User) {
+        expect(user.getUserInfo().username).toEqual(credentials.username);
+      }
+    });
+
+    it('Should throw an error saying invalid login info: ', async () => {
+      const credentials: Credentials = {
+        username: "holusmolus",
+        password: "holusolus"
+      }
+      await expect(async () => { await userStorageInteractorImplementation.loginAndGetUser(credentials) }).rejects.toThrow();
+    });
+
   });
+
 });
