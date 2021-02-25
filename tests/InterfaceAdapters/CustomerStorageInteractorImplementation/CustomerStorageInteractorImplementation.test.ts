@@ -3,7 +3,6 @@ import CustomerStorageInteractorImplemenation, { CustomerStorageAdapter } from '
 import Token from '../../../src/Entities/TokenCore/Token';
 
 import {
-    readFile,
     writeFile,
     customerTestStoragePath,
     getCustomers,
