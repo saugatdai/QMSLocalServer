@@ -22,11 +22,22 @@ describe('Testing of token count management component', () => {
         clearAllTokenStatusDataMockFunction();
     }
 
+    const getCurrentCustomerTokeNumberFunction = async () => {
+        return 5;
+    }
+
+    const setCurrentCustomerTokenNumberMockFunction = jest.fn();
+    const setCurrentCustomerTokenNumberFunction = async (tokenNumber: number) => {
+        setCurrentCustomerTokenNumberMockFunction();
+    }
+
     const tokenCountStorageInteractorAdapter: TokenCountStorageInteractorAdapter = {
         updateCurrentTokenCount: updateTokenCurrentCountFunction,
         getCurrentTokenCount: getCurrentTokenCountFunction,
         clearCurrentTokenCount: clearCurrentTokenCountFunction,
-        clearAllTokenStatusData: clearAllTokenStatusDataFunction
+        clearAllTokenStatusData: clearAllTokenStatusDataFunction,
+        getCurrentCustomerTokenNumber: getCurrentCustomerTokeNumberFunction,
+        setCurrentCustomerTokenNumber: setCurrentCustomerTokenNumberFunction
     }
 
     const tokenCountManager = new TokenCountManager(tokenCountStorageInteractorAdapter);
@@ -50,4 +61,14 @@ describe('Testing of token count management component', () => {
         await tokenCountManager.clearTokenData();
         expect(clearAllTokenStatusDataMockFunction.mock.calls.length).toBe(1);
     });
+
+    it('Should get current customer token number : ', async() => {
+        const tokenNumber = await getCurrentCustomerTokeNumberFunction();
+        expect(tokenNumber).toBe(5)
+    });
+
+    it('Should set current customer token number : ', async() => {
+        await setCurrentCustomerTokenNumberFunction(5);
+        expect(setCurrentCustomerTokenNumberMockFunction.mock.calls.length).toBe(1);
+    })
 });

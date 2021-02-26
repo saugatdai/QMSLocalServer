@@ -5,6 +5,6 @@ export default interface TokenCountStorageInteractorAdapter{
     getCurrentTokenCount: () => Promise<number>;
     clearCurrentTokenCount: () => Promise<void>;
     clearAllTokenStatusData: () => Promise<void>;
-    getCurrentCustomerToken: () => Promise<Token>;
-    setCurrentCustomerToken: (newCurrenttoken: Token) => Promise<void>;
+    getCurrentCustomerTokenNumber: () => Promise<number>;
+    setCurrentCustomerTokenNumber: (currentTokenNumber: number) => Promise<void>;
 }
