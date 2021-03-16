@@ -77,18 +77,21 @@ const token1: Token = {
   date: new Date(),
   tokenId: 1,
   tokenNumber: 1,
+  tokenCategory: 'A'
 }
 
 const token2: Token = {
   date: new Date(),
   tokenId: 2,
   tokenNumber: 2,
+  tokenCategory: 'A'
 }
 
 const token3: Token = {
   date: new Date(),
   tokenId: 3,
   tokenNumber: 3,
+  tokenCategory: 'C'
 }
 
 token2.date.setDate(12);

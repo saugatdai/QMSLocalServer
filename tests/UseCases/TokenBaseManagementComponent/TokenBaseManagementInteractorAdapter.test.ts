@@ -5,7 +5,7 @@ import TokenBaseStorageInteractorAdapter from '../../../src/UseCases/TokenBaseMa
 let allTokenBases = [tokenBaseObject1, tokenBaseObject2, tokenBaseObject3];
 
 const writeATokenBaseMockFunction = jest.fn();
-const writeATokenBaseFunction = async () => {
+const writeATokenBaseFunction = async (tokenBase: TokenBaseObject) => {
   writeATokenBaseMockFunction();
 }
 
@@ -53,31 +53,51 @@ const modifyATokenBase = async (tokenBase: TokenBaseObject) => {
   });
 }
 
-const getTodaysTokenBaseByNumber = async (tokenNumber: number) => {
-  const todaysTokenBase = allTokenBases.find(tokenBase => {
-    return tokenBase.token.date.getDate() === new Date().getDate() &&
-      tokenBase.token.tokenNumber === tokenNumber;
-  });
+const getTodaysTokenBaseByTokenNumber = async (tokenNumber: number, category?: string) => {
+  let todaysTokenBase: TokenBaseObject;
+  if (category) {
+    todaysTokenBase = allTokenBases.find(tokenBase => {
+      return tokenBase.token.date.getDate() === new Date().getDate() &&
+        tokenBase.token.tokenNumber === tokenNumber && tokenBase.token.tokenCategory === category;
+    });
+  } else {
+    todaysTokenBase = allTokenBases.find(tokenBase => {
+      return tokenBase.token.date.getDate() === new Date().getDate() &&
+        tokenBase.token.tokenNumber === tokenNumber;
+    });
+  }
   return todaysTokenBase;
 }
 
-const getNextAvailableTokenNumber = async () => {
+const getNextAvailableTokenNumberInACategory = async (tokenCateogry: String) => {
   let highestNumber = 0;
   allTokenBases.forEach(tokenBase => {
-    highestNumber = tokenBase.token.tokenNumber > highestNumber ? tokenBase.token.tokenNumber : highestNumber;
+    if (tokenBase.token.tokenCategory === tokenCateogry) {
+      highestNumber = tokenBase.token.tokenNumber > highestNumber ? tokenBase.token.tokenNumber : highestNumber;
+    }
   });
   return highestNumber + 1;
+}
+
+const getTokenBasesByTokenCategory = (tokenBases: TokenBaseObject[], tokenCategory: string) => {
+  return tokenBases.filter(tokenBase => tokenBase.token.tokenCategory === tokenCategory);
+}
+
+const getTokenBaseByTokenId = async (tokenId: number) => {
+  return allTokenBases.find(tokenBase => tokenBase.token.tokenId === tokenId);
 }
 
 const tokenBaseStorageInteractorAdapter: TokenBaseStorageInteractorAdapter = {
   filterTokenBaseByStatus: filterTokenBaseByStatus,
   filterTokenByTokenDate: filterTokenBaseByTokenDate,
-  getNextAvailableTokenNumber: getNextAvailableTokenNumber,
-  getTodaysTokenBaseByNumber: getTodaysTokenBaseByNumber,
+  getNextAvailableTokenNumberInACategory: getNextAvailableTokenNumberInACategory,
+  getTodaysTokenBaseByTokenNumber: getTodaysTokenBaseByTokenNumber,
   modifyATokenBase: modifyATokenBase,
   readAllTokenBases: readAllTokenBases,
   resetTokenBase: resetTokenBaseFunction,
-  writeATokenBase: writeATokenBaseFunction
+  writeATokenBase: writeATokenBaseFunction,
+  getTokenBasesByTokenCategory: getTokenBasesByTokenCategory,
+  getTokenBaseByTokenId: getTokenBaseByTokenId
 }
 
 
@@ -101,6 +121,50 @@ describe('testing of TokenBaseManagementInteractorAdapter', () => {
 
     const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenByTokenDate(date.toLocaleDateString());
     expect(filteredTokenBases.length).toBe(1);
+  });
+
+  it('Should get next available token number', async () => {
+    const nextAvailableTokenNumberInCateogoryA = await tokenBaseStorageInteractorAdapter.getNextAvailableTokenNumberInACategory('A');
+    expect(nextAvailableTokenNumberInCateogoryA).toBe(3);
+  });
+
+  it('Should get Todays token base by token number', async () => {
+    const tokenBase = await tokenBaseStorageInteractorAdapter.getTodaysTokenBaseByTokenNumber(3);
+    expect(tokenBase.token.tokenNumber).toBe(3);
+  });
+
+  it('Should get Todays token base by token number and token category', async () => {
+    const tokenBase = await tokenBaseStorageInteractorAdapter.getTodaysTokenBaseByTokenNumber(1,'A');
+    expect(tokenBase.token.tokenCategory).toBe('A');
+    expect(tokenBase.token.tokenNumber).toBe(1);
+  });
+
+  it('Should modify an existing token base', async () => {
+    const tokenBaseToBeModified = allTokenBases[0];
+    tokenBaseToBeModified.currentStatus = TokenStatus.UNPROCESSED;
+    await tokenBaseStorageInteractorAdapter.modifyATokenBase(tokenBaseToBeModified);
+    expect(allTokenBases[0].currentStatus).toBe(TokenStatus.UNPROCESSED);
+  });
+
+  it('Should read all token bases', async () => {
+    const tokenBases = await tokenBaseStorageInteractorAdapter.readAllTokenBases();
+    expect(tokenBases.length).toBe(3);
+  });
+
+  it('Should write a token base', async () => {
+    const tokenBase = allTokenBases[2];
+    await tokenBaseStorageInteractorAdapter.writeATokenBase(tokenBase);
+    expect(writeATokenBaseMockFunction.mock.calls.length).toBe(1);
+  });
+
+  it('Should get token base by category', () => {
+    const tokenBasesOfCategoryA = tokenBaseStorageInteractorAdapter.getTokenBasesByTokenCategory(allTokenBases,'C');
+    expect(tokenBasesOfCategoryA.length).toBe(1);
+  });
+
+  it('Should get token by tokenId', async () => {
+    const tokenBase = await tokenBaseStorageInteractorAdapter.getTokenBaseByTokenId(1);
+    expect(tokenBase.token.tokenId).toBe(1);
   });
 
 });
