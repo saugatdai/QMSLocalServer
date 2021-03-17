@@ -2,14 +2,22 @@ import TokenBaseStorageInteractorAdapter from './TokenBaseStorageInteractorAdapt
 import { TokenBaseObject, TokenStatus } from './TokenBaseModule';
 
 export default class TokenBaseManager {
-    private tokenBase: TokenBaseObject;
+    private _tokenBase: TokenBaseObject;
     constructor(private tokenBaseStorageInteractorAdapter: TokenBaseStorageInteractorAdapter) { }
 
+    public set tokenBase(tokenBase: TokenBaseObject){
+        this._tokenBase = tokenBase;
+    }
+
+    public get tokenBase(){
+        return this._tokenBase;
+    }
+
     public async createATokenBase() {
-        await this.tokenBaseStorageInteractorAdapter.writeATokenBase(this.tokenBase);
+        await this.tokenBaseStorageInteractorAdapter.writeATokenBase(this._tokenBase);
     }
 
     public async updateTokenBase() {
-        await this.tokenBaseStorageInteractorAdapter.modifyATokenBase(this.tokenBase);
+        await this.tokenBaseStorageInteractorAdapter.modifyATokenBase(this._tokenBase);
     }
 }

@@ -1,6 +1,7 @@
 import { tokenBaseObject1, tokenBaseObject2, tokenBaseObject3 } from './tokenBaseExporter';
 import { TokenBaseObject, TokenStatus } from '../../../src/UseCases/TokenBaseManagementComponent/TokenBaseModule';
 import TokenBaseStorageInteractorAdapter from '../../../src/UseCases/TokenBaseManagementComponent/TokenBaseStorageInteractorAdapter';
+import TokenBaseManager from '../../../src/UseCases/TokenBaseManagementComponent/TokenBaseManager';
 
 let allTokenBases = [tokenBaseObject1, tokenBaseObject2, tokenBaseObject3];
 
@@ -101,70 +102,89 @@ const tokenBaseStorageInteractorAdapter: TokenBaseStorageInteractorAdapter = {
 }
 
 
-describe('testing of TokenBaseManagementInteractorAdapter', () => {
-  it('should filterTokenBaseByStatus', async () => {
-    const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenBaseByStatus(TokenStatus.CALLAGAIN);
-    expect(filteredTokenBases.length).toBe(1);
+describe('Testing of TokenBaseModule', () => {
+  describe('testing of TokenBaseManagementInteractorAdapter', () => {
+    it('should filterTokenBaseByStatus', async () => {
+      const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenBaseByStatus(TokenStatus.CALLAGAIN);
+      expect(filteredTokenBases.length).toBe(1);
+    });
+  
+    it('Should filter a token by status with date', async () => {
+      const date = new Date();
+      date.setDate(12);
+  
+      const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenBaseByStatus(TokenStatus.PROCESSED, date);
+      expect(filteredTokenBases.length).toBe(1);
+    })
+  
+    it('Should filter token by Token Date', async () => {
+      const date = new Date();
+      date.setDate(12);
+  
+      const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenByTokenDate(date.toLocaleDateString());
+      expect(filteredTokenBases.length).toBe(1);
+    });
+  
+    it('Should get next available token number', async () => {
+      const nextAvailableTokenNumberInCateogoryA = await tokenBaseStorageInteractorAdapter.getNextAvailableTokenNumberInACategory('A');
+      expect(nextAvailableTokenNumberInCateogoryA).toBe(3);
+    });
+  
+    it('Should get Todays token base by token number', async () => {
+      const tokenBase = await tokenBaseStorageInteractorAdapter.getTodaysTokenBaseByTokenNumber(3);
+      expect(tokenBase.token.tokenNumber).toBe(3);
+    });
+  
+    it('Should get Todays token base by token number and token category', async () => {
+      const tokenBase = await tokenBaseStorageInteractorAdapter.getTodaysTokenBaseByTokenNumber(1,'A');
+      expect(tokenBase.token.tokenCategory).toBe('A');
+      expect(tokenBase.token.tokenNumber).toBe(1);
+    });
+  
+    it('Should modify an existing token base', async () => {
+      const tokenBaseToBeModified = allTokenBases[0];
+      tokenBaseToBeModified.currentStatus = TokenStatus.UNPROCESSED;
+      await tokenBaseStorageInteractorAdapter.modifyATokenBase(tokenBaseToBeModified);
+      expect(allTokenBases[0].currentStatus).toBe(TokenStatus.UNPROCESSED);
+    });
+  
+    it('Should read all token bases', async () => {
+      const tokenBases = await tokenBaseStorageInteractorAdapter.readAllTokenBases();
+      expect(tokenBases.length).toBe(3);
+    });
+  
+    it('Should write a token base', async () => {
+      const tokenBase = allTokenBases[2];
+      await tokenBaseStorageInteractorAdapter.writeATokenBase(tokenBase);
+      expect(writeATokenBaseMockFunction.mock.calls.length).toBe(1);
+    });
+  
+    it('Should get token base by category', () => {
+      const tokenBasesOfCategoryA = tokenBaseStorageInteractorAdapter.getTokenBasesByTokenCategory(allTokenBases,'C');
+      expect(tokenBasesOfCategoryA.length).toBe(1);
+    });
+  
+    it('Should get token by tokenId', async () => {
+      const tokenBase = await tokenBaseStorageInteractorAdapter.getTokenBaseByTokenId(1);
+      expect(tokenBase.token.tokenId).toBe(1);
+    });
+  
   });
 
-  it('Should filter a token by status with date', async () => {
-    const date = new Date();
-    date.setDate(12);
+  describe('Testing of TokenBaseManager', () => {
+    const tokenBase = allTokenBases[0];
+    const tokenBaseManager = new TokenBaseManager(tokenBaseStorageInteractorAdapter);
+    tokenBaseManager.tokenBase = tokenBase;
 
-    const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenBaseByStatus(TokenStatus.PROCESSED, date);
-    expect(filteredTokenBases.length).toBe(1);
-  })
+    it('Should create a new tokenBase', async () => {
+      await tokenBaseManager.createATokenBase();
+      expect(writeATokenBaseMockFunction.mock.calls.length).toBe(2);
+    });
 
-  it('Should filter token by Token Date', async () => {
-    const date = new Date();
-    date.setDate(12);
-
-    const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenByTokenDate(date.toLocaleDateString());
-    expect(filteredTokenBases.length).toBe(1);
+    it('Should update an existing token', async () => {
+      tokenBaseManager.tokenBase.currentStatus = TokenStatus.BYPASS;
+      tokenBaseManager.updateTokenBase();
+      expect(allTokenBases[0].currentStatus).toBe(TokenStatus.BYPASS);
+    });
   });
-
-  it('Should get next available token number', async () => {
-    const nextAvailableTokenNumberInCateogoryA = await tokenBaseStorageInteractorAdapter.getNextAvailableTokenNumberInACategory('A');
-    expect(nextAvailableTokenNumberInCateogoryA).toBe(3);
-  });
-
-  it('Should get Todays token base by token number', async () => {
-    const tokenBase = await tokenBaseStorageInteractorAdapter.getTodaysTokenBaseByTokenNumber(3);
-    expect(tokenBase.token.tokenNumber).toBe(3);
-  });
-
-  it('Should get Todays token base by token number and token category', async () => {
-    const tokenBase = await tokenBaseStorageInteractorAdapter.getTodaysTokenBaseByTokenNumber(1,'A');
-    expect(tokenBase.token.tokenCategory).toBe('A');
-    expect(tokenBase.token.tokenNumber).toBe(1);
-  });
-
-  it('Should modify an existing token base', async () => {
-    const tokenBaseToBeModified = allTokenBases[0];
-    tokenBaseToBeModified.currentStatus = TokenStatus.UNPROCESSED;
-    await tokenBaseStorageInteractorAdapter.modifyATokenBase(tokenBaseToBeModified);
-    expect(allTokenBases[0].currentStatus).toBe(TokenStatus.UNPROCESSED);
-  });
-
-  it('Should read all token bases', async () => {
-    const tokenBases = await tokenBaseStorageInteractorAdapter.readAllTokenBases();
-    expect(tokenBases.length).toBe(3);
-  });
-
-  it('Should write a token base', async () => {
-    const tokenBase = allTokenBases[2];
-    await tokenBaseStorageInteractorAdapter.writeATokenBase(tokenBase);
-    expect(writeATokenBaseMockFunction.mock.calls.length).toBe(1);
-  });
-
-  it('Should get token base by category', () => {
-    const tokenBasesOfCategoryA = tokenBaseStorageInteractorAdapter.getTokenBasesByTokenCategory(allTokenBases,'C');
-    expect(tokenBasesOfCategoryA.length).toBe(1);
-  });
-
-  it('Should get token by tokenId', async () => {
-    const tokenBase = await tokenBaseStorageInteractorAdapter.getTokenBaseByTokenId(1);
-    expect(tokenBase.token.tokenId).toBe(1);
-  });
-
-});
+})
