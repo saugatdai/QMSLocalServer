@@ -72,11 +72,17 @@ const getTodaysTokenBaseByTokenNumber = async (tokenNumber: number, category?: s
 
 const getNextAvailableTokenNumberInACategory = async (tokenCateogry: String) => {
   let highestNumber = 0;
-  allTokenBases.forEach(tokenBase => {
-    if (tokenBase.token.tokenCategory === tokenCateogry) {
-      highestNumber = tokenBase.token.tokenNumber > highestNumber ? tokenBase.token.tokenNumber : highestNumber;
-    }
-  });
+  if (tokenCateogry) {
+    allTokenBases.forEach(tokenBase => {
+      if (tokenBase.token.tokenCategory === tokenCateogry) {
+        highestNumber = tokenBase.token.tokenNumber > highestNumber ? tokenBase.token.tokenNumber : highestNumber;
+      }
+    });
+  } else {
+    allTokenBases.forEach(tokenBase => {
+      highestNumber = tokenBase.token.tokenNumber > highestNumber ? tokenBase.token.tokenNumber : highestNumber
+    });
+  }
   return highestNumber + 1;
 }
 
