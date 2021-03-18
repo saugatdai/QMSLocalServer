@@ -4,12 +4,12 @@ export interface TokenBaseStorageAdapter {
   getAllTokenBases: () => Promise<TokenBaseObject[]>;
   putATokenBase: (tokenBaseObject: TokenBaseObject) => Promise<void>;
   getTokenBasesByStatus: (status: TokenStatus, date?: Date) => Promise<TokenBaseObject[]>;
-  getTokenBaseByTokenDate: (date: Date) => Promise<TokenBaseObject[]>;
+  getTokenBaseByTokenDate: (date: string) => Promise<TokenBaseObject[]>;
   resetTokenBase: () => Promise<void>;
   editATokenBase: (tokenBaseObject: TokenBaseObject) => Promise<void>;
   readTodaysTokenBaseByTokenNumber: (tokenNumber: number) => Promise<TokenBaseObject>;
   readNextAvailableTokenNumberInACategory: (category: string) => Promise<number>;
-  readTokenBasesByTokenCategory: (tokenBases: TokenBaseObject[], category: string) => Promise<TokenBaseObject[]>;
+  readTokenBasesByTokenCategory: (tokenBases: TokenBaseObject[], category: string) => TokenBaseObject[];
   readTokenBaseByTokenId: (tokenId: number) => Promise<TokenBaseObject>;
 }
 
@@ -30,7 +30,7 @@ export default class TokenBaseStorageInteractorImplementation {
     return tokenBases;
   }
 
-  public async filterTokenBaseByTokenDate(date: Date) {
+  public async filterTokenBaseByTokenDate(date: string) {
     const tokenBases = await this.tokenBaseSorageAdapter.getTokenBaseByTokenDate(date);
     return tokenBases;
   }
