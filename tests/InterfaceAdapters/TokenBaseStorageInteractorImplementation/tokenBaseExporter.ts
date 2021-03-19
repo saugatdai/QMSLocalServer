@@ -28,6 +28,7 @@ const operator3Info: UserData = {
   password: 'mondus',
   role: UserRoles.OPERATOR,
   username: 'mondusdai',
+  counter: '3'
 }
 const operator3 = new Operator(operator3Info);
 // ***************** End Defining Operators *****************************

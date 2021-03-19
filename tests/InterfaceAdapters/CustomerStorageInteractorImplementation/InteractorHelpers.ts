@@ -3,7 +3,6 @@ import * as fs from 'fs';
 import * as util from 'util';
 
 import Customer from '../../../src/Entities/CustomerCore/Customer';
-import CustomerStorageInteractorImplementation from '../../../src/InterfaceAdapters/CustomerStorageInteractorImplementation';
 
 export const readFile = (filename: string) =>
   util.promisify(fs.readFile)(filename, 'utf-8');
@@ -14,18 +13,31 @@ export const customerTestStoragePath = path.join(__dirname, '/customers.json');
 
 const getCustomers = async () => {
   const customerJson = await readFile(customerTestStoragePath);
+  if (!customerJson) {
+    throw new Error("No Customer Found");
+  }
   const allCustomers: Customer[] = JSON.parse(customerJson);
   return allCustomers;
 }
 const createCustomer = async (customer: Customer) => {
-  const customers = await getCustomers();
-  customers.push(customer);
+  let customers: Customer[];
+  try {
+    customers = await getCustomers();
+    customers.push(customer);
+  } catch (error) {
+    customers = [customer];
+  }
   await writeFile(customerTestStoragePath, JSON.stringify(customers));
 }
 
 const readCustomerById = async (customerId: number) => {
-  const customers = await getCustomers();
-  return customers.find(customer => customer.customerId === customerId);
+  try {
+    const customers = await getCustomers();
+    return customers.find(customer => customer.customerId === customerId);
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
 }
 
 const updateCustomer = async (customer: Customer) => {
@@ -46,19 +58,27 @@ const deleteCustomerById = async (customerId: number) => {
 }
 
 const getNextAvailableId = async () => {
-  const allCustomers = await getCustomers();
   let greatestId = 0;
-  allCustomers.forEach(customer => {
-    if (customer.customerId > greatestId) {
-      greatestId = customer.customerId;
-    }
-  });
+  try {
+    const allCustomers = await getCustomers();
+    allCustomers.forEach(customer => {
+      if (customer.customerId > greatestId) {
+        greatestId = customer.customerId;
+      }
+    });
+  } catch (error) {
+
+  }
   return greatestId + 1;
 }
 
 const isIdAvailable = async (id: number) => {
   const allCustomers = await getCustomers();
   return !allCustomers.some(customer => customer.customerId === id);
+}
+
+const resetAllCustomers = async () => {
+  await writeFile(customerTestStoragePath, '');
 }
 
 
@@ -69,5 +89,6 @@ export {
   updateCustomer,
   deleteCustomerById,
   getNextAvailableId,
-  isIdAvailable
+  isIdAvailable,
+  resetAllCustomers
 }

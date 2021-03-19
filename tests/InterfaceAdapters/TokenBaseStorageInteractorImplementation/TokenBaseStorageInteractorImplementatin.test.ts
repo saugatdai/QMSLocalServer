@@ -27,15 +27,15 @@ const tokenBaseStorageAdapter: TokenBaseStorageAdapter = {
     resetTokenBase,
     editATokenBase,
     readTodaysTokenBaseByTokenNumber,
-    readNextAvailableTokenNumberInACategory,  
-    readTokenBasesByTokenCategory, 
+    readNextAvailableTokenNumberInACategory,
+    readTokenBasesByTokenCategory,
     readTokenBaseByTokenId
 }
 
 const tokenBaseStorageInteractorImplementation = new TokenBaseStorageInteractorImplementation(tokenBaseStorageAdapter);
 describe('Testing of TokenBaseStorageInteractorImplementation', () => {
     const tokenBaseArrays = [tokenBaseObject1, tokenBaseObject2, tokenBaseObject3];
-    
+
     beforeAll(async () => {
         await writeFile(tokenBaseTestStoragePath, JSON.stringify(tokenBaseArrays));
     });
@@ -50,19 +50,19 @@ describe('Testing of TokenBaseStorageInteractorImplementation', () => {
     });
 
     it('Should reset tokenBasesCollection', async () => {
-        await tokenBaseStorageInteractorImplementation.resetATokenBase();
-        expect(async () => {await tokenBaseStorageInteractorImplementation.readAllTokenBases()}).rejects.toThrow();
+        await tokenBaseStorageInteractorImplementation.resetTokenBase();
+        expect(async () => { await tokenBaseStorageInteractorImplementation.readAllTokenBases() }).rejects.toThrow();
     });
 
     it('Should add a tokenBase in an empty token base', async () => {
         await tokenBaseStorageInteractorImplementation.writeATokenBase(tokenBaseObject1);
         const allTokenBases = await tokenBaseStorageInteractorImplementation.readAllTokenBases();
-        expect(allTokenBases.length).toBe(1);
+        expect(allTokenBases[0].getBaseObjectDetails().token.tokenNumber).toBe(1);
     });
 
     it('Should add a tokenBase in existing token base', async () => {
         await tokenBaseStorageInteractorImplementation.writeATokenBase(tokenBaseObject2);
         const allTokenBases = await tokenBaseStorageInteractorImplementation.readAllTokenBases();
-        console.log(allTokenBases);
+        expect(allTokenBases[1]).toEqual(tokenBaseObject2);
     });
 });

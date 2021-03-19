@@ -9,6 +9,7 @@ export interface CustomerStorageAdapter {
   getCustomers: () => Promise<Customer[]>;
   getNextAvailableId: () => Promise<number>;
   isIdAvailable: (id: number) => Promise<boolean>;
+  resetCustomers: () => Promise<void>;
 }
 
 export default class CustomerStorageInteractorImplementation implements CustomerStorageInteractorAdapter {
@@ -44,5 +45,9 @@ export default class CustomerStorageInteractorImplementation implements Customer
     const id = await this.customerStorageAdapter.getNextAvailableId();
     customer.customerId = id;
     await this.addCustomerIfHasValidId(customer);
+  }
+
+  public async resetCustomers() {
+    await this.customerStorageAdapter.resetCustomers();
   }
 }

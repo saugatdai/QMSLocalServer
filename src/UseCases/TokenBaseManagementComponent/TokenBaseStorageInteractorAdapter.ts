@@ -4,11 +4,11 @@ export default interface TokenBaseStorageInteractorAdapter {
     readAllTokenBases: () => Promise<TokenBaseObject[]>;
     writeATokenBase: (TokenBaseObject: TokenBaseObject) => Promise<void>;
     filterTokenBaseByStatus: (status: TokenStatus, date?: Date) => Promise<TokenBaseObject[]>;
-    filterTokenByTokenDate: (date: string) => Promise<TokenBaseObject[]>;
+    filterTokenBaseByTokenDate: (date: string) => Promise<TokenBaseObject[]>;
     resetTokenBase: () => Promise<void>;
     modifyATokenBase: (token: TokenBaseObject) => Promise<void>;
     getTodaysTokenBaseByTokenNumber: (tokenNumber: number, cateogory?: string) => Promise<TokenBaseObject>;
     getNextAvailableTokenNumberInACategory: (tokenCategory: string) => Promise<number>;
-    getTokenBasesByTokenCategory: (tokenBases:TokenBaseObject[], tokenCategory: string) => TokenBaseObject[];
+    getTokenBasesByTokenCategory: (tokenBases: TokenBaseObject[], tokenCategory: string) => TokenBaseObject[];
     getTokenBaseByTokenId: (tokenId: number) => Promise<TokenBaseObject>;
 }

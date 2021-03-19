@@ -2,7 +2,11 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as util from 'util';
 
-import { TokenBaseObject, TokenStatus } from '../../../src/UseCases/TokenBaseManagementComponent/TokenBaseModule';
+import { TokenBaseObject, TokenProcessing, TokenStatus } from '../../../src/UseCases/TokenBaseManagementComponent/TokenBaseModule';
+import UserRoles from '../../../src/Entities/UserCore/UserRoles';
+import Token from '../../../src/Entities/TokenCore/Token';
+import { UserData } from '../../../src/Entities/UserCore/User';
+import Operator from '../../../src/Entities/UserCore/Operator';
 
 export const readFile = (filename: string) =>
     util.promisify(fs.readFile)(filename, 'utf-8');
@@ -11,16 +15,79 @@ export const writeFile = (filename: string, data: string) =>
 
 export const tokenBaseTestStoragePath = path.join(__dirname, '/tokenBase.json');
 
+// Define structure of json object stored in file
+
+type userInfo = {
+    id: number;
+    password: string;
+    role: UserRoles;
+    username: string;
+}
+
+type operator = {
+    _userInfo: UserData;
+    counter?: string;
+}
+
+type tokenProcessingInfo = {
+    _timeStamp: Date;
+    _operator: operator;
+    _status: TokenStatus;
+}
+
+
+type tokenBaseObjectJSONStructure = {
+    _token: Token;
+    tokenProcessingInfo: tokenProcessingInfo[];
+    _currentStatus: TokenStatus;
+};
+
 const getAllTokenBases: () => Promise<TokenBaseObject[]> = async () => {
     const allTokenBasesJSON = await readFile(tokenBaseTestStoragePath);
     if (!allTokenBasesJSON) {
         throw new Error('Empty Token Base');
     }
-    const temporaryTokenBases = JSON.parse(allTokenBasesJSON);
-    // TODO improve the temporarytkenbase to realtokenBase
-    // remove any type of temporarytkenbases by setting proper data type
-    // form a data type by looking at the stored data in JSON file
-    return temporaryTokenBases;
+    const temporaryTokenBases: tokenBaseObjectJSONStructure[] = JSON.parse(allTokenBasesJSON);
+    const tokenBases = getTokenBasesFromTemporaryTokenBase(temporaryTokenBases);
+    return tokenBases;
+}
+
+const getTokenBasesFromTemporaryTokenBase = (temporaryTokenBases: tokenBaseObjectJSONStructure[]) => {
+    const tokenBases: TokenBaseObject[] = [];
+
+    temporaryTokenBases.forEach(temporaryTokenBase => {
+        const token = getTokenByConvertingDateStringToDateObject(temporaryTokenBase._token);
+
+        const tokenBaseObject = new TokenBaseObject(token);
+
+        temporaryTokenBase.tokenProcessingInfo.forEach(tokenProcessingInfo => {
+            const tokenProcessing = getTokenProcessingObjectFromTokenProcessingInfo(tokenProcessingInfo);
+            tokenBaseObject.addTokenProcessingInfo(tokenProcessing);
+        });
+
+        tokenBaseObject.currentStatus = temporaryTokenBase._currentStatus;
+        tokenBases.push(tokenBaseObject);
+    });
+    return tokenBases;
+}
+
+const getTokenByConvertingDateStringToDateObject = (token: Token) => {
+    return { ...token, date: new Date(token.date) }
+}
+
+const getTokenProcessingObjectFromTokenProcessingInfo = (tokenProcessingInfo: tokenProcessingInfo) => {
+    const tokenProcessing = new TokenProcessing();
+
+    const operator = new Operator(tokenProcessingInfo._operator._userInfo);
+    if (tokenProcessingInfo._operator.counter) {
+        operator.setCounter(tokenProcessingInfo._operator.counter);
+    }
+    tokenProcessing.operator = operator;
+
+    tokenProcessing.timeStamp = new Date(tokenProcessingInfo._timeStamp);
+    tokenProcessing.status = tokenProcessingInfo._status;
+
+    return tokenProcessing;
 }
 
 const putATokenBase = async (tokenBase: TokenBaseObject) => {
@@ -28,7 +95,7 @@ const putATokenBase = async (tokenBase: TokenBaseObject) => {
     try {
         allTokenBases = await getAllTokenBases();
         allTokenBases.push(tokenBase);
-    }catch(error){
+    } catch (error) {
         allTokenBases = [tokenBase];
     }
     await writeFile(tokenBaseTestStoragePath, JSON.stringify(allTokenBases));

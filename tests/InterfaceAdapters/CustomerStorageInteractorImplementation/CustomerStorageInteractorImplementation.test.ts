@@ -11,7 +11,8 @@ import {
     updateCustomer,
     deleteCustomerById,
     getNextAvailableId,
-    isIdAvailable
+    isIdAvailable,
+    resetAllCustomers
 } from './InteractorHelpers';
 
 const customerStorageAdapter: CustomerStorageAdapter = {
@@ -21,7 +22,8 @@ const customerStorageAdapter: CustomerStorageAdapter = {
     updateCustomer,
     deleteCustomerById,
     getNextAvailableId,
-    isIdAvailable
+    isIdAvailable,
+    resetCustomers: resetAllCustomers
 };
 
 const token1: Token = {
@@ -94,6 +96,7 @@ describe('Test of CustomerStorageInteractorImplementation Interface adapter ', (
     });
 
     describe('First testing of the CustoemrStorageAdapter', () => {
+
         it('Should get All Customers', async () => {
             const allcustomers = await customerStorageAdapter.getCustomers();
             expect(allcustomers.length).toEqual(5);
@@ -186,7 +189,7 @@ describe('Test of CustomerStorageInteractorImplementation Interface adapter ', (
                 token: token,
                 remarks: 'nothing'
             }
-            await expect(async() => {await customerStorageInteractorImplementaiton.addCustomerIfHasValidId(customer)}).rejects.toThrow();
+            await expect(async () => { await customerStorageInteractorImplementaiton.addCustomerIfHasValidId(customer) }).rejects.toThrow();
         });
 
         it('Should get a coustomer by Id', async () => {
@@ -202,17 +205,23 @@ describe('Test of CustomerStorageInteractorImplementation Interface adapter ', (
             expect(udpatedCustomer.customerName).toBe(customer.customerName);
         });
 
-        it('Should delete a customer', async() => {
+        it('Should delete a customer', async () => {
             await customerStorageInteractorImplementaiton.deleteCustomerById(2);
             const customer = await customerStorageInteractorImplementaiton.getCustomerById(2);
             expect(customer).toBeFalsy();
         });
 
-        it('Should get all customers', async() => {
+        it('Should get all customers', async () => {
             const allCustomers = await customerStorageInteractorImplementaiton.getAllCustomers();
             expect(allCustomers.length).toBe(5);
         });
 
         // TODO Reset a customer base and handle error while reading customerbase
-    });    
+        it('Should reset all customers', async () => {
+            await customerStorageInteractorImplementaiton.resetCustomers();
+            expect(async () => { await customerStorageInteractorImplementaiton.getAllCustomers() }).rejects.toThrow();
+        });
+
+
+    });
 });

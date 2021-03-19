@@ -1,4 +1,5 @@
 import { TokenBaseObject, TokenStatus } from '../UseCases/TokenBaseManagementComponent/TokenBaseModule';
+import TokenBaseStorageInteractorAdapter from '../UseCases/TokenBaseManagementComponent/TokenBaseStorageInteractorAdapter';
 
 export interface TokenBaseStorageAdapter {
   getAllTokenBases: () => Promise<TokenBaseObject[]>;
@@ -13,7 +14,7 @@ export interface TokenBaseStorageAdapter {
   readTokenBaseByTokenId: (tokenId: number) => Promise<TokenBaseObject>;
 }
 
-export default class TokenBaseStorageInteractorImplementation {
+export default class TokenBaseStorageInteractorImplementation implements TokenBaseStorageInteractorAdapter {
   constructor(private tokenBaseSorageAdapter: TokenBaseStorageAdapter) { }
 
   public async readAllTokenBases() {
@@ -35,7 +36,7 @@ export default class TokenBaseStorageInteractorImplementation {
     return tokenBases;
   }
 
-  public async resetATokenBase() {
+  public async resetTokenBase() {
     await this.tokenBaseSorageAdapter.resetTokenBase();
   }
 
@@ -50,6 +51,7 @@ export default class TokenBaseStorageInteractorImplementation {
 
   public async getNextAvailableTokenNumberInACategory(category: string) {
     const tokenNumber = await this.tokenBaseSorageAdapter.readNextAvailableTokenNumberInACategory(category);
+    return tokenNumber;
   }
 
   public getTokenBasesByTokenCategory(tokenBaseObject: TokenBaseObject[], category: string) {
@@ -57,8 +59,9 @@ export default class TokenBaseStorageInteractorImplementation {
     return tokenBases;
   }
 
-  public async getTokenBasesByTokenId(tokenId: number) {
+  public async getTokenBaseByTokenId(tokenId: number) {
     const tokenBase = await this.tokenBaseSorageAdapter.readTokenBaseByTokenId(tokenId);
+    return tokenBase;
   }
 
 }
