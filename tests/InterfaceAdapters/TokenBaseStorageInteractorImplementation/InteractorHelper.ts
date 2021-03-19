@@ -9,17 +9,28 @@ export const readFile = (filename: string) =>
 export const writeFile = (filename: string, data: string) =>
     util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
-export const tokenBaseTestStoragePath = path.join(__dirname, '/tokenBase.json.json');
+export const tokenBaseTestStoragePath = path.join(__dirname, '/tokenBase.json');
 
 const getAllTokenBases: () => Promise<TokenBaseObject[]> = async () => {
     const allTokenBasesJSON = await readFile(tokenBaseTestStoragePath);
-    const allTokenBases = JSON.parse(allTokenBasesJSON) as TokenBaseObject[];
-    return allTokenBases;
+    if (!allTokenBasesJSON) {
+        throw new Error('Empty Token Base');
+    }
+    const temporaryTokenBases = JSON.parse(allTokenBasesJSON);
+    // TODO improve the temporarytkenbase to realtokenBase
+    // remove any type of temporarytkenbases by setting proper data type
+    // form a data type by looking at the stored data in JSON file
+    return temporaryTokenBases;
 }
 
 const putATokenBase = async (tokenBase: TokenBaseObject) => {
-    const allTokenBases = await getAllTokenBases();
-    allTokenBases.push(tokenBase);
+    let allTokenBases: TokenBaseObject[];
+    try {
+        allTokenBases = await getAllTokenBases();
+        allTokenBases.push(tokenBase);
+    }catch(error){
+        allTokenBases = [tokenBase];
+    }
     await writeFile(tokenBaseTestStoragePath, JSON.stringify(allTokenBases));
 }
 
@@ -118,5 +129,5 @@ export {
     readTodaysTokenBaseByTokenNumber,
     readNextAvailableTokenNumberInACategory,
     readTokenBasesByTokenCategory,
-    readTokenBaseByTokenId 
+    readTokenBaseByTokenId
 };
