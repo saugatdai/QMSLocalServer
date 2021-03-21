@@ -96,7 +96,7 @@ const getTokenBaseByTokenId = async (tokenId: number) => {
 
 const tokenBaseStorageInteractorAdapter: TokenBaseStorageInteractorAdapter = {
   filterTokenBaseByStatus: filterTokenBaseByStatus,
-  filterTokenByTokenDate: filterTokenBaseByTokenDate,
+  filterTokenBaseByTokenDate: filterTokenBaseByTokenDate,
   getNextAvailableTokenNumberInACategory: getNextAvailableTokenNumberInACategory,
   getTodaysTokenBaseByTokenNumber: getTodaysTokenBaseByTokenNumber,
   modifyATokenBase: modifyATokenBase,
@@ -127,7 +127,7 @@ describe('Testing of TokenBaseModule', () => {
       const date = new Date();
       date.setDate(12);
 
-      const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenByTokenDate(date.toLocaleDateString());
+      const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenBaseByTokenDate(date.toLocaleDateString());
       expect(filteredTokenBases.length).toBe(1);
     });
 

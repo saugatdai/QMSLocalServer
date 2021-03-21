@@ -73,8 +73,11 @@ const getNextAvailableId = async () => {
 }
 
 const isIdAvailable = async (id: number) => {
-  const allCustomers = await getCustomers();
-  return !allCustomers.some(customer => customer.customerId === id);
+  try {
+    const allCustomers = await getCustomers();
+    return !allCustomers.some(customer => customer.customerId === id);
+  } catch (error) { }
+  return true;
 }
 
 const resetAllCustomers = async () => {

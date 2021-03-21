@@ -222,6 +222,16 @@ describe('Test of CustomerStorageInteractorImplementation Interface adapter ', (
             expect(async () => { await customerStorageInteractorImplementaiton.getAllCustomers() }).rejects.toThrow();
         });
 
+        it('Should add a new customer in empty customerCollection', async () => {
+            await customerStorageInteractorImplementaiton.createNewCustomer(customer1);
+            const allCustomers = await customerStorageInteractorImplementaiton.getAllCustomers();
+            expect(allCustomers.length).toBe(1);
+        });
 
+        it('Should add a second customer', async () => {
+            await customerStorageInteractorImplementaiton.createNewCustomer(customer2);
+            const allCustomers = await customerStorageInteractorImplementaiton.getAllCustomers();
+            expect(allCustomers.length).toBe(2);
+        });
     });
 });

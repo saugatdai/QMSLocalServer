@@ -2,6 +2,7 @@ import Customer from '../../src/Entities/CustomerCore/Customer';
 import CustomerStorageInteractorAdapter from '../../src/UseCases/CustomerManagementComponent/CustomerStorageInteractorAdapter';
 import CustomerManager from '../../src/UseCases/CustomerManagementComponent/CustomerManager';
 import Token from '../../src/Entities/TokenCore/Token';
+import { resetAllCustomers } from '../InterfaceAdapters/CustomerStorageInteractorImplementation/InteractorHelpers';
 
 describe('Testing of customer management compoenent', () => {
   const token1: Token = {
@@ -60,7 +61,8 @@ describe('Testing of customer management compoenent', () => {
     updateCustomer: updateCustomerFunction,
     deleteCustomerById: deleteCustomerFunction,
     getAllCustomers: getAllCustomersFunction,
-    createNewCustomer: createNewCustomerFunction
+    createNewCustomer: createNewCustomerFunction,
+    resetCustomers: resetAllCustomers
   };
 
   const customerManager = new CustomerManager(customer1);
@@ -71,7 +73,7 @@ describe('Testing of customer management compoenent', () => {
     expect(createNewCustomerMockFunction.mock.calls.length).toEqual(1);
   });
 
-  it('should update customer in storage', async() => {
+  it('should update customer in storage', async () => {
     await customerManager.update();
     expect(updateCustomerMockFunction.mock.calls.length).toBe(1);
   });
