@@ -91,6 +91,7 @@ const getTokenProcessingObjectFromTokenProcessingInfo = (tokenProcessingInfo: to
 }
 
 const putATokenBase = async (tokenBase: TokenBaseObject) => {
+    tokenBase.token.tokenId = await getNextAvailableTokenId();
     let allTokenBases: TokenBaseObject[];
     try {
         allTokenBases = await getAllTokenBases();
@@ -186,6 +187,19 @@ const readTokenBaseByTokenId = async (tokenId: number) => {
     return allTokenBases.find(tokenBase => tokenBase.token.tokenId === tokenId);
 }
 
+const getNextAvailableTokenId = async () => {
+    let highestTokenId = 0;
+    try {
+        const allTokenBases = await getAllTokenBases();
+        allTokenBases.forEach(tokenBase => {
+            highestTokenId = tokenBase.token.tokenId > highestTokenId ? tokenBase.token.tokenId : highestTokenId;
+        });
+        return highestTokenId + 1;
+    } catch (error) {
+        return 1;
+    }
+}
+
 export {
     getAllTokenBases,
     putATokenBase,
@@ -196,5 +210,6 @@ export {
     readTodaysTokenBaseByTokenNumber,
     readNextAvailableTokenNumberInACategory,
     readTokenBasesByTokenCategory,
-    readTokenBaseByTokenId
+    readTokenBaseByTokenId,
+    getNextAvailableTokenId
 };

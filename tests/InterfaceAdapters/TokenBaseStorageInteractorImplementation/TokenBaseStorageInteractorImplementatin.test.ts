@@ -13,7 +13,8 @@ import {
     readTodaysTokenBaseByTokenNumber,
     readNextAvailableTokenNumberInACategory,
     readTokenBasesByTokenCategory,
-    readTokenBaseByTokenId
+    readTokenBaseByTokenId,
+    getNextAvailableTokenId
 } from './InteractorHelper';
 
 import { tokenBaseObject1, tokenBaseObject2, tokenBaseObject3 } from './tokenBaseExporter';
@@ -29,7 +30,8 @@ const tokenBaseStorageAdapter: TokenBaseStorageAdapter = {
     readTodaysTokenBaseByTokenNumber,
     readNextAvailableTokenNumberInACategory,
     readTokenBasesByTokenCategory,
-    readTokenBaseByTokenId
+    readTokenBaseByTokenId,
+    getNextAvailableTokenId
 }
 
 const tokenBaseStorageInteractorImplementation = new TokenBaseStorageInteractorImplementation(tokenBaseStorageAdapter);
@@ -49,9 +51,19 @@ describe('Testing of TokenBaseStorageInteractorImplementation', () => {
         expect(allTokenBases.length).toBe(3);
     });
 
+    it('Should get next available tokenId in a category', async () => {
+        const tokenId = await tokenBaseStorageAdapter.getNextAvailableTokenId();
+        expect(tokenId).toBe(4);
+    });
+
     it('Should reset tokenBasesCollection', async () => {
         await tokenBaseStorageInteractorImplementation.resetTokenBase();
         expect(async () => { await tokenBaseStorageInteractorImplementation.readAllTokenBases() }).rejects.toThrow();
+    });
+
+    it('Should read nextAvailable tokenID', async () => {
+        const tokenId = await tokenBaseStorageAdapter.getNextAvailableTokenId();
+        expect(tokenId).toBe(1);
     });
 
     it('Should add a tokenBase in an empty token base', async () => {
@@ -65,4 +77,5 @@ describe('Testing of TokenBaseStorageInteractorImplementation', () => {
         const allTokenBases = await tokenBaseStorageInteractorImplementation.readAllTokenBases();
         expect(allTokenBases[1]).toEqual(tokenBaseObject2);
     });
+
 });

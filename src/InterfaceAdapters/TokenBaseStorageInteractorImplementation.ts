@@ -12,6 +12,7 @@ export interface TokenBaseStorageAdapter {
   readNextAvailableTokenNumberInACategory: (category: string) => Promise<number>;
   readTokenBasesByTokenCategory: (tokenBases: TokenBaseObject[], category: string) => TokenBaseObject[];
   readTokenBaseByTokenId: (tokenId: number) => Promise<TokenBaseObject>;
+  getNextAvailableTokenId: () => Promise<number>;
 }
 
 export default class TokenBaseStorageInteractorImplementation implements TokenBaseStorageInteractorAdapter {
