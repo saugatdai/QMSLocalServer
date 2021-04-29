@@ -28,16 +28,24 @@ export default class TokenCallingFacade {
   }
 
   public callNextTOken(tokenNumber: number): void {
-    this._nextTokenStrategy.callNextToken(tokenNumber);
+    const callNextTokenObject = new CallNext();
+    callNextTokenObject.strategy = this._nextTokenStrategy;
+    callNextTokenObject.callToken(tokenNumber);
   }
   public callTokenAgain(tokenNumber: number): void {
-    this._callAgainStrategy.callAgainToken(tokenNumber);
+    const callAgainTokenObject = new CallAgain();
+    callAgainTokenObject.strategy = this._callAgainStrategy;
+    callAgainTokenObject.callToken(tokenNumber);
   }
   public byPassToken(tokenNumber: number): void {
-    this._byPassStrategy.bypassToken(tokenNumber);
+    const byPassTokenObject = new Bypass();
+    byPassTokenObject.strategy = this._byPassStrategy;
+    byPassTokenObject.callToken(tokenNumber);
   }
   public callRandomToken(tokenNumber: number): void {
-    this._randomCallStrategy.callRandomToken(tokenNumber);
+    const callRandomTokenObject = new RandomCall();
+    callRandomTokenObject.strategy = this._randomCallStrategy;
+    callRandomTokenObject.callToken(tokenNumber);
   }
 
   public pipeNextTokenFeature(feature: Feature): void {

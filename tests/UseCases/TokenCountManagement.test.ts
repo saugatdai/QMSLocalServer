@@ -8,7 +8,7 @@ describe('Testing of token count management component', () => {
         updateTokenCurrentCountMockFunction();
     }
 
-    const getCurrentTokenCountFunction = async() => {
+    const getCurrentTokenCountFunction = async () => {
         return 4;
     }
 
@@ -18,7 +18,7 @@ describe('Testing of token count management component', () => {
     }
 
     const clearAllTokenStatusDataMockFunction = jest.fn();
-    const clearAllTokenStatusDataFunction = async() => {
+    const clearAllTokenStatusDataFunction = async () => {
         clearAllTokenStatusDataMockFunction();
     }
 
@@ -62,12 +62,12 @@ describe('Testing of token count management component', () => {
         expect(clearAllTokenStatusDataMockFunction.mock.calls.length).toBe(1);
     });
 
-    it('Should get current customer token number : ', async() => {
+    it('Should get current customer token number : ', async () => {
         const tokenNumber = await getCurrentCustomerTokeNumberFunction();
         expect(tokenNumber).toBe(5)
     });
 
-    it('Should set current customer token number : ', async() => {
+    it('Should set current customer token number : ', async () => {
         await setCurrentCustomerTokenNumberFunction(5);
         expect(setCurrentCustomerTokenNumberMockFunction.mock.calls.length).toBe(1);
     })
