@@ -3,7 +3,7 @@ import tokenCountStorageInteractorAdapter from "./TokenCountStorageInteractorAda
 export default class TokenCountManager {
   constructor(
     private tokenCountStorageInteractorAdapter: tokenCountStorageInteractorAdapter
-  ) {}
+  ) { }
 
   public async presetTokenCount(count: number) {
     await this.tokenCountStorageInteractorAdapter.updateCurrentTokenCount(count);
@@ -16,9 +16,5 @@ export default class TokenCountManager {
   public async revcoverTokenCount() {
     const currentCount = await this.tokenCountStorageInteractorAdapter.getCurrentTokenCount();
     return currentCount;
-  }
-
-  public async clearTokenData() {
-    await this.tokenCountStorageInteractorAdapter.clearAllTokenStatusData();
   }
 }

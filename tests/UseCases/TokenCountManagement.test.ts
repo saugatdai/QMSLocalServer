@@ -1,6 +1,5 @@
 import TokenCountStorageInteractorAdapter from '../../src/UseCases/TokenCountManagementComponent/TokenCountStorageInteractorAdapter';
 import TokenCountManager from '../../src/UseCases/TokenCountManagementComponent/TokenCountManager';
-import tokenCountStorageInteractorAdapter from '../../src/UseCases/TokenCountManagementComponent/TokenCountStorageInteractorAdapter';
 
 describe('Testing of token count management component', () => {
     const updateTokenCurrentCountMockFunction = jest.fn();
@@ -34,10 +33,7 @@ describe('Testing of token count management component', () => {
     const tokenCountStorageInteractorAdapter: TokenCountStorageInteractorAdapter = {
         updateCurrentTokenCount: updateTokenCurrentCountFunction,
         getCurrentTokenCount: getCurrentTokenCountFunction,
-        clearCurrentTokenCount: clearCurrentTokenCountFunction,
-        clearAllTokenStatusData: clearAllTokenStatusDataFunction,
-        getCurrentCustomerTokenNumber: getCurrentCustomerTokeNumberFunction,
-        setCurrentCustomerTokenNumber: setCurrentCustomerTokenNumberFunction
+        clearCurrentTokenCount: clearCurrentTokenCountFunction
     }
 
     const tokenCountManager = new TokenCountManager(tokenCountStorageInteractorAdapter);
@@ -55,11 +51,6 @@ describe('Testing of token count management component', () => {
     it('Should be able to get current token count', async () => {
         const currentToken = await tokenCountManager.revcoverTokenCount();
         expect(currentToken).toBe(4);
-    });
-
-    it('should be able to clear all token status data', async () => {
-        await tokenCountManager.clearTokenData();
-        expect(clearAllTokenStatusDataMockFunction.mock.calls.length).toBe(1);
     });
 
     it('Should get current customer token number : ', async () => {

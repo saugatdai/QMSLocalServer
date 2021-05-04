@@ -15,7 +15,7 @@ const tokenCountStatusStoragePath = path.join(__dirname, '/tokenCount.json');
 
 const getTokenStatusObject = async () => {
   const tokenStatusJSON = await readFile(tokenCountStatusStoragePath);
-  const tokenStatusObject = JSON.parse(tokenStatusJSON) as TokenStatusObject;
+  const tokenStatusObject = await JSON.parse(tokenStatusJSON) as TokenStatusObject;
   return tokenStatusObject;
 }
 
@@ -27,7 +27,7 @@ const getCurrentCount = async () => {
 const resetCount = async () => {
   const tokenStatusObject = await getTokenStatusObject();
   tokenStatusObject.currentTokenCount = 0;
-  writeFile(tokenCountStatusStoragePath, JSON.stringify(tokenStatusObject));
+  await writeFile(tokenCountStatusStoragePath, JSON.stringify(tokenStatusObject));
 }
 
 const updateCurrentCount = async (newCount: number) => {

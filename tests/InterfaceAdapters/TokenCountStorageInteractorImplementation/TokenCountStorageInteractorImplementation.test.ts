@@ -39,5 +39,4 @@ describe('Testing of TokenCountStorageInteractorImplementation', () => {
     const currentCount = await getCurrentCount();
     expect(currentCount).toBe(0);
   });
-
 });

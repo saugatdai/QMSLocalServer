@@ -91,7 +91,7 @@ describe('Testing of customer management compoenent', () => {
     customerManager.customer = customer2;
     await expect(async () => {
       await customerManager.validateInfo();
-    }).rejects.toThrow('Custmer data did not match');
+    }).rejects.toThrow('Customer data did not match'); 
   });
 
   it('Should throw customer not found exception', () => {

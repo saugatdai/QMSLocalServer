@@ -4,13 +4,13 @@ import CustomerStorageInteractorAdapter from "./CustomerStorageInteractorAdapter
 export default class CustomerManager {
   private _customerStorageInteractorAdapter: CustomerStorageInteractorAdapter;
 
-  constructor(private _customer: Customer) {}
+  constructor(private _customer: Customer) { }
 
   public set customer(customer: Customer) {
     this._customer = customer;
   }
 
-  public set customerStorageInteractorAdapter(customerStorageInteractorAdapter: CustomerStorageInteractorAdapter){
+  public set customerStorageInteractorAdapter(customerStorageInteractorAdapter: CustomerStorageInteractorAdapter) {
     this._customerStorageInteractorAdapter = customerStorageInteractorAdapter;
   }
 
@@ -26,7 +26,7 @@ export default class CustomerManager {
     const obtainedCustomer = await this._customerStorageInteractorAdapter.getCustomerById(
       this._customer.customerId
     );
-    
+
     if (!obtainedCustomer) {
       throw new Error(`Customer not found`);
     }
@@ -36,7 +36,7 @@ export default class CustomerManager {
       obtainedCustomer.token.tokenId === this._customer.token.tokenId
 
     if (!validity) {
-      throw new Error("Custmer data did not match");
+      throw new Error("Customer data did not match");
     }
   }
 
@@ -44,7 +44,7 @@ export default class CustomerManager {
     await this._customerStorageInteractorAdapter.deleteCustomerById(this._customer.customerId);
   }
 
-  public addCustomerInfo<T>(propertyName: string, value: T){
+  public addCustomerInfo<T>(propertyName: string, value: T) {
     this[propertyName] = value;
   }
 }
