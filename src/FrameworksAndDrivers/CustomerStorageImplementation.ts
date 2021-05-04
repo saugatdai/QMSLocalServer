@@ -81,7 +81,7 @@ const isIdAvailable = async (id: number) => {
   return true;
 }
 
-const resetAllCustomers = async () => {
+const resetCustomers = async () => {
   await writeFile(customerTestStoragePath, '');
 }
 
@@ -93,7 +93,7 @@ const CustomerStorageImplementation: CustomerStorageAdapter = {
   deleteCustomerById,
   getNextAvailableId,
   isIdAvailable,
-  resetCustomers: resetAllCustomers
+  resetCustomers
 }
 
 export default CustomerStorageImplementation;
