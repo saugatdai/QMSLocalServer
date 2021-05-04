@@ -11,7 +11,7 @@ export interface UserStorageAdapter {
   deleteUser: (userId: number) => void;
   getUsers: () => Promise<User[] | Operator[]>;
   checkUserExistsWithUsername: (user: User | Operator) => Promise<boolean>;
-  setCounter: (opearator: Operator) => Promise<void>;
+  setCounter: (opearator: Operator | User) => Promise<void>;
   isCounterOccupied: (counterNumber: string) => Promise<boolean>;
   checkUserExistsWithId: (userId: number) => Promise<boolean>;
   getUsersByRole: (role: UserRoles) => Promise<User[] | Operator[]>;
@@ -20,7 +20,7 @@ export interface UserStorageAdapter {
   getUserByUsernameAndPassword: (credentials: Credentials) => Promise<User | false>;
 }
 
-export interface Credentials{
+export interface Credentials {
   username: string;
   password: string;
 }
@@ -96,9 +96,9 @@ export default class UserStorageInteractorImplementation
     await this.addUserIfIdUsernameCounterAvailable(user);
   }
 
-  public async loginAndGetUser(credentials: Credentials){
+  public async loginAndGetUser(credentials: Credentials) {
     const user = await this.userStorage.getUserByUsernameAndPassword(credentials);
-    if(!(user instanceof User)){
+    if (!(user instanceof User)) {
       throw new Error("Login Failed");
     }
     return user;

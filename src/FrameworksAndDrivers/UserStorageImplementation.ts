@@ -2,19 +2,20 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as util from 'util';
 
-import { UserData } from '../../../src/Entities/UserCore/User';
-import User from '../../../src/Entities/UserCore/User';
-import Operator from '../../../src/Entities/UserCore/Operator';
-import UserRoles from '../../../src/Entities/UserCore/UserRoles';
-import UserFactory from '../../../src/Entities/UserCore/UserFactory';
-import { Credentials } from '../../../src/InterfaceAdapters/UserStorageInteractorImplementation';
+import { UserData } from '../Entities/UserCore/User';
+import User from '../Entities/UserCore/User';
+import Operator from '../Entities/UserCore/Operator';
+import UserRoles from '../Entities/UserCore/UserRoles';
+import UserFactory from '../Entities/UserCore/UserFactory';
+import { Credentials } from '../InterfaceAdapters/UserStorageInteractorImplementation';
+import { UserStorageAdapter } from '../InterfaceAdapters/UserStorageInteractorImplementation';
 
 export const readFile = (filename: string) =>
   util.promisify(fs.readFile)(filename, 'utf-8');
 export const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
-const testStoragePath = path.join(__dirname, '/users.json');
+const testStoragePath = path.join(__dirname, '../../Data/users.json');
 
 const getAllUserDatas = async (): Promise<UserData[]> => {
   const userDatasJson = await readFile(testStoragePath);
@@ -131,8 +132,7 @@ const getUserByUsernameAndPassword = async (credentials: Credentials) => {
   return false;
 }
 
-export {
-  getAllUserDatas,
+const UserStorageImplementation: UserStorageAdapter = {
   createUser,
   getUsers,
   deleteUser,
@@ -143,6 +143,9 @@ export {
   isCounterOccupied,
   checkUserExistsWithId,
   getUsersByRole,
+  getAllUserDatas,
   getNextAvailableId,
   getUserByUsernameAndPassword
 };
+
+export default UserStorageImplementation;
