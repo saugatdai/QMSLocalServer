@@ -10,9 +10,9 @@ import UserFactory from '../Entities/UserCore/UserFactory';
 import { Credentials } from '../InterfaceAdapters/UserStorageInteractorImplementation';
 import { UserStorageAdapter } from '../InterfaceAdapters/UserStorageInteractorImplementation';
 
-export const readFile = (filename: string) =>
+const readFile = (filename: string) =>
   util.promisify(fs.readFile)(filename, 'utf-8');
-export const writeFile = (filename: string, data: string) =>
+const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
 const testStoragePath = path.join(__dirname, '../../Data/users.json');
