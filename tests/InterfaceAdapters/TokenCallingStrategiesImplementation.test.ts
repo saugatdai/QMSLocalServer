@@ -2,8 +2,7 @@ import {
   TokenBypassDefault,
   CallAgainDefault,
   CallNextTokenDefault,
-  RandomTokenCallDefault,
-  TokenCallerStorageAdapter
+  RandomTokenCallDefault
 } from '../../src/InterfaceAdapters/TokenCallingStrategiesImplementation';
 import EventManagerSingleton from '../../src/UseCases/EventManagementComponent/EventManagerSingleton';
 import EventTypes from '../../src/UseCases/EventManagementComponent/EventTypes';
@@ -32,17 +31,11 @@ describe('Testing of TokenCallingStrategiesImplementation.test.ts', () => {
     await callRandomTokenMockFunction(tokenNumber);
   }
 
-  const tokenCallerStorageAdapter: TokenCallerStorageAdapter = {
-    byPassToken: bypassTokenFunction,
-    callRandomToken: callRamdomTokenFunction,
-    callTokenAgain: callAgaintokenFunction,
-    nextTokenCaller: nextTokenCallerFunction
-  }
 
-  const tokenBypassDefaultObject = new TokenBypassDefault(tokenCallerStorageAdapter);
-  const callAgainDefaultObject = new CallAgainDefault(tokenCallerStorageAdapter);
-  const callNextTokenDefaultObject = new CallNextTokenDefault(tokenCallerStorageAdapter);
-  const randomTokenCallDefaultObject = new RandomTokenCallDefault(tokenCallerStorageAdapter);
+  const tokenBypassDefaultObject = new TokenBypassDefault(bypassTokenFunction);
+  const callAgainDefaultObject = new CallAgainDefault(callAgaintokenFunction);
+  const callNextTokenDefaultObject = new CallNextTokenDefault(nextTokenCallerFunction);
+  const randomTokenCallDefaultObject = new RandomTokenCallDefault(callRamdomTokenFunction);
 
   describe('Testing of TokenBypassDefault class', () => {
     const feature1Mock = jest.fn();

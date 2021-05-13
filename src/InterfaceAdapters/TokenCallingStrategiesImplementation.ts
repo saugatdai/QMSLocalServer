@@ -6,12 +6,6 @@ import RandomTokenCallStrategy from '../UseCases/TokenCallingComponent/RandomTok
 import EventTypes from '../UseCases/EventManagementComponent/EventTypes';
 import EventManagerSingleton from '../UseCases/EventManagementComponent/EventManagerSingleton';
 
-export interface TokenCallerStorageAdapter {
-  nextTokenCaller(tokenNumber: number): Promise<void>;
-  callTokenAgain(tokenNumber: number): Promise<void>;
-  byPassToken(tokenNumber: number): Promise<void>;
-  callRandomToken(tokenNumber: number): Promise<void>;
-}
 
 class FeaturesHandler {
   features: Feature[] = [];
@@ -22,7 +16,7 @@ class FeaturesHandler {
 }
 
 export class TokenBypassDefault extends FeaturesHandler implements BypassTokenStrategy {
-  constructor(private tokenCallerStorageImplementation: TokenCallerStorageAdapter) {
+  constructor(private byPassToken: (tokenNumber: number) => Promise<void>) {
     super();
   }
   public bypassToken(tokenNumber: number): void {
@@ -31,7 +25,7 @@ export class TokenBypassDefault extends FeaturesHandler implements BypassTokenSt
       feature.runFeature();
       return (feature.goToNextFeature) ? true : false;
     });
-    this.tokenCallerStorageImplementation.byPassToken(tokenNumber).then().catch(error => {
+    this.byPassToken(tokenNumber).then().catch(error => {
       console.log(error);
     });
     EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT);
@@ -39,7 +33,7 @@ export class TokenBypassDefault extends FeaturesHandler implements BypassTokenSt
 }
 
 export class CallAgainDefault extends FeaturesHandler implements CallAgainTokenStrategy {
-  constructor(private tokenCallerStorageImplementation: TokenCallerStorageAdapter) {
+  constructor(private callTokenAgain: (tokenNumber: number) => Promise<void>) {
     super();
   }
   public callAgainToken(tokenNumber: number): void {
@@ -48,7 +42,7 @@ export class CallAgainDefault extends FeaturesHandler implements CallAgainTokenS
       feature.runFeature();
       return (feature.goToNextFeature) ? true : false;
     });
-    this.tokenCallerStorageImplementation.callTokenAgain(tokenNumber).then().catch(error => {
+    this.callTokenAgain(tokenNumber).then().catch(error => {
       console.log(error);
     });
     EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT);
@@ -56,7 +50,7 @@ export class CallAgainDefault extends FeaturesHandler implements CallAgainTokenS
 }
 
 export class CallNextTokenDefault extends FeaturesHandler implements NextTokenStrategy {
-  constructor(private tokenCallerStorageImplementation: TokenCallerStorageAdapter) {
+  constructor(private nextTokenCaller: (tokenNumber: number) => Promise<void>) {
     super();
   }
   public callNextToken(tokenNumber: number) {
@@ -65,7 +59,7 @@ export class CallNextTokenDefault extends FeaturesHandler implements NextTokenSt
       feature.runFeature();
       return (feature.goToNextFeature) ? true : false;
     });
-    this.tokenCallerStorageImplementation.nextTokenCaller(tokenNumber).then().catch(error => {
+    this.nextTokenCaller(tokenNumber).then().catch(error => {
       console.log(error);
     });
     EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT);
@@ -73,7 +67,7 @@ export class CallNextTokenDefault extends FeaturesHandler implements NextTokenSt
 }
 
 export class RandomTokenCallDefault extends FeaturesHandler implements RandomTokenCallStrategy {
-  constructor(private tokenCallerStorageImplementation: TokenCallerStorageAdapter) {
+  constructor(private randomTokenCaller: (tokenNumber: number) => Promise<void>) {
     super();
   }
   public callRandomToken(tokenNumber: number) {
@@ -82,11 +76,11 @@ export class RandomTokenCallDefault extends FeaturesHandler implements RandomTok
       feature.runFeature();
       return (feature.goToNextFeature) ? true : false;
     });
-    this.tokenCallerStorageImplementation.callRandomToken(tokenNumber).then().catch(error => {
+    this.randomTokenCaller(tokenNumber).then().catch(error => {
       console.log(error);
     });
     EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
   }
 }
 
-// TODO TOkenCallingStrategies testing for usecase remaining
+// TODO TokenCallingStrategies testing for usecase remaining

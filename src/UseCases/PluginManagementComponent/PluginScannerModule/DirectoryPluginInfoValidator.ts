@@ -7,7 +7,7 @@ import PluginDirectoryScanner from './PluginDirectoryScanner';
 
 export default class PluginInfoValidator
   implements DirectoryPluginInfoValidatorInterface {
-  constructor(private pluginPath: string) {}
+  constructor(private pluginPath: string) { }
 
   public getValidPluginInfoForADirectory(directory: string): PluginInfo {
     const rawJson = fs.readFileSync(
@@ -36,7 +36,7 @@ export default class PluginInfoValidator
     return validDirectories;
   }
 
-  public hasPluginInfoValidPluginValidatorId(pluginInfo: PluginInfo): boolean{
+  public hasPluginInfoValidPluginValidatorId(pluginInfo: PluginInfo): boolean {
     // TODO validation task remaining
     return false;
   }

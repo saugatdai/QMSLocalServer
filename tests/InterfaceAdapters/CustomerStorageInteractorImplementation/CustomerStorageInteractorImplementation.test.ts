@@ -216,7 +216,6 @@ describe('Test of CustomerStorageInteractorImplementation Interface adapter ', (
             expect(allCustomers.length).toBe(5);
         });
 
-        // TODO Reset a customer base and handle error while reading customerbase
         it('Should reset all customers', async () => {
             await customerStorageInteractorImplementaiton.resetCustomers();
             expect(async () => { await customerStorageInteractorImplementaiton.getAllCustomers() }).rejects.toThrow();

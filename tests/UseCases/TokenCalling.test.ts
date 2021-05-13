@@ -3,7 +3,9 @@ import CallAgain from '../../src/UseCases/TokenCallingComponent/CallAgainModule/
 import Bypass from '../../src/UseCases/TokenCallingComponent/BypassTokenModule/Bypass';
 import CallNext from '../../src/UseCases/TokenCallingComponent/NextTokenModule/CallNext';
 import RandomCall from '../../src/UseCases/TokenCallingComponent/RandomTokenCallModule/RandomCall';
-import TokenCallingFacade from '../../src/UseCases/TokenCallingComponent/TokenCallingFacade';
+import TokenCallingFacade from '../../src/UseCases/TokenCallingComponent/TokenCallingFacadeSingleton';
+import TokenForward from '../../src/UseCases/TokenCallingComponent/TokenForwardModule/TokenForward';
+import TokenCallingFacadeSingleton from '../../src/UseCases/TokenCallingComponent/TokenCallingFacadeSingleton';
 
 describe('Testing of Token Calling Use Cases', () => {
   describe('Testing of Token Calling Component', () => {
@@ -19,7 +21,7 @@ describe('Testing of Token Calling Use Cases', () => {
     };
 
     describe('Testing of CallAgainModule', () => {
-      const callMockFunction = jest.fn((tokenNumber) => {});
+      const callMockFunction = jest.fn((tokenNumber) => { });
       const callTokenAgainStrategyFunction = (tokenNumber: number) => {
         callMockFunction(tokenNumber);
       };
@@ -42,7 +44,7 @@ describe('Testing of Token Calling Use Cases', () => {
     });
 
     describe('Testing of BypassTokenModule', () => {
-      const callMockFunction = jest.fn((tokenNumber) => {});
+      const callMockFunction = jest.fn((tokenNumber) => { });
 
       const byPassTokenStrategyFunction = (tokenNumber: number) => {
         callMockFunction(tokenNumber);
@@ -66,7 +68,7 @@ describe('Testing of Token Calling Use Cases', () => {
     });
 
     describe('Testing of NextTokenModule', () => {
-      const callMockFunction = jest.fn((tokenNumber) => {});
+      const callMockFunction = jest.fn((tokenNumber) => { });
       const callNextStrategyFunction = (tokenNumber: number) => {
         callMockFunction(tokenNumber);
       };
@@ -89,7 +91,7 @@ describe('Testing of Token Calling Use Cases', () => {
     });
 
     describe('Testing of RandomTokenCallModule', () => {
-      const callMockFunction = jest.fn((tokenNumber) => {});
+      const callMockFunction = jest.fn((tokenNumber) => { });
       const randomTokenCallStrategyFunction = (tokenNumber: number) => {
         callMockFunction(tokenNumber);
       };
@@ -111,6 +113,31 @@ describe('Testing of Token Calling Use Cases', () => {
         randomCall.callToken(4);
         expect(callMockFunction.mock.calls.length).toBe(1);
       });
+    });
+
+    describe('Testing of TokenForwardModule', () => {
+      const callMockFunction = jest.fn(tokenNumber => { });
+      const tokenForwardStrategyFunction = (tokenNumber: number) => {
+        callMockFunction(tokenNumber);
+      }
+
+      const forwardTokenStrategyObject = {
+        features: [feature],
+        pipeFeature: pipeFeature,
+        forwardToken: tokenForwardStrategyFunction
+      }
+
+      const forwardToken = new TokenForward();
+      it('Should get and set strategy for Token Forward', () => {
+        forwardToken.strategy = forwardTokenStrategyObject;
+        expect(forwardToken.strategy).toEqual(forwardTokenStrategyObject);
+      });
+
+      it('Should forward a token', () => {
+        forwardToken.callToken(4);
+        expect(callMockFunction.mock.calls.length).toBe(1);
+      })
+
     });
 
     describe('Testing of Token Calling Facade', () => {
@@ -139,6 +166,11 @@ describe('Testing of Token Calling Use Cases', () => {
         randomTokenCallMockFunction();
       };
 
+      const tokenForwardMockFunction = jest.fn();
+      const tokenForwardFunction = (tokenNumber: number) => {
+        tokenForwardMockFunction();
+      }
+
       const feature = {
         runFeature: runFeatureFunction,
       };
@@ -156,7 +188,7 @@ describe('Testing of Token Calling Use Cases', () => {
 
       const nextTokenStrategy = {
         features: [],
-        callNextToken: callNextTokenMockFunction,
+        callNextToken: callNextTokenFunction,
         pipeFeature: pipeFeatureFunction,
       };
 
@@ -172,30 +204,48 @@ describe('Testing of Token Calling Use Cases', () => {
         pipeFeature: pipeFeatureFunction,
       };
 
-      const tokenCallingFacade = new TokenCallingFacade();
+      const tokenForwardStrategy = {
+        features: [],
+        forwardToken: tokenForwardFunction,
+        pipeFeature: pipeFeatureFunction
+      }
+
+      const tokenCallingFacade = TokenCallingFacade.getInstance();
+
       describe('Testing token calling procedure of Facade', () => {
         tokenCallingFacade.byPassStrategy = byPassTokenStrategy;
         it('Should bypass a token', () => {
           tokenCallingFacade.byPassToken(4);
           expect(byPassTokenMockFunction.mock.calls.length).toBe(1);
+          expect(tokenCallingFacade.currentlyProcessingNumber).toBe(4);
         });
 
         tokenCallingFacade.callAgainStrategy = callAgainTokenStrategy;
         it('Should call again a token', () => {
-          tokenCallingFacade.callTokenAgain(4);
+          tokenCallingFacade.callTokenAgain(5);
           expect(callAgainMockFunction.mock.calls.length).toBe(1);
+          expect(tokenCallingFacade.currentlyProcessingNumber).toBe(5);
         });
 
         tokenCallingFacade.nextTokenStrategy = nextTokenStrategy;
         it('Should call next token', () => {
-          tokenCallingFacade.callNextTOken(4);
+          tokenCallingFacade.callNextToken(40);
           expect(callNextTokenMockFunction.mock.calls.length).toBe(1);
+          expect(tokenCallingFacade.currentlyProcessingNumber).toBe(40);
         });
 
         tokenCallingFacade.randomCallStrategy = randomTokenStrategy;
         it('Should call a random token', () => {
-          tokenCallingFacade.callRandomToken(4);
+          tokenCallingFacade.callRandomToken(400);
           expect(randomTokenCallMockFunction.mock.calls.length).toBe(1);
+          expect(tokenCallingFacade.currentlyProcessingNumber).toBe(400);
+        });
+
+        tokenCallingFacade.tokenForwardStrategy = tokenForwardStrategy;
+        it('Should forward a token', () => {
+          tokenCallingFacade.forwardToken(32);
+          expect(tokenForwardMockFunction.mock.calls.length).toBe(1);
+          expect(tokenCallingFacade.currentlyProcessingNumber).toBe(32);
         });
       });
 
@@ -215,6 +265,10 @@ describe('Testing of Token Calling Use Cases', () => {
         it('Should pipe a randomTokenCall feature', () => {
           tokenCallingFacade.pipeRandomTokenFeature(feature);
           expect(pipeFeatureMockFunction.mock.calls.length).toBe(4);
+        });
+        it('Should pipe a tokenForward feature', () => {
+          tokenCallingFacade.pipeTokenForwardFeature(feature);
+          expect(pipeFeatureMockFunction.mock.calls.length).toBe(5);
         });
       });
     });

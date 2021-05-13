@@ -4,4 +4,5 @@ export default interface PluginInfo {
   minCoreVersion?: string;
   pluginId: number;
   pluginValidatorId: string;
+  pluginDescription?: string;
 }

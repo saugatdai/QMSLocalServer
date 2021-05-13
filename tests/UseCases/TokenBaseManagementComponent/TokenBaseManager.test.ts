@@ -120,7 +120,9 @@ describe('Testing of TokenBaseModule', () => {
       date.setDate(12);
 
       const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenBaseByStatus(TokenStatus.PROCESSED, date);
-      expect(filteredTokenBases.length).toBe(1);
+      filteredTokenBases.forEach(tokenBase => {
+        expect(tokenBase.token.date.getDate()).toBe(12);
+      });
     })
 
     it('Should filter token by Token Date', async () => {
@@ -128,7 +130,9 @@ describe('Testing of TokenBaseModule', () => {
       date.setDate(12);
 
       const filteredTokenBases = await tokenBaseStorageInteractorAdapter.filterTokenBaseByTokenDate(date.toLocaleDateString());
-      expect(filteredTokenBases.length).toBe(1);
+      filteredTokenBases.forEach(tokenBase => {
+        expect(tokenBase.token.date.getDate()).toBe(12);
+      });
     });
 
     it('Should get next available token number', async () => {

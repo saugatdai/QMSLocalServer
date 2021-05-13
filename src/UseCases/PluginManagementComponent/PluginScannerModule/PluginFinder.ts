@@ -13,9 +13,8 @@ export interface DirectoryPluginInfoValidatorInterface {
 
 export default class PluginFinder implements PluginFinderInterface {
   private _plugins: Plugin[] = [];
-  public findingProcessCompleted = false;
 
-  constructor(private pluginPath: string) {}
+  constructor(private pluginPath: string) { }
 
   public async scanForPlugins(): Promise<Plugin[]> {
     const directoryPluginInfoValidator: DirectoryPluginInfoValidatorInterface = new DirectoryPluginInfoValidator(
@@ -51,7 +50,10 @@ export default class PluginFinder implements PluginFinderInterface {
     return scannedPlugins.filter((plugin) => plugin !== undefined);
   }
 
-  public get plugins(): Plugin[] {
-    return this._plugins;
+  public async getPrioritySortedPlugins() {
+    const plugins = await this.scanForPlugins();
+    return plugins.sort((a, b) => a.priority > b.priority ? 1 : -1);
   }
+
+
 }
