@@ -1,5 +1,6 @@
 export interface Feature {
   runFeature: () => void;
+  goToNextFeature: boolean;
 }
 
 export interface EventHandler {

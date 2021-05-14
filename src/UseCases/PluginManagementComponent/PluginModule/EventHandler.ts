@@ -1,4 +1,4 @@
-export default interface EventHandler{
+export default interface EventHandler {
     eventType: string;
-    handleEvent(): () => void;
+    handleEvent: () => void;
 }

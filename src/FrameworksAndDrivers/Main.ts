@@ -1,6 +1,4 @@
 import * as path from 'path';
-
-
 import {
   CallAgainDefault,
   CallNextTokenDefault,
@@ -15,15 +13,35 @@ import PipelineTypes from '../UseCases/PluginManagementComponent/PluginModule/Pi
 import Plugin from '../UseCases/PluginManagementComponent/PluginModule/Plugin';
 
 export default class Main {
-  public async loadPlugins() {
-    const pluginFinder = new PluginFinder(path.join(__dirname, '../../plugins'));
+  public async loadPlugins(pluginPath: string) {
+    const pluginFinder = new PluginFinder(pluginPath);
     const sortedPlugins = await pluginFinder.getPrioritySortedPlugins();
-    console.log(sortedPlugins);
     sortedPlugins.forEach(plugin => {
-      // TODO Provision for registering plugin strategies
+      this.registerStrategiesFromPluginIfExists(plugin);
+    });
+    sortedPlugins.forEach(plugin => {
       this.registerEventHandlersFromPluginIfExists(plugin);
       this.registerPipelineExecutorsFromPluginIfExists(plugin);
     });
+  }
+
+  private registerStrategiesFromPluginIfExists(plugin: Plugin) {
+    const tokenCallingFacadeSingleton = TokenCallingFacadeSingleton.getInstance();
+    if (plugin.bypassStrategy) {
+      tokenCallingFacadeSingleton.byPassStrategy = plugin.bypassStrategy;
+    }
+    if (plugin.callAgainStrategy) {
+      tokenCallingFacadeSingleton.callAgainStrategy = plugin.callAgainStrategy;
+    }
+    if (plugin.nextTokenStrategy) {
+      tokenCallingFacadeSingleton.nextTokenStrategy = plugin.nextTokenStrategy;
+    }
+    if (plugin.randomCallStrategy) {
+      tokenCallingFacadeSingleton.randomCallStrategy = plugin.randomCallStrategy;
+    }
+    if (plugin.tokenForwardStrategy) {
+      tokenCallingFacadeSingleton.tokenForwardStrategy = plugin.tokenForwardStrategy;
+    }
   }
 
   private registerEventHandlersFromPluginIfExists(plugin: Plugin) {

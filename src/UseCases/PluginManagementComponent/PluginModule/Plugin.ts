@@ -5,6 +5,7 @@ import CallAgainStrategy from '../../TokenCallingComponent/CallAgainModule/CallA
 import BypassTokenStrategy from '../../TokenCallingComponent/BypassTokenModule/BypassTokenStrategy';
 import NextTokenStrategy from '../../TokenCallingComponent/NextTokenModule/NextTokenStrategy';
 import RandomTokenCallStrategy from '../../TokenCallingComponent/RandomTokenCallModule/RandomTokenCallStrategy';
+import TokenForwardStrategy from '../../TokenCallingComponent/TokenForwardModule/TokenForwardStrategy';
 
 export default interface Plugin {
   eventHandlers?: EventHandler[];
@@ -15,4 +16,5 @@ export default interface Plugin {
   bypassStrategy?: BypassTokenStrategy;
   nextTokenStrategy?: NextTokenStrategy;
   randomCallStrategy?: RandomTokenCallStrategy;
+  tokenForwardStrategy?: TokenForwardStrategy;
 }
