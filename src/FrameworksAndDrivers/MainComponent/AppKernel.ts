@@ -1,19 +1,19 @@
-import * as path from 'path';
 import {
   CallAgainDefault,
   CallNextTokenDefault,
   RandomTokenCallDefault,
   TokenBypassDefault
-} from '../InterfaceAdapters/TokenCallingStrategiesImplementation';
+} from '../../InterfaceAdapters/TokenCallingStrategiesImplementation';
 
-import PluginFinder from '../UseCases/PluginManagementComponent/PluginScannerModule/PluginFinder';
-import TokenCallingFacadeSingleton from '../UseCases/TokenCallingComponent/TokenCallingFacadeSingleton';
-import EventManagerSingleton from '../UseCases/EventManagementComponent/EventManagerSingleton';
-import PipelineTypes from '../UseCases/PluginManagementComponent/PluginModule/PipelineTypes';
-import Plugin from '../UseCases/PluginManagementComponent/PluginModule/Plugin';
+import PluginFinder from '../../UseCases/PluginManagementComponent/PluginScannerModule/PluginFinder';
+import TokenCallingFacadeSingleton from '../../UseCases/TokenCallingComponent/TokenCallingFacadeSingleton';
+import EventManagerSingleton from '../../UseCases/EventManagementComponent/EventManagerSingleton';
+import PipelineTypes from '../../UseCases/PluginManagementComponent/PluginModule/PipelineTypes';
+import Plugin from '../../UseCases/PluginManagementComponent/PluginModule/Plugin';
 
-export default class Main {
-  public async loadPlugins(pluginPath: string) {
+export default class AppKernel {
+  public async initializeCoreCallingActivities(pluginPath: string) {
+    this.initializeTokenCallingFacadeWithDefaultStrategies();
     const pluginFinder = new PluginFinder(pluginPath);
     const sortedPlugins = await pluginFinder.getPrioritySortedPlugins();
     sortedPlugins.forEach(plugin => {
@@ -82,7 +82,7 @@ export default class Main {
     }
   }
 
-  public initializeTokenCallingFacade() {
+  private initializeTokenCallingFacadeWithDefaultStrategies() {
     const callAgainDefault = new CallAgainDefault(async (tokenNumber: number) => { });
     const callNextTokenDefault = new CallNextTokenDefault(async (tokenNumber: number) => { });
     const randomTokenCallDefault = new RandomTokenCallDefault(async (tokenNumber: number) => { })

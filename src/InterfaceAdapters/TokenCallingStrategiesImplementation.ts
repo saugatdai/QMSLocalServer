@@ -82,5 +82,3 @@ export class RandomTokenCallDefault extends FeaturesHandler implements RandomTok
     EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
   }
 }
-
-// TODO TokenCallingStrategies testing for usecase remaining
