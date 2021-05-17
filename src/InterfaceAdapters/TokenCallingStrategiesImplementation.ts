@@ -16,6 +16,7 @@ class FeaturesHandler {
 }
 
 export class TokenBypassDefault extends FeaturesHandler implements BypassTokenStrategy {
+  private continuation = true;
   constructor(private byPassToken: (tokenNumber: number) => Promise<void>) {
     super();
   }
@@ -23,16 +24,20 @@ export class TokenBypassDefault extends FeaturesHandler implements BypassTokenSt
     EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
     this.features.every(feature => {
       feature.runFeature();
-      return (feature.goToNextFeature) ? true : false;
+      this.continuation = (feature.goToNextFeature) ? true : false;
+      return this.continuation;
     });
-    this.byPassToken(tokenNumber).then().catch(error => {
-      console.log(error);
-    });
+    if (this.continuation) {
+      this.byPassToken(tokenNumber).then().catch(error => {
+        console.log(error);
+      });
+    }
     EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT);
   }
 }
 
 export class CallAgainDefault extends FeaturesHandler implements CallAgainTokenStrategy {
+  private continuation = true;
   constructor(private callTokenAgain: (tokenNumber: number) => Promise<void>) {
     super();
   }
@@ -40,16 +45,20 @@ export class CallAgainDefault extends FeaturesHandler implements CallAgainTokenS
     EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
     this.features.every(feature => {
       feature.runFeature();
-      return (feature.goToNextFeature) ? true : false;
+      this.continuation = (feature.goToNextFeature) ? true : false;
+      return this.continuation;
     });
-    this.callTokenAgain(tokenNumber).then().catch(error => {
-      console.log(error);
-    });
+    if (this.continuation) {
+      this.callTokenAgain(tokenNumber).then().catch(error => {
+        console.log(error);
+      });
+    }
     EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT);
   }
 }
 
 export class CallNextTokenDefault extends FeaturesHandler implements NextTokenStrategy {
+  private continuation = true;
   constructor(private nextTokenCaller: (tokenNumber: number) => Promise<void>) {
     super();
   }
@@ -57,16 +66,20 @@ export class CallNextTokenDefault extends FeaturesHandler implements NextTokenSt
     EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
     this.features.every(feature => {
       feature.runFeature();
-      return (feature.goToNextFeature) ? true : false;
+      this.continuation = (feature.goToNextFeature) ? true : false;
+      return this.continuation;
     });
-    this.nextTokenCaller(tokenNumber).then().catch(error => {
-      console.log(error);
-    });
+    if (this.continuation) {
+      this.nextTokenCaller(tokenNumber).then().catch(error => {
+        console.log(error);
+      });
+    }
     EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT);
   }
 }
 
 export class RandomTokenCallDefault extends FeaturesHandler implements RandomTokenCallStrategy {
+  private continuation = true;
   constructor(private randomTokenCaller: (tokenNumber: number) => Promise<void>) {
     super();
   }
@@ -74,11 +87,14 @@ export class RandomTokenCallDefault extends FeaturesHandler implements RandomTok
     EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
     this.features.every(feature => {
       feature.runFeature();
-      return (feature.goToNextFeature) ? true : false;
+      this.continuation = (feature.goToNextFeature) ? true : false;
+      return this.continuation;
     });
-    this.randomTokenCaller(tokenNumber).then().catch(error => {
-      console.log(error);
-    });
+    if (this.continuation) {
+      this.randomTokenCaller(tokenNumber).then().catch(error => {
+        console.log(error);
+      });
+    }
     EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
   }
 }

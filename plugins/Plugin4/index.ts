@@ -6,5 +6,4 @@ export default {
   eventHandlers: [preCallEventHandler, postCallEventHandler],
   pipelineExecutors: [pipelineExecutorPlugin4],
   priority: 8,
-  nextTokenStrategy: callNext
 }

@@ -84,7 +84,9 @@ export default class AppKernel {
 
   private initializeTokenCallingFacadeWithDefaultStrategies() {
     const callAgainDefault = new CallAgainDefault(async (tokenNumber: number) => { });
-    const callNextTokenDefault = new CallNextTokenDefault(async (tokenNumber: number) => { });
+    const callNextTokenDefault = new CallNextTokenDefault(async (tokenNumber: number) => {
+      console.log('CallNextTokenDefaultFeature');
+    });
     const randomTokenCallDefault = new RandomTokenCallDefault(async (tokenNumber: number) => { })
     const tokenBypassDefault = new TokenBypassDefault(async (tokenNumber: number) => { });
     const tokenCallingFacadeSingleton = TokenCallingFacadeSingleton.getInstance();

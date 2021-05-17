@@ -70,8 +70,8 @@ describe('Testing of TokenCallingStrategiesImplementation.test.ts', () => {
 
     tokenBypassDefaultObject.bypassToken(2);
 
-    it('Should execute bypass Function', async () => {
-      expect(bypassTokenMockFunction.mock.calls.length).toBe(1);
+    it('Should not execute bypass Function', async () => {
+      expect(bypassTokenMockFunction.mock.calls.length).toBe(0);
     });
     it('should call features appropriately with chain of responsibility principle', () => {
       expect(feature1Mock.mock.calls.length).toBe(1);
@@ -124,8 +124,8 @@ describe('Testing of TokenCallingStrategiesImplementation.test.ts', () => {
 
     callAgainDefaultObject.callAgainToken(2);
 
-    it('Should execute bypass Function', async () => {
-      expect(bypassTokenMockFunction.mock.calls.length).toBe(1);
+    it('Should not execute callAgainToken() Function', async () => {
+      expect(callAgainTokenMockFunction.mock.calls.length).toBe(0);
     });
     it('should call features appropriately with chain of responsibility principle', () => {
       expect(feature1Mock.mock.calls.length).toBe(1);
@@ -178,8 +178,8 @@ describe('Testing of TokenCallingStrategiesImplementation.test.ts', () => {
 
     callNextTokenDefaultObject.callNextToken(2);
 
-    it('Should execute bypass Function', async () => {
-      expect(bypassTokenMockFunction.mock.calls.length).toBe(1);
+    it('Should not execute callNext() Function', async () => {
+      expect(nextTokenCallerMockFunction.mock.calls.length).toBe(0);
     });
     it('should call features appropriately with chain of responsibility principle', () => {
       expect(feature1Mock.mock.calls.length).toBe(1);
@@ -232,8 +232,8 @@ describe('Testing of TokenCallingStrategiesImplementation.test.ts', () => {
 
     randomTokenCallDefaultObject.callRandomToken(2);
 
-    it('Should execute bypass Function', async () => {
-      expect(bypassTokenMockFunction.mock.calls.length).toBe(1);
+    it('Should not execute callRandomToken() function', async () => {
+      expect(callRandomTokenMockFunction.mock.calls.length).toBe(0);
     });
     it('should call features appropriately with chain of responsibility principle', () => {
       expect(feature1Mock.mock.calls.length).toBe(1);
