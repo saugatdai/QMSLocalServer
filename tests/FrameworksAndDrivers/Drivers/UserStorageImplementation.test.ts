@@ -3,12 +3,12 @@ import * as util from 'util';
 import * as fs from 'fs';
 
 
-import { UserData } from '../../src/Entities/UserCore/User';
-import User from '../../src/Entities/UserCore/User';
-import UserRoles from '../../src/Entities/UserCore/UserRoles';
-import UserFactory from '../../src/Entities/UserCore/UserFactory';
-import { Credentials } from '../../src/InterfaceAdapters/UserStorageInteractorImplementation';
-import UserStorageImplementation from '../../src/FrameworksAndDrivers/Drivers/UserStorageImplementation';
+import { UserData } from '../../../src/Entities/UserCore/User';
+import User from '../../../src/Entities/UserCore/User';
+import UserRoles from '../../../src/Entities/UserCore/UserRoles';
+import UserFactory from '../../../src/Entities/UserCore/UserFactory';
+import { Credentials } from '../../../src/InterfaceAdapters/UserStorageInteractorImplementation';
+import UserStorageImplementation from '../../../src/FrameworksAndDrivers/Drivers/UserStorageImplementation';
 
 export const readFile = (filename: string) =>
   util.promisify(fs.readFile)(filename, 'utf-8');
@@ -66,10 +66,10 @@ const lastUserData = {
 
 describe('Testing of UserStroageImplementation', () => {
   beforeAll(async () => {
-    await writeFile(path.join(__dirname, '../../Data/users.json'), usersJSON);
+    await writeFile(path.join(__dirname, '../../../Data/users.json'), usersJSON);
   });
   afterAll(async () => {
-    await writeFile(path.join(__dirname, '../../Data/users.json'), '');
+    await writeFile(path.join(__dirname, '../../../Data/users.json'), '');
   });
 
   describe('Testing of UserStorageAdapter', () => {

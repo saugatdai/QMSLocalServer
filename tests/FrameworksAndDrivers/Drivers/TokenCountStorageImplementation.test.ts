@@ -1,4 +1,4 @@
-import TokenCountStorageImplementation from '../../src/FrameworksAndDrivers/Drivers/TokenCountStorageImplementation';
+import TokenCountStorageImplementation from '../../../src/FrameworksAndDrivers/Drivers/TokenCountStorageImplementation';
 
 describe('Testing of TokenCountStorageInteractorImplementation', () => {
   beforeAll(async () => {

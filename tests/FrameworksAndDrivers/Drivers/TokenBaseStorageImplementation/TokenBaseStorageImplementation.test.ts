@@ -2,7 +2,7 @@ import * as path from 'path';
 import * as fs from 'fs';
 import * as util from 'util';
 
-import TokenBaseStorageImplementation from '../../../src/FrameworksAndDrivers/Drivers/TokenBaseStorageImplementation';
+import TokenBaseStorageImplementation from '../../../../src/FrameworksAndDrivers/Drivers/TokenBaseStorageImplementation';
 import { tokenBaseObject1, tokenBaseObject2, tokenBaseObject3 } from './tokenBaseExporter';
 
 const readFile = (filename: string) =>
@@ -10,7 +10,7 @@ const readFile = (filename: string) =>
 const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
-const tokenBaseTestStoragePath = path.join(__dirname, '../../../Data/tokenBase.json');
+const tokenBaseTestStoragePath = path.join(__dirname, '../../../../Data/tokenBase.json');
 
 describe('Testing of TokenBaseStorageInteractorImplementation', () => {
   const tokenBaseArrays = [tokenBaseObject1, tokenBaseObject2, tokenBaseObject3];

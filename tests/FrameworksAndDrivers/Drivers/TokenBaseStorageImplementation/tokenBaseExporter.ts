@@ -1,10 +1,10 @@
-import { TokenBaseObject } from '../../../src/UseCases/TokenBaseManagementComponent/TokenBaseModule';
-import { TokenProcessing } from '../../../src/UseCases/TokenBaseManagementComponent/TokenBaseModule';
-import { TokenStatus } from '../../../src/UseCases/TokenBaseManagementComponent/TokenBaseModule';
-import Token from '../../../src/Entities/TokenCore/Token';
-import Operator from '../../../src/Entities/UserCore/Operator';
-import { UserData } from '../../../src/Entities/UserCore/User';
-import UserRoles from '../../../src/Entities/UserCore/UserRoles';
+import { TokenBaseObject } from '../../../../src/UseCases/TokenBaseManagementComponent/TokenBaseModule';
+import { TokenProcessing } from '../../../../src/UseCases/TokenBaseManagementComponent/TokenBaseModule';
+import { TokenStatus } from '../../../../src/UseCases/TokenBaseManagementComponent/TokenBaseModule';
+import Token from '../../../../src/Entities/TokenCore/Token';
+import Operator from '../../../../src/Entities/UserCore/Operator';
+import { UserData } from '../../../../src/Entities/UserCore/User';
+import UserRoles from '../../../../src/Entities/UserCore/UserRoles';
 
 // ********************** Define Operators ********************************
 const operator1Info: UserData = {

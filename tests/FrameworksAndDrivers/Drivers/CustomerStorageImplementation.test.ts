@@ -2,9 +2,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 import * as util from 'util';
 
-import Customer from '../../src/Entities/CustomerCore/Customer';
-import CustomerStorageImplementation from '../../src/FrameworksAndDrivers/Drivers/CustomerStorageImplementation';
-import Token from '../../src/Entities/TokenCore/Token';
+import Customer from '../../../src/Entities/CustomerCore/Customer';
+import CustomerStorageImplementation from '../../../src/FrameworksAndDrivers/Drivers/CustomerStorageImplementation';
+import Token from '../../../src/Entities/TokenCore/Token';
 
 const token1: Token = {
   date: new Date(),
@@ -65,7 +65,7 @@ const customer5: Customer = {
   customerName: "Lochan Thapa"
 }
 
-const customerTestStoragePath = path.join(__dirname, '../../Data/customers.json');
+const customerTestStoragePath = path.join(__dirname, '../../../Data/customers.json');
 
 const customerCollection = [customer1, customer2, customer3, customer4, customer5];
 
