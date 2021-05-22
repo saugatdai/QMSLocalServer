@@ -10,7 +10,7 @@ export default (pathPrefix: string) => {
       const routeHandler = target.prototype[propertyName];
       const path = Reflect.getMetadata(MetadataKeys.PATH, target.prototype, propertyName);
       const method: Methods = Reflect.getMetadata(MetadataKeys.METHOD, target.prototype, propertyName);
-      const middlewares: RequestHandler[] = Reflect.getMetadata(MetadataKeys.MIDDLEWARE, target.prototype, propertyName);
+      const middlewares: RequestHandler[] = Reflect.getMetadata(MetadataKeys.MIDDLEWARE, target.prototype, propertyName) || [];
       if (path && method) {
         AppRouterSingleton.getInstance()[method](`${pathPrefix}${path}`, [...middlewares], routeHandler);
       }

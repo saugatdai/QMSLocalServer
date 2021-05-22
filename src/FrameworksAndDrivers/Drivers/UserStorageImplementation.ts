@@ -19,8 +19,12 @@ const testStoragePath = path.join(__dirname, '../../../Data/users.json');
 
 const getAllUserDatas = async (): Promise<UserData[]> => {
   const userDatasJson = await readFile(testStoragePath);
-  const userDatas: UserData[] = JSON.parse(userDatasJson);
-  return userDatas;
+  if (userDatasJson) {
+    const userDatas: UserData[] = JSON.parse(userDatasJson);
+    return userDatas;
+  } else {
+    return [];
+  }
 };
 
 const createUser = async (user: User) => {
