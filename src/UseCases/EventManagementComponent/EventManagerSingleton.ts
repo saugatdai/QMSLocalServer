@@ -1,6 +1,7 @@
-import * as Emitter from 'events';
+import EventEmitter from 'events';
 
-export default class EventManagerSingleton extends Emitter {
+
+export default class EventManagerSingleton extends EventEmitter {
   private static instance = new EventManagerSingleton();
 
   private constructor() {
