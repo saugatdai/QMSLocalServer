@@ -40,9 +40,4 @@ class UserRoute {
       res.status(500).send({ error: error.toString() });
     }
   }
-
-  @get('/:username')
-  public getUserByUsername(req: Request, res: Response) {
-    res.status(200).send(`This route sends profile of ${req.params.username}`);
-  }
 }
