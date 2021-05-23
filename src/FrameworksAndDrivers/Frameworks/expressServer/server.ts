@@ -1,6 +1,6 @@
 import express, { NextFunction, Request, Response } from 'express';
 import 'reflect-metadata';
-import AppRouterSingleton from './Helpers/AppRouter';
+import AppRouterSingleton from './Helpers/userRouteHelper/AppRouter';
 import './RouteHandlers/UserRoutes';
 
 const app = express();
@@ -12,7 +12,5 @@ app.use(AppRouterSingleton.getInstance());
 app.get('/', (req: Request, res: Response) => {
   res.status(200).send('Hello from queuemanagement server');
 });
-
-
 
 export default app;

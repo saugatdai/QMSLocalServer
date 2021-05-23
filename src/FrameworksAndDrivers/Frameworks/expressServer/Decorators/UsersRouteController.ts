@@ -2,7 +2,7 @@ import { RequestHandler } from 'express';
 
 import MetadataKeys from "../Constants/MetadataKeys";
 import Methods from '../Constants/Methods';
-import AppRouterSingleton from "../Helpers/AppRouter";
+import AppRouterSingleton from "../Helpers/userRouteHelper/AppRouter";
 
 export default (pathPrefix: string) => {
   return (target: Function) => {

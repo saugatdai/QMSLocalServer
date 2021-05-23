@@ -8,9 +8,9 @@ import { UserData } from '../../../../src/Entities/UserCore/User';
 import UserRoles from '../../../../src/Entities/UserCore/UserRoles';
 
 
-export const readFile = (filename: string) =>
+const readFile = (filename: string) =>
   util.promisify(fs.readFile)(filename, 'utf-8');
-export const writeFile = (filename: string, data: string) =>
+const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
 const usersJSON = `[
@@ -65,18 +65,44 @@ const lastUserData = {
 const filePath = path.join(__dirname, '../../../../Data/users.json');
 
 describe('Testing of the /users route with empty database', () => {
+
+  beforeAll(async () => {
+    await writeFile(filePath, '');
+  });
+  afterAll(async () => {
+    await writeFile(filePath, '');
+  });
+
   it('should get all users when userfile is empty', async () => {
     const res = await request(server).get('/users');
     expect(res.statusCode).toEqual(200);
   });
 
-  describe('Testing of /users route with filled database', () => {
-    beforeAll(async () => {
-      await writeFile(filePath, '');
+  it('Should create a SuperAdministrator', async () => {
+    const res = await request(server).post('/users').send({
+      'username': 'saugatdai',
+      'role': 'SuperAdministrator',
+      'password': "mypassword"
     });
-
-    afterAll(async () => {
-      await writeFile(filePath, '');
-    });
+    expect(res.statusCode).toEqual(201);
   });
+
+  it('Should reject creating a SuperAdministrator if already exists', async () => {
+    const res = await request(server).post('/users').send({
+      'username': 'shaggy',
+      'role': 'SuperAdministrator',
+      'password': "mypassword"
+    });
+    expect(res.statusCode).toEqual(400);
+  });
+
+  it('Should login a user successfully', async () => {
+    const res = await request(server).post('/users/login').send({
+      'username': 'saugatdai',
+      'password': 'mypassword'
+    });
+    console.log(res.body);
+    expect(res.statusCode).toEqual(200);
+  });
+
 });

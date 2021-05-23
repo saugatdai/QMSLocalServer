@@ -1,5 +1,8 @@
-import { NextFunction, Request, RequestHandler, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import bcrypt from 'bcrypt';
+
 import UserRoles from '../../../../Entities/UserCore/UserRoles';
+import UserStorageHelper from '../Helpers/userRouteHelper/UserStorageHelper';
 
 export const validateUserData = (req: Request, res: Response, next: NextFunction) => {
   if (!req.body.username || !req.body.role || !req.body.password) {
@@ -21,12 +24,37 @@ export const validateUserData = (req: Request, res: Response, next: NextFunction
   }
 }
 
-export const userMiddleware1 = (req: Request, res: Response, next: NextFunction) => {
-  console.log('usermiddleware1');
+export const superAdminCreateCheck = async (req: Request, res: Response, next: NextFunction) => {
+  const userStorageHelper = new UserStorageHelper();
+  const superAdmin = await userStorageHelper.userStorageInteractorImplementation.getUsersByRole(UserRoles.SUPERADMIN);
+
+  if (superAdmin.length && req.body.role === UserRoles.SUPERADMIN) {
+    res.status(400).send({ error: "SuperAdministrator already exists" });
+  } else {
+    next();
+  }
+}
+
+export const hashPassword = async (req: Request, res: Response, next: NextFunction) => {
+  req.body.password = await bcrypt.hash(req.body.password, 10);
   next();
 }
 
-export const userMiddleware2 = (req: Request, res: Response, next: NextFunction) => {
-  console.log('usermiddleware2');
-  next();
+// TODO validate superuser while creating admin
+export const validateAdminCreatinfo = async (req: Request, res: Response, next: NextFunction) => {
+
 }
+
+// TODO validate admin info while creating other users
+export const validateForAdmin = async (req: Request, res: Response, next: NextFunction) => {
+
+}
+
+export const validateLoginCredentialsPresence = (req: Request, res: Response, next: NextFunction) => {
+  if (!req.body.username || !req.body.password) {
+    res.status(400).send({ error: 'Bad login credentials' });
+  } else {
+    next();
+  }
+}
+
