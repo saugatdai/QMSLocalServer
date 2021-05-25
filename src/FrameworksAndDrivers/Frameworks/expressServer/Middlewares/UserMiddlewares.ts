@@ -1,8 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 
 import UserRoles from '../../../../Entities/UserCore/UserRoles';
 import UserStorageHelper from '../Helpers/userRouteHelper/UserStorageHelper';
+import OtherConstants from '../Constants/OtherConstants';
+import AuthTokenHelper from '../Helpers/userRouteHelper/AuthTokenHelper';
+import UserManager from '../../../../UseCases/UserManagementComponent/UserManager';
+
+type jwtDecodedData = {
+  id: number;
+}
 
 export const validateUserData = (req: Request, res: Response, next: NextFunction) => {
   if (!req.body.username || !req.body.role || !req.body.password) {
@@ -28,7 +36,9 @@ export const superAdminCreateCheck = async (req: Request, res: Response, next: N
   const userStorageHelper = new UserStorageHelper();
   const superAdmin = await userStorageHelper.userStorageInteractorImplementation.getUsersByRole(UserRoles.SUPERADMIN);
 
-  if (superAdmin.length && req.body.role === UserRoles.SUPERADMIN) {
+  if (req.body.role !== UserRoles.SUPERADMIN) {
+    res.status(400).send({ error: 'This route is for creating superadmins only' });
+  } else if (superAdmin.length && req.body.role === UserRoles.SUPERADMIN) {
     res.status(400).send({ error: "SuperAdministrator already exists" });
   } else {
     next();
@@ -40,19 +50,50 @@ export const hashPassword = async (req: Request, res: Response, next: NextFuncti
   next();
 }
 
-// TODO validate superuser while creating admin
-export const validateAdminCreatinfo = async (req: Request, res: Response, next: NextFunction) => {
-
-}
-
-// TODO validate admin info while creating other users
-export const validateForAdmin = async (req: Request, res: Response, next: NextFunction) => {
-
-}
-
 export const validateLoginCredentialsPresence = (req: Request, res: Response, next: NextFunction) => {
   if (!req.body.username || !req.body.password) {
     res.status(400).send({ error: 'Bad login credentials' });
+  } else {
+    next();
+  }
+}
+
+
+export const auth = async (req: Request, res: Response, next: NextFunction) => {
+  const authHeader = req.headers.authorization;
+  if (authHeader) {
+    const token = authHeader.split(' ')[1];
+    jwt.verify(token, OtherConstants.JWTSECRET, async (error, data: jwtDecodedData) => {
+      if (error) {
+        res.status(401).send({ error: 'Invalid Token' });
+      } else {
+        const tokensHolder = await new AuthTokenHelper().getAllTokensById(data.id);
+        if (!tokensHolder) {
+          res.status(401).send({ error: 'Received token does not yield any token holder' });
+        } else {
+          const match = tokensHolder.tokens.find(loopToken => token === loopToken);
+          if (match) {
+            const user = await new UserStorageHelper().userStorageInteractorImplementation.getUserById(data.id);
+            req.body.user = user;
+            next();
+          } else {
+            res.status(401).send({ error: 'Non-existing token' });
+          }
+        }
+      }
+    });
+  } else {
+    res.status(401).send({ error: 'Requires Login' });
+  }
+}
+
+export const checkAUthorityForCreatingAUser = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.role === UserRoles.ADMIN && req.body.user.getUserInfo().role != UserRoles.SUPERADMIN) {
+    res.status(400).send({ error: 'Only superadmins can create admin' });
+  } else if (req.body.role === UserRoles.SUPERADMIN) {
+    res.status(400).send({ error: 'Can not create a superadmin from this route' });
+  } else if (req.body.role !== UserRoles.ADMIN && req.body.user.getUserInfo().role != UserRoles.ADMIN) {
+    res.status(400).send({ error: 'Only admins can create users with such roles' });
   } else {
     next();
   }

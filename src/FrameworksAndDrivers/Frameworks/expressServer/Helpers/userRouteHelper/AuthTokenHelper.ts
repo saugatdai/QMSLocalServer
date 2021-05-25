@@ -19,7 +19,6 @@ export type tokenHolder = {
   token: string
 }
 
-export const jwtSecret = '$@ug@t$!gde1';
 
 export default class AuthTokenHelper {
 
@@ -72,5 +71,10 @@ export default class AuthTokenHelper {
     }
     storedTokensHolders.push(newTokensHolder);
     await writeFile(authFilePath, JSON.stringify(storedTokensHolders));
+  }
+
+  public async getAllTokensById(id: number) {
+    const storedTokensHolders = await this.getStoredTokenHolders();
+    return storedTokensHolders.find(storedTokensHolder => storedTokensHolder.id === id);
   }
 }

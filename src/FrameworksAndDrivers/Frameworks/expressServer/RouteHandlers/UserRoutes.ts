@@ -6,9 +6,10 @@ import use from '../Decorators/MiddlewareDecorator';
 import { get, post } from '../Decorators/PathAndRequestMethodDecorator';
 import UsersRouteController from '../Decorators/UsersRouteController';
 import UserStorageHelper from '../Helpers/userRouteHelper/UserStorageHelper';
-import { superAdminCreateCheck, validateUserData, validateLoginCredentialsPresence, hashPassword } from '../Middlewares/UserMiddlewares';
+import { superAdminCreateCheck, validateUserData, validateLoginCredentialsPresence, hashPassword, auth, checkAUthorityForCreatingAUser } from '../Middlewares/UserMiddlewares';
 import UserManager from '../../../../UseCases/UserManagementComponent/UserManager';
-import AuthTokenHelper, { jwtSecret } from '../Helpers/userRouteHelper/AuthTokenHelper';
+import AuthTokenHelper from '../Helpers/userRouteHelper/AuthTokenHelper';
+import OtherConstants from '../Constants/OtherConstants';
 
 @UsersRouteController('/users')
 class UserRoute {
@@ -20,20 +21,27 @@ class UserRoute {
   }
 
   @post('/')
+  @use(auth)
+  @use(checkAUthorityForCreatingAUser)
   @use(validateUserData)
-  @use(superAdminCreateCheck)
   @use(hashPassword)
   public async createAUser(req: Request, res: Response) {
     try {
-      const userStorageHelper = new UserStorageHelper();
-      const user = await userStorageHelper.getUserFromUserData(req.body);
-
-      const userManager = new UserManager(user);
-      userManager.userStorageInteractorAdapter = userStorageHelper.userStorageInteractorImplementation;
-      await userManager.store();
-
-      const createdUser = await userStorageHelper.userStorageInteractorImplementation.getUserById(user.getUserInfo().id);
+      const createdUser = await new UserStorageHelper().createAUser(req, res);
       res.status(201).send(createdUser);
+    } catch (error) {
+      res.status(500).send({ error: error.toString() });
+    }
+  }
+
+  @post('/superAdmin')
+  @use(validateUserData)
+  @use(superAdminCreateCheck)
+  @use(hashPassword)
+  public async createASuperAdmin(req: Request, res: Response) {
+    try {
+      const createdSuperAdmin = await new UserStorageHelper().createAUser(req, res);
+      res.status(201).send(createdSuperAdmin);
     } catch (error) {
       res.status(500).send({ error: error.toString() });
     }
@@ -43,7 +51,6 @@ class UserRoute {
   @use(validateLoginCredentialsPresence)
   public async login(req: Request, res: Response) {
     const userStorageHelper = new UserStorageHelper();
-
     try {
       const users = await userStorageHelper.userStorageInteractorImplementation.getAllUsers();
       const user = users.find(user => user.getUserInfo().username === req.body.username);
@@ -54,14 +61,12 @@ class UserRoute {
       if (!match) {
         throw new Error('Invalid password');
       }
-      jsonwebtoken.sign({ id: user.getUserInfo().id }, jwtSecret, async (error: Error, token: string) => {
+      jsonwebtoken.sign({ id: user.getUserInfo().id }, OtherConstants.JWTSECRET, async (error: Error, token: string) => {
         await new AuthTokenHelper().storeATokenForUser({ id: user.getUserInfo().id, token })
         res.status(200).send({
           user, token
         });
       });
-
-
     } catch (error) {
       res.status(400).send({ error: error.toString() });
     }
