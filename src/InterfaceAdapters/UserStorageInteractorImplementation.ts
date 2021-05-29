@@ -7,7 +7,7 @@ import UserFactory from '../Entities/UserCore/UserFactory';
 export interface UserStorageAdapter {
   createUser: (user: User) => Promise<void>;
   readUser: (userId: number) => Promise<User | Operator>;
-  updateUser: (user: User) => void;
+  updateUser: (user: User) => Promise<void>;
   deleteUser: (userId: number) => void;
   getUsers: () => Promise<User[] | Operator[]>;
   checkUserExistsWithUsername: (user: User | Operator) => Promise<boolean>;

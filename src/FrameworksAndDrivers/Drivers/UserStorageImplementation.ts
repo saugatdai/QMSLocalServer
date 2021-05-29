@@ -64,7 +64,6 @@ const readUser = async (userId: number): Promise<User> => {
 
 const updateUser = async (user: User): Promise<void> => {
   const initialUserDataGroup = await getAllUserDatas();
-
   const finalUserDataGroup: UserData[] = initialUserDataGroup.map(
     (loopUserData) => {
       if (loopUserData.id === user.getUserInfo().id) {
@@ -73,7 +72,6 @@ const updateUser = async (user: User): Promise<void> => {
       return loopUserData;
     }
   );
-
   await writeFile(testStoragePath, JSON.stringify(finalUserDataGroup));
 };
 

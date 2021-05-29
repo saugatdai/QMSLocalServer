@@ -6,4 +6,3 @@ export default interface Customer {
   remarks: string;
   customerName: string;
 }
-

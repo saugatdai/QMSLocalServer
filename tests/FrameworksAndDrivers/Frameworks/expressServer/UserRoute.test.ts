@@ -76,10 +76,7 @@ describe('Testing of the /users route with empty database', () => {
     await writeFile(tokenFilePath, '');
   });
 
-  it('should get all users when userfile is empty', async () => {
-    const res = await request(server).get('/users');
-    expect(res.statusCode).toEqual(200);
-  });
+  /* ###################### Superadmin Creation and Admin CRUD ###################### */
 
   it('Should deny creating SuperAdministrator because of a missing or invalid property', async () => {
     const res1 = await request(server).post('/users/superAdmin').send({
@@ -185,6 +182,142 @@ describe('Testing of the /users route with empty database', () => {
     expect(res.statusCode).toBe(201);
   });
 
+  it('Should not allow other users to view admins', async () => {
+    const res1 = await request(server).get('/users/login').send({
+      'username': 'shaggy',
+      'password': 'mypassword'
+    });
+
+    token = res1.body.token;
+    const res = await request(server).get('/users/admins').set('Authorization', `Bearer ${token}`).send();
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('Should allow superadmins to view admins', async () => {
+    let res = await request(server).post('/users/login').send({
+      'username': 'saugatdai',
+      'password': 'mypassword'
+    });
+    token = res.body.token;
+    res = await request(server).get('/users/admins').set('Authorization', `Bearer ${token}`).send();
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('Should allow superadmins to edit admins', async () => {
+    await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'holus',
+      'role': 'Administrator',
+      'password': 'holusdai123'
+    });
+
+    let res = await request(server).patch('/users/admins/3').set('Authorization', `Bearer ${token}`).send({
+      'username': 'shaggy1',
+      'role': 'Administrator',
+      'password': 'hello123'
+    });
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('Should not allow superadmins to edit admins with missing properties and values ', async () => {
+    let res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'user': 'saugatsigdel',
+      'role': 'Administrator',
+      'password': 'helloworld'
+    });
+    expect(res.statusCode).toBe(400);
+
+    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'saugatsigdel',
+      'rol': 'Administrator',
+      'password': 'helloworld'
+    });
+    expect(res.statusCode).toBe(400);
+
+    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'saugatsigdel',
+      'roll': 'Administrator',
+      'passwod': 'helloworld'
+    });
+    expect(res.statusCode).toBe(400);
+
+    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'sa',
+      'role': 'Administrator',
+      'password': 'helloworld'
+    });
+    expect(res.statusCode).toBe(400);
+
+    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'saugatsigdel',
+      'role': 'Adm',
+      'password': 'helloworld'
+    });
+    expect(res.statusCode).toBe(400);
+
+    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'saugatsigdel',
+      'role': 'Administrator',
+      'password': 'held'
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('Should not allow other users to update other admins', async () => {
+    const res = await request(server).post('/users/login').send({
+      'username': 'shaggy1',
+      'password': 'hello123'
+    });
+
+    const tempToken = res.body.token;
+
+    const res2 = await request(server).patch('/users/admins/:2').set('Authorization', `Bearer ${tempToken}`).send({
+      'username': 'shaggy12345',
+      'password': 'holusmondus',
+      'role': 'Administrator'
+    });
+    expect(res2.status).toBe(401);
+  });
+
+  it('Should not allow other users to view an admin profile', async () => {
+    let res = await request(server).post('/users/login').send({
+      'username': 'shaggy',
+      'password': 'hello123'
+    });
+    const tempToken = res.body.token;
+    res = await request(server).get('/users/admins/2').set('Authorization', `Bearer ${tempToken}`).send();
+    expect(res.statusCode).toBe(401)
+  });
+
+  it('Should allow superadmins to view an admin profile', async () => {
+    let res = await request(server).get('/users/admins/2').set('Authorization', `Bearer ${token}`).send();
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('Should not allow other users to delete admins', async () => {
+    const res1 = await request(server).post('/users/login').send({
+      'username': 'shaggy1',
+      'password': 'hello123'
+    });
+
+    const tempToken = res1.body.token;
+
+    const res2 = await request(server).delete('/users/admins/:2').set('Authorization', `Bearer ${tempToken}`).send();
+    expect(res2.statusCode).toBe(401);
+  });
+
+
+
+  it('Shuld allow superadmins to delete admins', async () => {
+    const res = await request(server).delete('/users/admins/3').set('Authorization', `Bearer ${token}`).send();
+    expect(res.statusCode).toBe(200);
+  });
+
+
+
+
+
+  /*################################### Admin Functionality and Users CRUD ######################################## */
+
   it('Should reject invalid token for an administrator creating a user', async () => {
     const newToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEifQ.5EUZWk745D-_yyLWlqRQqjv6ZmWv8gILqCH22g3O4tA';
     const res = await request(server).post('/users').set('Authorization', `Bearer ${newToken}`).send({
@@ -241,21 +374,21 @@ describe('Testing of the /users route with empty database', () => {
   });
 
   it('Should deny creating user because of a missing or invalid property', async () => {
-    const res1 = await request(server).post('/users/superAdmin').send({
+    const res1 = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
       'user': 'saugatdai',
       'role': 'Operator',
       'password': "mypassword"
     });
     expect(res1.statusCode).toEqual(400);
     expect(res1.body.error).toEqual('invalid userdata');
-    const res2 = await request(server).post('/users/superAdmin').send({
+    const res2 = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
       'username': 'saugatdai',
       'roll': 'Registrator',
       'password': "mypassword"
     });
     expect(res2.statusCode).toEqual(400);
     expect(res2.body.error).toEqual('invalid userdata');
-    const res3 = await request(server).post('/users/superAdmin').send({
+    const res3 = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
       'username': 'saugatdai',
       'role': 'Operator',
       'passwo': "mypassword"
@@ -264,10 +397,154 @@ describe('Testing of the /users route with empty database', () => {
     expect(res3.body.error).toEqual('invalid userdata');
   });
 
-  it('Should get all users', async () => {
-    const res = await request(server).get('/users').send();
-    console.log(res.body);
+  it('Should not allow other to view the general users', async () => {
+    let res = await request(server).post('/users/login').send({
+      'username': 'abcd',
+      'password': 'mypassword'
+    });
+    token = res.body.token;
+
+    res = await request(server).get('/users').set('Authorization', `Bearer ${token}`).send();
+    expect(res.statusCode).toEqual(401);
+
+    res = await request(server).post('/users/login').send({
+      'username': 'saugatdai',
+      'password': 'mypassword'
+    });
+    token = res.body.token;
+
+    res = await request(server).get('/users').set('Authorization', `Bearer ${token}`).send();
+    expect(res.statusCode).toEqual(401);
   });
 
+  it('Should not allow a user to view another user profile ', async () => {
+    const res = await request(server).get('/users/getuser/3').set('Authorization', `Bearer ${token}`).send();
+    expect(res.statusCode).toEqual(401);
+  });
+
+  it('Should allow admin to view the general users', async () => {
+    let res = await request(server).post('/users/login').send({
+      'username': 'shaggy',
+      'password': 'mypassword'
+    });
+    token = res.body.token;
+
+    res = await request(server).get('/users').set('Authorization', `Bearer ${token}`).send();
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('Should allow admin to view another user profile', async () => {
+    const res = await request(server).get('/users/getuser/3').set('Authorization', `Bearer ${token}`).send();
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('Should allow admins to edit users', async () => {
+    const res = await request(server).patch('/users/3').set('Authorization', `Bearer ${token}`).send({
+      'username': 'saugatprasadsigdel',
+      'password': 'holus12345',
+      'role': 'Registrator'
+    });
+    expect(res.statusCode).toEqual(200);
+  });
+
+  it('Should not allow other users to edit users', async () => {
+    let res = await request(server).post('/users/login').send({
+      'username': 'saugatprasadsigdel',
+      'password': 'holus12345'
+    });
+    const tempToken = res.body.token;
+    res = await request(server).patch('/users/3').set('Authorization', `Bearer ${tempToken}`).send({
+      'username': 'saugatprasadsigdel',
+      'password': 'holus12345',
+      'role': 'Registrator'
+    });
+    expect(res.statusCode).toEqual(401);
+  });
+
+  it('Should not allow admin to edit users with invalid properties or values', async () => {
+    let res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'user': 'saugatsigdel',
+      'role': 'Registrator',
+      'password': 'helloworld'
+    });
+    expect(res.statusCode).toBe(400);
+
+    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'saugatsigdel',
+      'rol': 'Registrator',
+      'password': 'helloworld'
+    });
+    expect(res.statusCode).toBe(400);
+
+    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'saugatsigdel',
+      'role': 'Registrator',
+      'passwod': 'helloworld'
+    });
+    expect(res.statusCode).toBe(400);
+
+    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'sa',
+      'role': 'Registrator',
+      'password': 'helloworld'
+    });
+    expect(res.statusCode).toBe(400);
+
+    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'saugatsigdel',
+      'role': 'Adm',
+      'password': 'helloworld'
+    });
+    expect(res.statusCode).toBe(400);
+
+    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'saugatsigdel',
+      'role': 'Administrator',
+      'password': 'held'
+    });
+    expect(res.statusCode).toBe(400);
+  });
+
+  it('Should not allow superadmins to delete other users than admins', async () => {
+    let res1 = await request(server).post('/users/login').send({
+      'username': 'shaggy1',
+      'password': 'hello123'
+    });
+    const tempToken = res1.body.token;
+    res1 = await request(server).post('/users').set('Authorization', `Bearer ${tempToken}`).send({
+      'username': 'holusdai',
+      'password': 'holusmondus',
+      'role': 'Operator'
+    });
+
+    res1 = await request(server).delete('/users/admins/4').set('Authorization', `Bearer ${token}`).send();
+    expect(res1.statusCode).toEqual(401);
+  });
+
+  it('Should not allow other users to delete admin', async () => {
+    let res = await request(server).post('/users/login').send({
+      'username': 'saugatprasadsigdel',
+      'password': 'holus12345'
+    });
+    const tempToken = res.body.token;
+    res = await request(server).delete('/users/3').set('Authorization', `Bearer ${tempToken}`).send();
+
+    expect(res.statusCode).toBe(401);
+  });
+
+  it('Should allow admin to delete other users', async () => {
+    const res = await request(server).delete('/users/3').set('Authorization', `Bearer ${token}`).send();
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('Should not allow other users to delete other users', async () => {
+    let res = await request(server).post('/users/login').send({
+      'username': 'saugatprasadsigdel',
+      'password': 'holus12345'
+    });
+    const tempToken = res.body.token;
+    res = await request(server).delete('/users/4').set('Authorization', `Bearer ${tempToken}`).send();
+    expect(res.statusCode).toBe(401);
+  });
 
 });

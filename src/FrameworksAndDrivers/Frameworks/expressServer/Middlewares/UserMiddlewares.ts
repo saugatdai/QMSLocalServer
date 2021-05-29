@@ -32,7 +32,7 @@ export const validateUserData = (req: Request, res: Response, next: NextFunction
   }
 }
 
-export const superAdminCreateCheck = async (req: Request, res: Response, next: NextFunction) => {
+export const superAdminPresenceCreateCheck = async (req: Request, res: Response, next: NextFunction) => {
   const userStorageHelper = new UserStorageHelper();
   const superAdmin = await userStorageHelper.userStorageInteractorImplementation.getUsersByRole(UserRoles.SUPERADMIN);
 
@@ -94,6 +94,22 @@ export const checkAUthorityForCreatingAUser = async (req: Request, res: Response
     res.status(400).send({ error: 'Can not create a superadmin from this route' });
   } else if (req.body.role !== UserRoles.ADMIN && req.body.user.getUserInfo().role != UserRoles.ADMIN) {
     res.status(400).send({ error: 'Only admins can create users with such roles' });
+  } else {
+    next();
+  }
+}
+
+export const checkAdminAuthority = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.user && req.body.user.getUserInfo().role != UserRoles.ADMIN) {
+    res.status(401).send({ error: 'Must be Admin' });
+  } else {
+    next();
+  }
+}
+
+export const checkSuperAdminAuthority = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.user && req.body.user.getUserInfo().role !== UserRoles.SUPERADMIN) {
+    res.status(401).send({ error: 'Must be superadmin to access admins' });
   } else {
     next();
   }
