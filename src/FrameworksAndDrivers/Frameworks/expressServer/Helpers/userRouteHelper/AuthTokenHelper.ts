@@ -7,7 +7,6 @@ const readFile = (filename: string) =>
 const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
-const authFilePath = path.join(__dirname, '/auths.json');
 
 type tokensHolder = {
   id: number,
@@ -21,6 +20,8 @@ export type tokenHolder = {
 
 
 export default class AuthTokenHelper {
+
+  constructor(private authFilePath = path.join(__dirname, '/auths.json')) { }
 
   public async storeATokenForUser(tokenHolder: tokenHolder) {
     const storedTokensHolders = await this.getStoredTokenHolders();
@@ -36,7 +37,7 @@ export default class AuthTokenHelper {
   }
 
   private async getStoredTokenHolders() {
-    const tokenHoldersJSON = await readFile(authFilePath);
+    const tokenHoldersJSON = await readFile(this.authFilePath);
     let storedTokensHolders: tokensHolder[];
     if (tokenHoldersJSON) {
       storedTokensHolders = JSON.parse(tokenHoldersJSON);
@@ -51,7 +52,7 @@ export default class AuthTokenHelper {
       id: tokenHolder.id,
       tokens: [tokenHolder.token]
     }]
-    await writeFile(authFilePath, JSON.stringify(tokenHolderArray));
+    await writeFile(this.authFilePath, JSON.stringify(tokenHolderArray));
   }
 
   private async insertATokenToExistingTokensHolder(tokenHolder: tokenHolder, storedTokensHolders: tokensHolder[]) {
@@ -61,7 +62,7 @@ export default class AuthTokenHelper {
       }
       return loopTokenHolder;
     });
-    await writeFile(authFilePath, JSON.stringify(updatedTokenHolders));
+    await writeFile(this.authFilePath, JSON.stringify(updatedTokenHolders));
   }
 
   private async storeANewTokenHolderIntoExistingTokensHolders(storedTokensHolders: tokensHolder[], tokenHolder: tokenHolder) {
@@ -70,11 +71,41 @@ export default class AuthTokenHelper {
       tokens: [tokenHolder.token]
     }
     storedTokensHolders.push(newTokensHolder);
-    await writeFile(authFilePath, JSON.stringify(storedTokensHolders));
+    await writeFile(this.authFilePath, JSON.stringify(storedTokensHolders));
   }
 
-  public async getAllTokensById(id: number) {
+  public async getAllTokensHolderById(id: number) {
     const storedTokensHolders = await this.getStoredTokenHolders();
     return storedTokensHolders.find(storedTokensHolder => storedTokensHolder.id === id);
+  }
+
+  public async getAllTokensOfAUserId(id: number) {
+    const tokenHolders = await this.getStoredTokenHolders();
+    const tokensHolder = tokenHolders.find(tokenHolder => tokenHolder.id === id);
+    if (!tokensHolder) {
+      return [];
+    } else {
+      return tokensHolder.tokens;
+    }
+  }
+
+  public async deleteATokenOfUserId(id: number, token: string) {
+    let storedTokensHolder = await this.getStoredTokenHolders();
+    storedTokensHolder = storedTokensHolder.map(tokensHolder => {
+      if (tokensHolder.id === id) {
+        tokensHolder.tokens = tokensHolder.tokens.filter(loopToken => {
+          return loopToken !== token;
+        });
+      }
+      return tokensHolder;
+    });
+
+    await writeFile(this.authFilePath, JSON.stringify(storedTokensHolder));
+  }
+
+  public async deleteAllTokensOfUserId(id: number) {
+    let storedTokensHolder = await this.getStoredTokenHolders();
+    storedTokensHolder = storedTokensHolder.filter(tokenHolder => tokenHolder.id !== id);
+    await writeFile(this.authFilePath, JSON.stringify(storedTokensHolder));
   }
 }

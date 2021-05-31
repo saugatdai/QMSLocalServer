@@ -37,7 +37,6 @@ class TokenProcessing {
             timestamp: this._timeStamp
         };
     }
-
 }
 
 class TokenBaseObject {

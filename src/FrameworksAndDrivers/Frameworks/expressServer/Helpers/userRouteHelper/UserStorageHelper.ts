@@ -84,7 +84,6 @@ export default class UserStorageHelper {
       const userManager = new UserManager(user);
       userManager.userStorageInteractorAdapter = this.userStorageInteractorImplementation;
       await userManager.update();
-
       const createdUser = await this.userStorageInteractorImplementation.getUserById(user.getUserInfo().id);
       return createdUser;
     }

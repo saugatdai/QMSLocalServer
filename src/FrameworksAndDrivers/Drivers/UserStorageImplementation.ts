@@ -15,7 +15,11 @@ const readFile = (filename: string) =>
 const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
-const testStoragePath = path.join(__dirname, '../../../Data/users.json');
+export let testStoragePath = path.join(__dirname, '../../../Data/users.json');
+
+export const changeStoragePath = (storagePath: string) => {
+  testStoragePath = storagePath;
+}
 
 const getAllUserDatas = async (): Promise<UserData[]> => {
   const userDatasJson = await readFile(testStoragePath);

@@ -4,7 +4,7 @@ import jsonwebtoken from 'jsonwebtoken';
 
 import use from '../Decorators/MiddlewareDecorator';
 import { del, get, patch, post } from '../Decorators/PathAndRequestMethodDecorator';
-import UsersRouteController from '../Decorators/UsersRouteController';
+import Controller from '../Decorators/Controller';
 import UserStorageHelper from '../Helpers/userRouteHelper/UserStorageHelper';
 import {
   superAdminPresenceCreateCheck,
@@ -20,7 +20,7 @@ import AuthTokenHelper from '../Helpers/userRouteHelper/AuthTokenHelper';
 import OtherConstants from '../Constants/OtherConstants';
 import UserRoles from '../../../../Entities/UserCore/UserRoles';
 
-@UsersRouteController('/users')
+@Controller('/users')
 class UserRoute {
   @get('/')
   @use(auth)
@@ -103,14 +103,39 @@ class UserRoute {
         throw new Error('Invalid password');
       }
       jsonwebtoken.sign({ id: user.getUserInfo().id }, OtherConstants.JWTSECRET, async (error: Error, token: string) => {
-        await new AuthTokenHelper().storeATokenForUser({ id: user.getUserInfo().id, token })
+        const authTokenHelper = new AuthTokenHelper();
+        await authTokenHelper.storeATokenForUser({ id: user.getUserInfo().id, token })
         res.status(200).send({
-          user, token
+          user, token, storedTokens: await authTokenHelper.getAllTokensOfAUserId(user.getUserInfo().id)
         });
       });
     } catch (error) {
       res.status(400).send({ error: error.toString() });
     }
+  }
+
+
+  @get('/logout')
+  @use(auth)
+  public async logOutUser(req: Request, res: Response) {
+    const currentToken = req.headers.authorization.split(' ')[1];
+    const authTokenHelper = new AuthTokenHelper();
+    await authTokenHelper.deleteATokenOfUserId(req.body.user.getUserInfo().id, currentToken);
+    const userTokens = await authTokenHelper.getAllTokensOfAUserId(req.body.user.getUserInfo().id);
+    res.status(200).send({ user: req.body.user, storedTokens: userTokens });
+  }
+
+  @get('/logoutall')
+  @use(auth)
+  public async logOutUserFromALlDevices(req: Request, res: Response) {
+    const authTokenHelper = new AuthTokenHelper();
+    await authTokenHelper.deleteAllTokensOfUserId(req.body.user.getUserInfo().id);
+    const userWithTokens = await new UserStorageHelper().userStorageInteractorImplementation.getUserById(req.body.user.getUserInfo().id);
+    const userToBeSent = {
+      user: userWithTokens,
+      tokens: await authTokenHelper.getAllTokensOfAUserId(userWithTokens.getUserInfo().id)
+    }
+    res.status(200).send(userToBeSent);
   }
 
   @get('/admins')
@@ -149,6 +174,16 @@ class UserRoute {
   public async deleteAdmin(req: Request, res: Response) {
     await new UserStorageHelper().deleteAdmin(req, res);
     res.status(200).send();
+  }
+
+  @get('/superAdmin')
+  public async getSuperAdminInfo(req: Request, res: Response) {
+    try {
+      const superAdmin = await new UserStorageHelper().userStorageInteractorImplementation.getUsersByRole(UserRoles.SUPERADMIN);
+      res.status(200).send(superAdmin);
+    } catch (error) {
+      res.status(500).send(error.toString());
+    }
   }
 
 }

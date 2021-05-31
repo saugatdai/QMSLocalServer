@@ -67,7 +67,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
       if (error) {
         res.status(401).send({ error: 'Invalid Token' });
       } else {
-        const tokensHolder = await new AuthTokenHelper().getAllTokensById(data.id);
+        const tokensHolder = await new AuthTokenHelper().getAllTokensHolderById(data.id);
         if (!tokensHolder) {
           res.status(401).send({ error: 'Received token does not yield any token holder' });
         } else {

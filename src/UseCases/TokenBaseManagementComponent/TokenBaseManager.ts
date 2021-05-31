@@ -1,15 +1,15 @@
 import TokenBaseStorageInteractorAdapter from './TokenBaseStorageInteractorAdapter';
-import { TokenBaseObject, TokenStatus } from './TokenBaseModule';
+import { TokenBaseObject } from './TokenBaseModule';
 
 export default class TokenBaseManager {
     private _tokenBase: TokenBaseObject;
     constructor(private tokenBaseStorageInteractorAdapter: TokenBaseStorageInteractorAdapter) { }
 
-    public set tokenBase(tokenBase: TokenBaseObject){
+    public set tokenBase(tokenBase: TokenBaseObject) {
         this._tokenBase = tokenBase;
     }
 
-    public get tokenBase(){
+    public get tokenBase() {
         return this._tokenBase;
     }
 

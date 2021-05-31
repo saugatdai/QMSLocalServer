@@ -1,11 +1,8 @@
 import * as util from 'util';
 import * as fs from 'fs';
-import * as path from 'path';
 
 import request from 'supertest';
 import server from '../../../../src/FrameworksAndDrivers/Frameworks/expressServer/server';
-import { UserData } from '../../../../src/Entities/UserCore/User';
-import UserRoles from '../../../../src/Entities/UserCore/UserRoles';
 
 
 const readFile = (filename: string) =>
@@ -13,70 +10,14 @@ const readFile = (filename: string) =>
 const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
-const usersJSON = `[
-  {
-      "id": 1,
-      "username": "saugatdai",
-      "role": "Administrator",
-      "password": "123"
-  },
-  {
-      "id": 2,
-      "username": "lochandai",
-      "role": "Registrator",
-      "password": "abc",
-      "counter": "8"
-  },
-  {
-      "id": 3,
-      "username": "Sangitdai",
-      "role": "Operator",
-      "counter": "7",
-      "password": "def"
-  },
-  {
-      "id": 4,
-      "username": "mu*isdai",
-      "password": "chutis",
-      "role": "Registrator"
-  },
-  {
-      "id": 5,
-      "username": "holusdai",
-      "role": "Registrator",
-      "password": "jkl"
-  }
-]`;
-
-const firstUserData: UserData = {
-  id: 1,
-  username: 'saugatdai',
-  role: UserRoles.ADMIN,
-  password: '123',
-};
-
-const lastUserData = {
-  id: 5,
-  username: 'holusdai',
-  role: 'Registrator',
-  password: 'jkl',
-};
-
-const filePath = path.join(__dirname, '../../../../Data/users.json');
-const tokenFilePath = path.join(__dirname, '../../../../src/FrameworksAndDrivers/Frameworks/expressServer/Helpers/userRouteHelper/auths.json');
+let token: string, workingId: number, operatorId: number;
 
 describe('Testing of the /users route with empty database', () => {
-
-  beforeAll(async () => {
-    await writeFile(filePath, '');
-    await writeFile(tokenFilePath, '');
-  });
-  afterAll(async () => {
-    await writeFile(filePath, '');
-    await writeFile(tokenFilePath, '');
-  });
-
   /* ###################### Superadmin Creation and Admin CRUD ###################### */
+  it('Should get a status 200 if no superAdmin is present as well', async () => {
+    const res = await request(server).get('/users/superAdmin').send();
+    expect(res.statusCode).toBe(200)
+  })
 
   it('Should deny creating SuperAdministrator because of a missing or invalid property', async () => {
     const res1 = await request(server).post('/users/superAdmin').send({
@@ -153,8 +94,6 @@ describe('Testing of the /users route with empty database', () => {
     expect(res2.statusCode).toBe(400);
   });
 
-  let token: string = null;
-
   it('Should successfully login the Superadministrator', async () => {
     const res = await request(server).post('/users/login').send({
       'username': 'saugatdai',
@@ -204,13 +143,15 @@ describe('Testing of the /users route with empty database', () => {
   });
 
   it('Should allow superadmins to edit admins', async () => {
-    await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+    let res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
       'username': 'holus',
       'role': 'Administrator',
       'password': 'holusdai123'
     });
 
-    let res = await request(server).patch('/users/admins/3').set('Authorization', `Bearer ${token}`).send({
+    workingId = res.body._userInfo.id;
+
+    res = await request(server).patch(`/users/admins/${workingId}`).set('Authorization', `Bearer ${token}`).send({
       'username': 'shaggy1',
       'role': 'Administrator',
       'password': 'hello123'
@@ -219,42 +160,42 @@ describe('Testing of the /users route with empty database', () => {
   });
 
   it('Should not allow superadmins to edit admins with missing properties and values ', async () => {
-    let res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+    let res = await request(server).patch(`/users/admins/${workingId}`).set('Authorization', `Bearer ${token}`).send({
       'user': 'saugatsigdel',
       'role': 'Administrator',
       'password': 'helloworld'
     });
     expect(res.statusCode).toBe(400);
 
-    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+    res = await request(server).patch(`/users/admins/${workingId}`).set('Authorization', `Bearer ${token}`).send({
       'username': 'saugatsigdel',
       'rol': 'Administrator',
       'password': 'helloworld'
     });
     expect(res.statusCode).toBe(400);
 
-    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+    res = await request(server).patch(`/users/admins/${workingId}`).set('Authorization', `Bearer ${token}`).send({
       'username': 'saugatsigdel',
       'roll': 'Administrator',
       'passwod': 'helloworld'
     });
     expect(res.statusCode).toBe(400);
 
-    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+    res = await request(server).patch(`/users/admins/${workingId}`).set('Authorization', `Bearer ${token}`).send({
       'username': 'sa',
       'role': 'Administrator',
       'password': 'helloworld'
     });
     expect(res.statusCode).toBe(400);
 
-    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+    res = await request(server).patch(`/users/admins/${workingId}`).set('Authorization', `Bearer ${token}`).send({
       'username': 'saugatsigdel',
       'role': 'Adm',
       'password': 'helloworld'
     });
     expect(res.statusCode).toBe(400);
 
-    res = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+    res = await request(server).patch(`/users/admins/${workingId}`).set('Authorization', `Bearer ${token}`).send({
       'username': 'saugatsigdel',
       'role': 'Administrator',
       'password': 'held'
@@ -268,9 +209,10 @@ describe('Testing of the /users route with empty database', () => {
       'password': 'hello123'
     });
 
+    workingId = res.body.user._userInfo.id;
     const tempToken = res.body.token;
 
-    const res2 = await request(server).patch('/users/admins/:2').set('Authorization', `Bearer ${tempToken}`).send({
+    const res2 = await request(server).patch(`/users/admins/${workingId}`).set('Authorization', `Bearer ${tempToken}`).send({
       'username': 'shaggy12345',
       'password': 'holusmondus',
       'role': 'Administrator'
@@ -284,12 +226,12 @@ describe('Testing of the /users route with empty database', () => {
       'password': 'hello123'
     });
     const tempToken = res.body.token;
-    res = await request(server).get('/users/admins/2').set('Authorization', `Bearer ${tempToken}`).send();
+    res = await request(server).get(`/users/admins/${workingId}`).set('Authorization', `Bearer ${tempToken}`).send();
     expect(res.statusCode).toBe(401)
   });
 
   it('Should allow superadmins to view an admin profile', async () => {
-    let res = await request(server).get('/users/admins/2').set('Authorization', `Bearer ${token}`).send();
+    let res = await request(server).get(`/users/admins/${workingId}`).set('Authorization', `Bearer ${token}`).send();
     expect(res.statusCode).toBe(200);
   });
 
@@ -301,20 +243,14 @@ describe('Testing of the /users route with empty database', () => {
 
     const tempToken = res1.body.token;
 
-    const res2 = await request(server).delete('/users/admins/:2').set('Authorization', `Bearer ${tempToken}`).send();
+    const res2 = await request(server).delete(`/users/admins/${workingId}`).set('Authorization', `Bearer ${tempToken}`).send();
     expect(res2.statusCode).toBe(401);
   });
 
-
-
   it('Shuld allow superadmins to delete admins', async () => {
-    const res = await request(server).delete('/users/admins/3').set('Authorization', `Bearer ${token}`).send();
+    const res = await request(server).delete(`/users/admins/${workingId}`).set('Authorization', `Bearer ${token}`).send();
     expect(res.statusCode).toBe(200);
   });
-
-
-
-
 
   /*################################### Admin Functionality and Users CRUD ######################################## */
 
@@ -322,7 +258,7 @@ describe('Testing of the /users route with empty database', () => {
     const newToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjEifQ.5EUZWk745D-_yyLWlqRQqjv6ZmWv8gILqCH22g3O4tA';
     const res = await request(server).post('/users').set('Authorization', `Bearer ${newToken}`).send({
       'username': 'abcd',
-      'role': 'Administrator',
+      'role': 'Operator',
       'password': 'mypassword'
     });
     expect(res.statusCode).toEqual(401);
@@ -352,6 +288,7 @@ describe('Testing of the /users route with empty database', () => {
       'role': 'Operator',
       'password': 'mypassword'
     });
+    workingId = res.body._userInfo.id;
     expect(res.statusCode).toEqual(201);
   })
 
@@ -418,7 +355,7 @@ describe('Testing of the /users route with empty database', () => {
   });
 
   it('Should not allow a user to view another user profile ', async () => {
-    const res = await request(server).get('/users/getuser/3').set('Authorization', `Bearer ${token}`).send();
+    const res = await request(server).get(`/users/getuser/${workingId}`).set('Authorization', `Bearer ${token}`).send();
     expect(res.statusCode).toEqual(401);
   });
 
@@ -434,12 +371,12 @@ describe('Testing of the /users route with empty database', () => {
   });
 
   it('Should allow admin to view another user profile', async () => {
-    const res = await request(server).get('/users/getuser/3').set('Authorization', `Bearer ${token}`).send();
+    const res = await request(server).get(`/users/getuser/${workingId}`).set('Authorization', `Bearer ${token}`).send();
     expect(res.statusCode).toBe(200);
   });
 
   it('Should allow admins to edit users', async () => {
-    const res = await request(server).patch('/users/3').set('Authorization', `Bearer ${token}`).send({
+    const res = await request(server).patch(`/users/${workingId}`).set('Authorization', `Bearer ${token}`).send({
       'username': 'saugatprasadsigdel',
       'password': 'holus12345',
       'role': 'Registrator'
@@ -453,7 +390,7 @@ describe('Testing of the /users route with empty database', () => {
       'password': 'holus12345'
     });
     const tempToken = res.body.token;
-    res = await request(server).patch('/users/3').set('Authorization', `Bearer ${tempToken}`).send({
+    res = await request(server).patch(`/users/${workingId}`).set('Authorization', `Bearer ${tempToken}`).send({
       'username': 'saugatprasadsigdel',
       'password': 'holus12345',
       'role': 'Registrator'
@@ -507,8 +444,8 @@ describe('Testing of the /users route with empty database', () => {
 
   it('Should not allow superadmins to delete other users than admins', async () => {
     let res1 = await request(server).post('/users/login').send({
-      'username': 'shaggy1',
-      'password': 'hello123'
+      'username': 'shaggy',
+      'password': 'mypassword'
     });
     const tempToken = res1.body.token;
     res1 = await request(server).post('/users').set('Authorization', `Bearer ${tempToken}`).send({
@@ -516,8 +453,8 @@ describe('Testing of the /users route with empty database', () => {
       'password': 'holusmondus',
       'role': 'Operator'
     });
-
-    res1 = await request(server).delete('/users/admins/4').set('Authorization', `Bearer ${token}`).send();
+    operatorId = res1.body._userInfo.id;
+    res1 = await request(server).delete(`/users/admins/${operatorId}`).set('Authorization', `Bearer ${token}`).send();
     expect(res1.statusCode).toEqual(401);
   });
 
@@ -527,13 +464,13 @@ describe('Testing of the /users route with empty database', () => {
       'password': 'holus12345'
     });
     const tempToken = res.body.token;
-    res = await request(server).delete('/users/3').set('Authorization', `Bearer ${tempToken}`).send();
+    res = await request(server).delete(`/users/${workingId}`).set('Authorization', `Bearer ${tempToken}`).send();
 
     expect(res.statusCode).toBe(401);
   });
 
   it('Should allow admin to delete other users', async () => {
-    const res = await request(server).delete('/users/3').set('Authorization', `Bearer ${token}`).send();
+    const res = await request(server).delete(`/users/${workingId}`).set('Authorization', `Bearer ${token}`).send();
     expect(res.statusCode).toBe(200);
   });
 
@@ -543,8 +480,31 @@ describe('Testing of the /users route with empty database', () => {
       'password': 'holus12345'
     });
     const tempToken = res.body.token;
-    res = await request(server).delete('/users/4').set('Authorization', `Bearer ${tempToken}`).send();
+    res = await request(server).delete(`/users/${operatorId}`).set('Authorization', `Bearer ${tempToken}`).send();
     expect(res.statusCode).toBe(401);
   });
 
+  it('Should log out superadministrator from a device', async () => {
+    let superAdminResponse = await request(server).post('/users/login').send({
+      'username': 'saugatdai',
+      'password': 'mypassword'
+    });
+
+    const numberOfTokens = superAdminResponse.body.storedTokens.length;
+    const currentToken = superAdminResponse.body.token;
+
+    superAdminResponse = await request(server).get('/users/logout').set('Authorization', `Bearer ${currentToken}`).send();
+    expect(superAdminResponse.body.storedTokens.length).toBeLessThan(numberOfTokens);
+  });
+
+  it('Should log the SuperAdministrator out of all devices ', async () => {
+    let superAdministratorResopnse = await request(server).post('/users/login').send({
+      'username': 'saugatdai',
+      'password': 'mypassword'
+    });
+    const superAdminToken = superAdministratorResopnse.body.token;
+
+    superAdministratorResopnse = await request(server).get('/users/logoutall').set('Authorization', `Bearer ${superAdminToken}`).send();
+    expect(superAdministratorResopnse.body.tokens.length).toBe(0);
+  });
 });
