@@ -36,8 +36,21 @@ const updateCurrentCount = async (newCount: number) => {
   await writeFile(tokenCountStatusStoragePath, JSON.stringify(tokenStatusObject));
 }
 
+const setLatestCustomerTokenCount = async (count: number) => {
+  const tokenStatusObject = await getTokenStatusObject();
+  tokenStatusObject.latestCustomerTokenCount = count;
+  await writeFile(tokenCountStatusStoragePath, JSON.stringify(tokenStatusObject));
+}
+
+const getLatestCustomerTokenCount = async () => {
+  const tokenStatusObject = await getTokenStatusObject();
+  return tokenStatusObject.latestCustomerTokenCount;
+}
+
 export {
   updateCurrentCount,
   getCurrentCount,
-  resetCount
+  resetCount,
+  setLatestCustomerTokenCount,
+  getLatestCustomerTokenCount
 }

@@ -22,4 +22,13 @@ export default class TokenCountManager {
   public async createACategory(category: string) {
     await this.tokenCountStorageInteractorAdapter.registerANewCategory(category);
   }
+
+  public async setLatestCustomerTokenCount(count: number) {
+    await this.tokenCountStorageInteractorAdapter.setLatestCustomerTokenCount(count, this.category);
+  }
+
+  public async getLatestCustomerTokenCount() {
+    const latestCount = await this.tokenCountStorageInteractorAdapter.getLatestCustomerTokenCount(this.category);
+    return latestCount;
+  }
 }

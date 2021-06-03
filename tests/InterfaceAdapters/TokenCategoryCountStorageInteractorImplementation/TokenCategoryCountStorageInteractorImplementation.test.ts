@@ -74,6 +74,18 @@ describe('Testing of TokenCategoryCountStorageInteractorImplementation', () => {
     expect(anotherCurrentCount).toBe(0);
   });
 
+  it('Should set and get the latest customer count of a category', async () => {
+    await tokenCategoryCountStorageInteractorImplementation.setLatestCustomerTokenCount(4, category);
+    await tokenCategoryCountStorageInteractorImplementation.setLatestCustomerTokenCount(15, anotherCategory);
+
+    const latestCustomerTokeNumber = await tokenCategoryCountStorageInteractorImplementation.getLatestCustomerTokenCount(category);
+    const anotherLatestCustomerTokeNumber = await tokenCategoryCountStorageInteractorImplementation.getLatestCustomerTokenCount(anotherCategory);
+
+    expect(latestCustomerTokeNumber).toBe(4);
+    expect(anotherLatestCustomerTokeNumber).toBe(15);
+
+  });
+
 
 
 });

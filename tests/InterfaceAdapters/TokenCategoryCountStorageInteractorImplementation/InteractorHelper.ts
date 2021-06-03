@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import * as util from 'util';
+import { TokenCountStorageAdapter } from '../../../src/InterfaceAdapters/TokenCategoryCountStorageInteractorImplementation';
 
 export const readFile = (filename: string) =>
   util.promisify(fs.readFile)(filename, 'utf-8');
@@ -88,15 +89,31 @@ const updateCurrentCount = async (newCount: number, category: string) => {
   }
 }
 
+const setLatestCustomerTokenCount = async (count: number, category: string) => {
+  const tokenStatusObject = await getTokenStatusObject(category);
+  tokenStatusObject.latestCustomerTokenCount = count;
+  const updatedCollection = await getUpdatedTokenStatusObjectCollection(tokenStatusObject);
+  await writeFile(tokenCountStatusStoragePath, JSON.stringify(updatedCollection));
+}
+
+const getLatestCustomerTokenCount = async (category: string) => {
+  const tokenStatusObject = await getTokenStatusObject(category);
+  return tokenStatusObject.latestCustomerTokenCount;
+}
+
 const getTokenStatusObject = async (category: string) => {
   const tokenStatusObjectsCollection = await getTokenStatusObjectsCollection();
   const tokenStatusObject = tokenStatusObjectsCollection.find(tokenStatusObject => tokenStatusObject.category === category);
   return tokenStatusObject;
 }
 
-export default {
+const tokenCategoryCountStorageImplementation: TokenCountStorageAdapter = {
   updateCurrentCount,
   getCurrentCount,
   resetCount,
-  registerANewCategory
+  registerANewCategory,
+  setLatestCustomerTokenCount,
+  getLatestCustomerTokenCount
 }
+
+export default tokenCategoryCountStorageImplementation;

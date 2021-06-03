@@ -10,11 +10,20 @@ export default class TokenCountManager {
   }
 
   public async resetTokenCount() {
-    this.tokenCountStorageInteractorAdapter.clearCurrentTokenCount();
+    await this.tokenCountStorageInteractorAdapter.clearCurrentTokenCount();
   }
 
   public async revcoverTokenCount() {
     const currentCount = await this.tokenCountStorageInteractorAdapter.getCurrentTokenCount();
     return currentCount;
+  }
+
+  public async setLatestCustomerTokenCount(count: number) {
+    await this.tokenCountStorageInteractorAdapter.setLatestCustomerTokenCount(count);
+  }
+
+  public async getLatestCustomerTokenCount() {
+    const latestCount = await this.tokenCountStorageInteractorAdapter.getLatestCustomerTokenCount();
+    return latestCount;
   }
 }

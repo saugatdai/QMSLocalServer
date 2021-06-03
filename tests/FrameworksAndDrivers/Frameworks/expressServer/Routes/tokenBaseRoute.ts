@@ -3,9 +3,6 @@ import * as fs from 'fs';
 
 import request from 'supertest';
 import server from '../../../../../src/FrameworksAndDrivers/Frameworks/expressServer/server';
-import TokenBaseStorageInteractorImplementation from '../../../../../src/InterfaceAdapters/TokenBaseStorageInteractorImplementation';
-import TokenBaseStorageImplementation from '../../../../../src/FrameworksAndDrivers/Drivers/TokenBaseStorageImplementation';
-import TokenBaseManager from '../../../../../src/UseCases/TokenBaseManagementComponent/TokenBaseManager';
 
 
 const readFile = (filename: string) =>
@@ -33,6 +30,7 @@ export default () => describe('Testing of tokenBaseRoute', () => {
   beforeAll(async () => {
     await setTokens();
   });
+
   it('Should get an empty tokenbase error message for requesting all tokenbases', async () => {
     const res = await request(server).get('/tokenbase').set('Authorization', `Bearer ${adminToken}`).send();
     expect(res.statusCode).toBe(500);
@@ -41,8 +39,25 @@ export default () => describe('Testing of tokenBaseRoute', () => {
     const res = await request(server).get('/tokenbase/createatokenbase').set('Authorization', `Bearer ${registratorToken}`).send();
     expect(res.statusCode).toBe(200);
   });
-  it('Should get existing tokenbase', async () => {
-    const res = await request(server).get('/tokenbase').set('Authorization', `Bearer ${registratorToken}`).send();
+
+  it('Should create a new category', async () => {
+    const res = await request(server).post('/tokenbase/createtokencategory').set('Authorization', `Bearer ${adminToken}`).send({
+      "category": "A"
+    });
     expect(res.statusCode).toBe(200);
   });
+
+  it('Should create a new tokenBase with a category', async () => {
+    const res = await request(server).get('/tokenbase/createatokenbase/A').set('Authorization', `Bearer ${registratorToken}`).send();
+    console.log(res.body);
+    expect(res.statusCode).toBe(200);
+  });
+
+  it('Should get existing tokenbase', async () => {
+    const res = await request(server).get('/tokenbase').set('Authorization', `Bearer ${registratorToken}`).send();
+    console.log(res.body);
+    expect(res.statusCode).toBe(200);
+  });
+
+
 });

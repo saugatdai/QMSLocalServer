@@ -1,7 +1,9 @@
 import {
   updateCurrentCount,
   getCurrentCount,
-  resetCount
+  resetCount,
+  setLatestCustomerTokenCount,
+  getLatestCustomerTokenCount
 } from './InteractorHelper';
 
 import TokenCountStorageInteractorImplementation, { TokenCountStorageAdapter } from '../../../src/InterfaceAdapters/TokenCountStorageInteractorImplementation';
@@ -9,7 +11,9 @@ import TokenCountStorageInteractorImplementation, { TokenCountStorageAdapter } f
 const tokenCountStorageAdapter: TokenCountStorageAdapter = {
   getCurrentCount,
   updateCurrentCount,
-  resetCount
+  resetCount,
+  setLatestCustomerTokenCount,
+  getLatestCustomerTokenCount
 }
 
 const tokenCountStorageInteractorImplementation = new TokenCountStorageInteractorImplementation(tokenCountStorageAdapter);
@@ -39,4 +43,11 @@ describe('Testing of TokenCountStorageInteractorImplementation', () => {
     const currentCount = await getCurrentCount();
     expect(currentCount).toBe(0);
   });
+
+  it('Should set and get the latest customer token count', async () => {
+    await tokenCountStorageInteractorImplementation.setLatestCustomerTokenCount(12);
+    const latestCustomerCount = await tokenCountStorageAdapter.getLatestCustomerTokenCount();
+    expect(latestCustomerCount).toBe(12);
+  });
+
 });

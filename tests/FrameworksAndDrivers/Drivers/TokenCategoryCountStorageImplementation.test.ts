@@ -11,7 +11,6 @@ const writeFile = (filename: string, data: string) =>
 
 const tokenCategoryCountStoragePath = path.join(__dirname, '../../../Data/tokenCategoryCount.json');
 
-console.log(tokenCategoryCountStoragePath);
 
 const category = 'C';
 const anotherCategory = 'R';
@@ -72,6 +71,17 @@ describe('Testing of TokenCategoryCountStorageInteractorImplementation', () => {
 
     expect(currentCount).toBe(0);
     expect(anotherCurrentCount).toBe(0);
+  });
+
+  it('Should set and get the latest customer token count', async () => {
+    await TokenCategoryCountStorageImplementation.setLatestCustomerTokenCount(12, category);
+    await TokenCategoryCountStorageImplementation.setLatestCustomerTokenCount(120, anotherCategory);
+
+    const latestCustomerToken = await TokenCategoryCountStorageImplementation.getLatestCustomerTokenCount(category);
+    const anotherLatestCustomerToken = await TokenCategoryCountStorageImplementation.getLatestCustomerTokenCount(anotherCategory);
+
+    expect(latestCustomerToken).toBe(12);
+    expect(anotherLatestCustomerToken).toBe(120);
   });
 
 

@@ -5,6 +5,8 @@ export interface TokenCountStorageAdapter {
     updateCurrentCount: (newCount: number) => Promise<void>;
     getCurrentCount: () => Promise<number>;
     resetCount: () => Promise<void>;
+    setLatestCustomerTokenCount: (count: number) => Promise<void>;
+    getLatestCustomerTokenCount: () => Promise<number>;
 }
 
 export default class TokenCountStorageInteractorImplementation implements TokenCountStorageInteractorAdapter {
@@ -21,6 +23,15 @@ export default class TokenCountStorageInteractorImplementation implements TokenC
 
     public async updateCurrentTokenCount(newCount: number) {
         await this.tokenCountStorageAdapter.updateCurrentCount(newCount);
+    }
+
+    public async setLatestCustomerTokenCount(count: number) {
+        await this.tokenCountStorageAdapter.setLatestCustomerTokenCount(count);
+    }
+
+    public async getLatestCustomerTokenCount() {
+        const latestCount = await this.tokenCountStorageAdapter.getLatestCustomerTokenCount();
+        return latestCount;
     }
 
 }

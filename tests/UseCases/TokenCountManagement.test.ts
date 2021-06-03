@@ -33,7 +33,9 @@ describe('Testing of token count management component', () => {
     const tokenCountStorageInteractorAdapter: TokenCountStorageInteractorAdapter = {
         updateCurrentTokenCount: updateTokenCurrentCountFunction,
         getCurrentTokenCount: getCurrentTokenCountFunction,
-        clearCurrentTokenCount: clearCurrentTokenCountFunction
+        clearCurrentTokenCount: clearCurrentTokenCountFunction,
+        setLatestCustomerTokenCount: setCurrentCustomerTokenNumberFunction,
+        getLatestCustomerTokenCount: getCurrentCustomerTokeNumberFunction
     }
 
     const tokenCountManager = new TokenCountManager(tokenCountStorageInteractorAdapter);
@@ -53,13 +55,13 @@ describe('Testing of token count management component', () => {
         expect(currentToken).toBe(4);
     });
 
-    it('Should get current customer token number : ', async () => {
-        const tokenNumber = await getCurrentCustomerTokeNumberFunction();
-        expect(tokenNumber).toBe(5)
+    it('Should set the latest customer tokenCount', async () => {
+        await tokenCountManager.setLatestCustomerTokenCount(12);
+        expect(setCurrentCustomerTokenNumberMockFunction.mock.calls.length).toBe(1);
     });
 
-    it('Should set current customer token number : ', async () => {
-        await setCurrentCustomerTokenNumberFunction(5);
-        expect(setCurrentCustomerTokenNumberMockFunction.mock.calls.length).toBe(1);
-    })
+    it('Should get the latest customer token Count ', async () => {
+        const latestCustomerCount = await tokenCountManager.getLatestCustomerTokenCount();
+        expect(latestCustomerCount).toBe(5);
+    });
 });

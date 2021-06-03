@@ -25,4 +25,11 @@ describe('Testing of TokenCountStorageInteractorImplementation', () => {
     const currentCount = await TokenCountStorageImplementation.getCurrentCount();
     expect(currentCount).toBe(0);
   });
+
+  it('Should set and get the latest customer token count', async () => {
+    await TokenCountStorageImplementation.setLatestCustomerTokenCount(13);
+    const latestCustomerTokenCount = await TokenCountStorageImplementation.getLatestCustomerTokenCount();
+
+    expect(latestCustomerTokenCount).toBe(13);
+  });
 });

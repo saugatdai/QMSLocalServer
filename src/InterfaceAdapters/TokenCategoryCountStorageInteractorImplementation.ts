@@ -1,11 +1,12 @@
 import TokenCategoryCountStorageInteractorAdapter from '../UseCases/TokenCategoryCountManagementComponent/TokenCategoryCountStorageInteractorAdapter';
-import Token from '../Entities/TokenCore/Token';
 
 export interface TokenCountStorageAdapter {
   updateCurrentCount: (newCount: number, category: string) => Promise<void>;
   getCurrentCount: (category: string) => Promise<number>;
   resetCount: (category: string) => Promise<void>;
   registerANewCategory: (category: string) => Promise<void>;
+  setLatestCustomerTokenCount: (count: number, category: string) => Promise<void>;
+  getLatestCustomerTokenCount: (category: string) => Promise<number>;
 }
 
 export default class TokenCountStorageInteractorImplementation implements TokenCategoryCountStorageInteractorAdapter {
@@ -26,6 +27,15 @@ export default class TokenCountStorageInteractorImplementation implements TokenC
 
   public async registerANewCategory(category: string) {
     await this.tokenCountStorageAdapter.registerANewCategory(category);
+  }
+
+  public async setLatestCustomerTokenCount(count: number, category: string) {
+    await this.tokenCountStorageAdapter.setLatestCustomerTokenCount(count, category);
+  }
+
+  public async getLatestCustomerTokenCount(category: string) {
+    const latestCount = await this.tokenCountStorageAdapter.getLatestCustomerTokenCount(category);
+    return latestCount;
   }
 
 }
