@@ -2,7 +2,7 @@ import * as util from 'util';
 import * as fs from 'fs';
 
 import request from 'supertest';
-import server from '../../../../src/FrameworksAndDrivers/Frameworks/expressServer/server';
+import server from '../../../../../src/FrameworksAndDrivers/Frameworks/expressServer/server';
 
 
 const readFile = (filename: string) =>
@@ -11,12 +11,11 @@ const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
 let token: string, workingId: number, operatorId: number;
-
-describe('Testing of the /users route with empty database', () => {
-  /* ###################### Superadmin Creation and Admin CRUD ###################### */
+/* ###################### Superadmin Creation and Admin CRUD ###################### */
+export default () => describe('Testing of userRoutes', () => {
   it('Should get a status 200 if no superAdmin is present as well', async () => {
     const res = await request(server).get('/users/superAdmin').send();
-    expect(res.statusCode).toBe(200)
+    expect(res.statusCode).toBe(200);
   })
 
   it('Should deny creating SuperAdministrator because of a missing or invalid property', async () => {

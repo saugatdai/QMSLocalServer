@@ -64,5 +64,4 @@ export default class TokenBaseStorageInteractorImplementation implements TokenBa
     const tokenBase = await this.tokenBaseSorageAdapter.readTokenBaseByTokenId(tokenId);
     return tokenBase;
   }
-
 }

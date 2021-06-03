@@ -1,42 +1,52 @@
 import { Request, Response } from 'express';
 
 import Controller from "../Decorators/Controller";
-import { get } from "../Decorators/PathAndRequestMethodDecorator";
+import { get, post } from "../Decorators/PathAndRequestMethodDecorator";
 import { auth } from '../Middlewares/UserMiddlewares';
 import use from '../Decorators/MiddlewareDecorator';
-import { checkForAdminOrRegistrator } from '../Middlewares/TokenBaseRoutesMiddleware';
-import TokenBaseManager from '../../../../UseCases/TokenBaseManagementComponent/TokenBaseManager';
+import { checkForAdminOrRegistrator, checkForRegistrator } from '../Middlewares/TokenBaseRoutesMiddleware';
 import TokenBaseStorageImplementation from '../../../Drivers/TokenBaseStorageImplementation';
-import TokenCountManager from '../../../../UseCases/TokenCountManagementComponent/TokenCountManager';
-import TokenCountStorageImplementation from '../../../Drivers/TokenCountStorageImplementation';
-import TokenCountStorageInteractorImplementation from '../../../../InterfaceAdapters/TokenCountStorageInteractorImplementation';
 import Token from '../../../../Entities/TokenCore/Token';
+import TokenBaseStorageInteractorImplementation from '../../../../InterfaceAdapters/TokenBaseStorageInteractorImplementation';
+import { getTokenCountManager } from '../Helpers/tokenCountHelper';
+import { TokenBaseObject } from '../../../../UseCases/TokenBaseManagementComponent/TokenBaseModule';
+import { getTokenBaseManager } from '../Helpers/tokenBaseRouteHelper';
+
 
 @Controller('/tokenbase')
 class TokenBaseRoutes {
   @get('/')
   @use(auth)
   @use(checkForAdminOrRegistrator)
-
   public async getAllTokenBases(req: Request, res: Response) {
+    try {
+      const tokenBaseStorageInteractorImplementation = new TokenBaseStorageInteractorImplementation(TokenBaseStorageImplementation);
+      const allTokenBases = await tokenBaseStorageInteractorImplementation.readAllTokenBases();
+      res.status(200).send(allTokenBases);
+    } catch (error) {
+      res.status(500).send({ error: error.toString() });
+    }
+  }
+
+  @get('/createatokenbase')
+  @use(auth)
+  @use(checkForRegistrator)
+  public async createANewTokenBase(req: Request, res: Response) {
     const nextAvailableTokenId = await TokenBaseStorageImplementation.getNextAvailableTokenId();
-    const tokenCountManager = this.getTokenCountManager();
+    const tokenCountManager = getTokenCountManager();
     const tokenNumber = await tokenCountManager.revcoverTokenCount();
+
     const token: Token = {
       tokenId: nextAvailableTokenId,
       tokenNumber: tokenNumber + 1,
       date: new Date(),
     }
+    const tokenBaseObject = new TokenBaseObject(token);
 
-    console.log(token);
-    res.status(200).send({ message: 'New route for tokenbase....' });
+    const tokenBaseManager = getTokenBaseManager();
+    tokenBaseManager.tokenBase = tokenBaseObject;
+
+    await tokenBaseManager.createATokenBase();
+    res.status(200).send(tokenBaseManager.tokenBase);
   }
-
-  private getTokenCountManager() {
-    const tokenCountStorageInteractor = new TokenCountStorageInteractorImplementation(TokenCountStorageImplementation);
-    const tokenCountManager = new TokenCountManager(tokenCountStorageInteractor);
-    return tokenCountManager;
-  }
-
-
 }
