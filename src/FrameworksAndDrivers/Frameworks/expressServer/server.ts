@@ -4,6 +4,7 @@ import AppRouterSingleton from './Helpers/userRouteHelper/AppRouter';
 import './RouteHandlers/UserRoutes';
 import './RouteHandlers/TokenBaseRoutes';
 import './RouteHandlers/CustomerRoutes';
+import './RouteHandlers/TokenCountRoute';
 
 const app = express();
 app.use(express.json());
