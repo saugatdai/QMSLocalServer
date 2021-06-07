@@ -62,7 +62,6 @@ class TokenBaseRoutes {
     }
   }
 
-  // TODO move this route to TokenCategoryRoutes.ts
   @post('/createtokencategory')
   @use(auth)
   @use(checkAdminAuthority)

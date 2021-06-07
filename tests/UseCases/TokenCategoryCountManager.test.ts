@@ -28,7 +28,7 @@ describe('Testing of tokenCategoryCountManager', () => {
   });
 
   it('Should get current token count', () => {
-    tokenCategoryCountManager.revcoverTokenCount();
+    tokenCategoryCountManager.recoverTokenCount();
     expect(getCurrentTokenCount.mock.calls.length).toBe(1);
   });
 

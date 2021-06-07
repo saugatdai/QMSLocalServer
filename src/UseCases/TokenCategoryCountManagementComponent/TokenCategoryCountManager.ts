@@ -14,7 +14,7 @@ export default class TokenCountManager {
     this.tokenCountStorageInteractorAdapter.clearCurrentTokenCount(this.category);
   }
 
-  public async revcoverTokenCount() {
+  public async recoverTokenCount() {
     const currentCount = await this.tokenCountStorageInteractorAdapter.getCurrentTokenCount(this.category);
     return currentCount;
   }
