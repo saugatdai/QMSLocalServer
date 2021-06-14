@@ -1,7 +1,8 @@
+import Token from '../../../Entities/TokenCore/Token';
 import Feature from '../Feature';
 
 export default interface TokenForwardStrategy {
   features: Feature[];
-  forwardToken: (tokenNumber: number) => void;
+  forwardToken: (handledToken: Token) => Promise<Token>;
   pipeFeature: (feature: Feature) => void;
 }

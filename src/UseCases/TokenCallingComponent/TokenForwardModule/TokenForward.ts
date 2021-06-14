@@ -1,3 +1,4 @@
+import Token from '../../../Entities/TokenCore/Token';
 import TokenForwardStrategy from './TokenForwardStrategy';
 
 export default class TokenForward {
@@ -11,7 +12,8 @@ export default class TokenForward {
     return this._strategy;
   }
 
-  public callToken(tokenNumber: number): void {
-    this._strategy.forwardToken(tokenNumber);
+  public async callToken(handledToken: Token): Promise<Token> {
+    const nextToken = await this._strategy.forwardToken(handledToken);
+    return nextToken;
   }
 }

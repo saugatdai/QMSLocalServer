@@ -151,6 +151,8 @@ const readTodaysTokenBaseByTokenNumber = async (tokenNumber: number, category?: 
   if (category) {
     todaysTokenBase = allTokenBases.find(tokenBase => {
       return tokenBase.token.date.getDate() === new Date().getDate() &&
+        tokenBase.token.date.getMonth() === new Date().getMonth() &&
+        tokenBase.token.date.getFullYear() === new Date().getFullYear() &&
         tokenBase.token.tokenNumber === tokenNumber && tokenBase.token.tokenCategory === category;
     });
   } else {
@@ -162,18 +164,25 @@ const readTodaysTokenBaseByTokenNumber = async (tokenNumber: number, category?: 
   return todaysTokenBase;
 }
 
-const readNextAvailableTokenNumberInACategory = async (tokenCategory: string) => {
+const readNextAvailableTokenNumberInACategoryForToday = async (tokenCategory: string) => {
   const allTokenBases = await getAllTokenBases();
   let highestNumber = 0;
   if (tokenCategory) {
     allTokenBases.forEach(tokenBase => {
-      if (tokenBase.token.tokenCategory === tokenCategory) {
+      if (tokenBase.token.tokenCategory === tokenCategory &&
+        tokenBase.token.date.getDate() === new Date().getDate() &&
+        tokenBase.token.date.getMonth() === new Date().getMonth() &&
+        tokenBase.token.date.getFullYear() === new Date().getFullYear()) {
         highestNumber = tokenBase.token.tokenNumber > highestNumber ? tokenBase.token.tokenNumber : highestNumber;
       }
     });
   } else {
     allTokenBases.forEach(tokenBase => {
-      highestNumber = tokenBase.token.tokenNumber > highestNumber ? tokenBase.token.tokenNumber : highestNumber
+      if (tokenBase.token.date.getDate() === new Date().getDate() &&
+        tokenBase.token.date.getMonth() === new Date().getMonth() &&
+        tokenBase.token.date.getFullYear() === new Date().getFullYear()) {
+        highestNumber = tokenBase.token.tokenNumber > highestNumber ? tokenBase.token.tokenNumber : highestNumber
+      }
     });
   }
   return highestNumber + 1;
@@ -209,7 +218,7 @@ const TokenBaseStorageImplementation: TokenBaseStorageAdapter = {
   resetTokenBase,
   editATokenBase,
   readTodaysTokenBaseByTokenNumber,
-  readNextAvailableTokenNumberInACategory,
+  readNextAvailableTokenNumberInACategoryForToday,
   readTokenBasesByTokenCategory,
   readTokenBaseByTokenId,
   getNextAvailableTokenId

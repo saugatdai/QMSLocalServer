@@ -1,5 +1,7 @@
 import * as Path from 'path';
-import AppKernel from "../../../src/FrameworksAndDrivers/Drivers/AppKernel";
+import Token from '../../../src/Entities/TokenCore/Token';
+import AppKernelSingleton from '../../../src/FrameworksAndDrivers/Drivers/AppKernelSingleton';
+import AppKernel from "../../../src/FrameworksAndDrivers/Drivers/AppKernelSingleton";
 import TokenCallingFacadeSingleton from "../../../src/UseCases/TokenCallingComponent/TokenCallingFacadeSingleton";
 import { eventHandler1MockFunction, eventHandler2, eventHandler2MockFunction } from './plugins/TestPlugin1/EventHandlers';
 import {
@@ -16,16 +18,23 @@ import {
   tokenFrowardStrategyMock
 } from './plugins/TestPlugin1/Strategies';
 
+const token: Token = {
+  date: new Date(),
+  tokenId: 1,
+  tokenNumber: 123,
+  tokenCategory: ''
+}
+
 describe('Testing of Main component', () => {
-  const appKernel = new AppKernel();
+  const appKernel = AppKernel.getInstance();
 
   it('Should Load all plugins, event-handlers, pipelineExeuctors and strategies', async () => {
     await appKernel.initializeCoreCallingActivities(Path.join(__dirname, './plugins'));
-    TokenCallingFacadeSingleton.getInstance().callNextToken(4);
-    TokenCallingFacadeSingleton.getInstance().callTokenAgain(4);
-    TokenCallingFacadeSingleton.getInstance().callRandomToken(4);
-    TokenCallingFacadeSingleton.getInstance().forwardToken(4);
-    TokenCallingFacadeSingleton.getInstance().byPassToken(4);
+    TokenCallingFacadeSingleton.getInstance().callNextToken(token);
+    TokenCallingFacadeSingleton.getInstance().callTokenAgain(token);
+    TokenCallingFacadeSingleton.getInstance().callRandomToken(token);
+    TokenCallingFacadeSingleton.getInstance().forwardToken(token);
+    TokenCallingFacadeSingleton.getInstance().byPassToken(token);
 
     expect(pipeline1Feature1Mock.mock.calls.length).toBe(1);
     expect(pipeline1Feature2Mock.mock.calls.length).toBe(1);

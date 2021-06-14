@@ -1,4 +1,5 @@
 import BypassTokenStrategy from './BypassTokenStrategy';
+import Token from "../../../Entities/TokenCore/Token";
 
 export default class Bypass {
   private _strategy: BypassTokenStrategy;
@@ -11,7 +12,8 @@ export default class Bypass {
     return this._strategy;
   }
 
-  public callToken(tokenNumber: number): void {
-    this._strategy.bypassToken(tokenNumber);
+  public async callToken(handledToken: Token): Promise<Token> {
+    const nextToken = await this._strategy.bypassToken(handledToken);
+    return nextToken;
   }
 }

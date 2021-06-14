@@ -1,10 +1,11 @@
-import express, { NextFunction, Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import 'reflect-metadata';
 import AppRouterSingleton from './Helpers/userRouteHelper/AppRouter';
 import './RouteHandlers/UserRoutes';
 import './RouteHandlers/TokenBaseRoutes';
 import './RouteHandlers/CustomerRoutes';
 import './RouteHandlers/TokenCountRoute';
+import './RouteHandlers/TokenCallerRoute';
 
 const app = express();
 app.use(express.json());

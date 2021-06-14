@@ -2,6 +2,7 @@ import tokenBaseRoute from "./Routes/tokenBaseRoute";
 import userRoute from "./Routes/userRoute";
 import customerRoute from './Routes/customerRoute';
 import tokenCountRoute from './Routes/tokenCountRoute';
+import tokenCallerRoute from './Routes/tokenCallerRoute';
 
 describe('Testing of express Routes', () => {
   describe('The user route test', () => {
@@ -15,5 +16,8 @@ describe('Testing of express Routes', () => {
   });
   describe('The token count route test', () => {
     tokenCountRoute();
+  });
+  describe('The token caller route test', () => {
+    tokenCallerRoute();
   });
 });

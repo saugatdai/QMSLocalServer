@@ -161,7 +161,7 @@ const readTodaysTokenBaseByTokenNumber = async (tokenNumber: number, category?: 
     return todaysTokenBase;
 }
 
-const readNextAvailableTokenNumberInACategory = async (tokenCategory: string) => {
+const readNextAvailableTokenNumberInACategoryForToday = async (tokenCategory: string) => {
     const allTokenBases = await getAllTokenBases();
     let highestNumber = 0;
     if (tokenCategory) {
@@ -208,7 +208,7 @@ export {
     resetTokenBase,
     editATokenBase,
     readTodaysTokenBaseByTokenNumber,
-    readNextAvailableTokenNumberInACategory,
+    readNextAvailableTokenNumberInACategoryForToday,
     readTokenBasesByTokenCategory,
     readTokenBaseByTokenId,
     getNextAvailableTokenId

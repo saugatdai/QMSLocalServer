@@ -70,7 +70,7 @@ const getTodaysTokenBaseByTokenNumber = async (tokenNumber: number, category?: s
   return todaysTokenBase;
 }
 
-const getNextAvailableTokenNumberInACategory = async (tokenCateogry: String) => {
+const getNextAvailableTokenNumberInACategoryForToday = async (tokenCateogry: String) => {
   let highestNumber = 0;
   if (tokenCateogry) {
     allTokenBases.forEach(tokenBase => {
@@ -97,7 +97,7 @@ const getTokenBaseByTokenId = async (tokenId: number) => {
 const tokenBaseStorageInteractorAdapter: TokenBaseStorageInteractorAdapter = {
   filterTokenBaseByStatus: filterTokenBaseByStatus,
   filterTokenBaseByTokenDate: filterTokenBaseByTokenDate,
-  getNextAvailableTokenNumberInACategory: getNextAvailableTokenNumberInACategory,
+  getNextAvailableTokenNumberInACategoryForToday: getNextAvailableTokenNumberInACategoryForToday,
   getTodaysTokenBaseByTokenNumber: getTodaysTokenBaseByTokenNumber,
   modifyATokenBase: modifyATokenBase,
   readAllTokenBases: readAllTokenBases,
@@ -136,7 +136,7 @@ describe('Testing of TokenBaseModule', () => {
     });
 
     it('Should get next available token number', async () => {
-      const nextAvailableTokenNumberInCateogoryA = await tokenBaseStorageInteractorAdapter.getNextAvailableTokenNumberInACategory('A');
+      const nextAvailableTokenNumberInCateogoryA = await tokenBaseStorageInteractorAdapter.getNextAvailableTokenNumberInACategoryForToday('A');
       expect(nextAvailableTokenNumberInCateogoryA).toBe(3);
     });
 

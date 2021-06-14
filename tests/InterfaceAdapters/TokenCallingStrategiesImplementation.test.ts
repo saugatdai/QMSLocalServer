@@ -1,3 +1,4 @@
+import Token from '../../src/Entities/TokenCore/Token';
 import {
   TokenBypassDefault,
   CallAgainDefault,
@@ -14,28 +15,39 @@ describe('Testing of TokenCallingStrategiesImplementation.test.ts', () => {
   const callAgainTokenMockFunction = jest.fn();
   const bypassTokenMockFunction = jest.fn();
   const callRandomTokenMockFunction = jest.fn();
+  const preCallMockFunction = jest.fn();
 
-  const nextTokenCallerFunction = async (tokenNumber: number) => {
-    await nextTokenCallerMockFunction(tokenNumber);
+  const dummyToken: Token = {
+    date: new Date(),
+    tokenId: 1,
+    tokenNumber: 123
   }
 
-  const callAgaintokenFunction = async (tokenNumber: number) => {
-    await callAgainTokenMockFunction(tokenNumber);
+  const preCallFunction = async () => {
+    preCallMockFunction();
   }
 
-  const bypassTokenFunction = async (tokenNumber: number) => {
-    await bypassTokenMockFunction(tokenNumber);
+  const nextTokenPostCallerFunction = async () => {
+    await nextTokenCallerMockFunction();
   }
 
-  const callRamdomTokenFunction = async (tokenNumber: number) => {
-    await callRandomTokenMockFunction(tokenNumber);
+  const callAgaintokenFunction = async () => {
+    await callAgainTokenMockFunction();
+  }
+
+  const bypassTokenFunction = async () => {
+    await bypassTokenMockFunction();
+  }
+
+  const callRamdomTokenFunction = async () => {
+    await callRandomTokenMockFunction();
   }
 
 
-  const tokenBypassDefaultObject = new TokenBypassDefault(bypassTokenFunction);
-  const callAgainDefaultObject = new CallAgainDefault(callAgaintokenFunction);
-  const callNextTokenDefaultObject = new CallNextTokenDefault(nextTokenCallerFunction);
-  const randomTokenCallDefaultObject = new RandomTokenCallDefault(callRamdomTokenFunction);
+  const tokenBypassDefaultObject = new TokenBypassDefault(preCallFunction, bypassTokenFunction);
+  const callAgainDefaultObject = new CallAgainDefault(preCallFunction, callAgaintokenFunction);
+  const callNextTokenDefaultObject = new CallNextTokenDefault(preCallFunction, nextTokenPostCallerFunction);
+  const randomTokenCallDefaultObject = new RandomTokenCallDefault(preCallFunction, callRamdomTokenFunction);
 
   describe('Testing of TokenBypassDefault class', () => {
     const feature1Mock = jest.fn();
@@ -63,12 +75,19 @@ describe('Testing of TokenCallingStrategiesImplementation.test.ts', () => {
       runFeature: feature4Mock
     }
 
+    const dummyToken: Token = {
+      date: new Date(),
+      tokenId: 1,
+      tokenNumber: 1,
+      tokenCategory: ''
+    }
+
     tokenBypassDefaultObject.pipeFeature(feature1);
     tokenBypassDefaultObject.pipeFeature(feature2);
     tokenBypassDefaultObject.pipeFeature(feature3);
     tokenBypassDefaultObject.pipeFeature(feature4);
 
-    tokenBypassDefaultObject.bypassToken(2);
+    tokenBypassDefaultObject.bypassToken(dummyToken);
 
     it('Should not execute bypass Function', async () => {
       expect(bypassTokenMockFunction.mock.calls.length).toBe(0);
@@ -122,7 +141,7 @@ describe('Testing of TokenCallingStrategiesImplementation.test.ts', () => {
       postCallEventSubscriberFunction(testArg);
     });
 
-    callAgainDefaultObject.callAgainToken(2);
+    callAgainDefaultObject.callAgainToken(dummyToken);
 
     it('Should not execute callAgainToken() Function', async () => {
       expect(callAgainTokenMockFunction.mock.calls.length).toBe(0);
@@ -176,7 +195,14 @@ describe('Testing of TokenCallingStrategiesImplementation.test.ts', () => {
       postCallEventSubscriberFunction(testArg);
     });
 
-    callNextTokenDefaultObject.callNextToken(2);
+    const dummyToken: Token = {
+      date: new Date(),
+      tokenId: 1,
+      tokenNumber: 1,
+      tokenCategory: ''
+    }
+
+    callNextTokenDefaultObject.callNextToken(dummyToken);
 
     it('Should not execute callNext() Function', async () => {
       expect(nextTokenCallerMockFunction.mock.calls.length).toBe(0);
@@ -230,7 +256,7 @@ describe('Testing of TokenCallingStrategiesImplementation.test.ts', () => {
       postCallEventSubscriberFunction(testArg);
     });
 
-    randomTokenCallDefaultObject.callRandomToken(2);
+    randomTokenCallDefaultObject.callRandomToken(dummyToken);
 
     it('Should not execute callRandomToken() function', async () => {
       expect(callRandomTokenMockFunction.mock.calls.length).toBe(0);

@@ -1,14 +1,16 @@
 import Token from "../../../../../Entities/TokenCore/Token";
+import Operator from "../../../../../Entities/UserCore/Operator";
 import TokenBaseStorageInteractorImplementation from "../../../../../InterfaceAdapters/TokenBaseStorageInteractorImplementation"
 import TokenBaseManager from "../../../../../UseCases/TokenBaseManagementComponent/TokenBaseManager";
 import { TokenBaseObject } from "../../../../../UseCases/TokenBaseManagementComponent/TokenBaseModule";
 import TokenBaseStorageImplementation from "../../../../Drivers/TokenBaseStorageImplementation"
 import { getCategoryTokenCountManager, getTokenCountManager } from "../tokenCountHelper";
 
-const getTokenBaseManager = () => {
+export const getTokenBaseManager = () => {
   const tokenBaseStorageInteractorImplementation = new TokenBaseStorageInteractorImplementation(TokenBaseStorageImplementation);
   return new TokenBaseManager(tokenBaseStorageInteractorImplementation);
 }
+
 
 export const createNewNonCategoryTokenBaseObject = async () => {
   const nextAvailableTokenId = await TokenBaseStorageImplementation.getNextAvailableTokenId();

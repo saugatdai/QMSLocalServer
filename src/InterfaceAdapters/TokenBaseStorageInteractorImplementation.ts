@@ -9,7 +9,7 @@ export interface TokenBaseStorageAdapter {
   resetTokenBase: () => Promise<void>;
   editATokenBase: (tokenBaseObject: TokenBaseObject) => Promise<void>;
   readTodaysTokenBaseByTokenNumber: (tokenNumber: number) => Promise<TokenBaseObject>;
-  readNextAvailableTokenNumberInACategory: (category: string) => Promise<number>;
+  readNextAvailableTokenNumberInACategoryForToday: (category: string) => Promise<number>;
   readTokenBasesByTokenCategory: (tokenBases: TokenBaseObject[], category: string) => TokenBaseObject[];
   readTokenBaseByTokenId: (tokenId: number) => Promise<TokenBaseObject>;
   getNextAvailableTokenId: () => Promise<number>;
@@ -50,8 +50,8 @@ export default class TokenBaseStorageInteractorImplementation implements TokenBa
     return tokenBases;
   }
 
-  public async getNextAvailableTokenNumberInACategory(category: string) {
-    const tokenNumber = await this.tokenBaseSorageAdapter.readNextAvailableTokenNumberInACategory(category);
+  public async getNextAvailableTokenNumberInACategoryForToday(category: string) {
+    const tokenNumber = await this.tokenBaseSorageAdapter.readNextAvailableTokenNumberInACategoryForToday(category);
     return tokenNumber;
   }
 

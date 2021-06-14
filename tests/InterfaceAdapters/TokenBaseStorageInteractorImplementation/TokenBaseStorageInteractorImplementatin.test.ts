@@ -11,7 +11,7 @@ import {
     resetTokenBase,
     editATokenBase,
     readTodaysTokenBaseByTokenNumber,
-    readNextAvailableTokenNumberInACategory,
+    readNextAvailableTokenNumberInACategoryForToday,
     readTokenBasesByTokenCategory,
     readTokenBaseByTokenId,
     getNextAvailableTokenId
@@ -28,7 +28,7 @@ const tokenBaseStorageAdapter: TokenBaseStorageAdapter = {
     resetTokenBase,
     editATokenBase,
     readTodaysTokenBaseByTokenNumber,
-    readNextAvailableTokenNumberInACategory,
+    readNextAvailableTokenNumberInACategoryForToday,
     readTokenBasesByTokenCategory,
     readTokenBaseByTokenId,
     getNextAvailableTokenId

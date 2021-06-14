@@ -6,7 +6,8 @@ enum TokenStatus {
     BYPASS = "ByPass",
     FORWARD = " Forward",
     UNPROCESSED = "Unprocessed",
-    PROCESSED = "Processed"
+    PROCESSED = "Processed",
+    ASSIGNED = "Assigned"
 }
 
 class TokenProcessing {

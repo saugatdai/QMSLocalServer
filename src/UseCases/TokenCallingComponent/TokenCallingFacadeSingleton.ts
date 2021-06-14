@@ -9,6 +9,8 @@ import RandomCallStrategy from './RandomTokenCallModule/RandomTokenCallStrategy'
 import Feature from './Feature';
 import TokenForwardStrategy from './TokenForwardModule/TokenForwardStrategy';
 import TokenForward from './TokenForwardModule/TokenForward';
+import TokenCallingState from './TokenCallingState';
+import Token from '../../Entities/TokenCore/Token';
 
 export default class TokenCallingFacadeSingleton {
   private bypass = new Bypass();
@@ -17,7 +19,7 @@ export default class TokenCallingFacadeSingleton {
   private randomCall = new RandomCall();
   private tokenForward = new TokenForward();
 
-  private _currentlyProcessingNumber: number;
+  private _tokenCallingStates: TokenCallingState[] = [];
 
   private static instance = new TokenCallingFacadeSingleton();
 
@@ -27,11 +29,28 @@ export default class TokenCallingFacadeSingleton {
     return this.instance;
   }
 
-
-
-  public get currentlyProcessingNumber(): number {
-    return this._currentlyProcessingNumber;
+  public addTokenCallingState(tokenCallingState: TokenCallingState) {
+    const existingState = this.getATokenCallingStateByOperatorName(tokenCallingState.operator.getUserInfo().username);
+    if (existingState) {
+      this._tokenCallingStates = this._tokenCallingStates.map(loopTokenCallingState => {
+        if (loopTokenCallingState.operator.getUserInfo().username === tokenCallingState.operator.getUserInfo().username) {
+          return tokenCallingState;
+        }
+        return loopTokenCallingState;
+      });
+    } else {
+      this._tokenCallingStates.push(tokenCallingState);
+    }
   }
+
+  public get tokenCallingStates() {
+    return this._tokenCallingStates;
+  }
+
+  public getATokenCallingStateByOperatorName(username: string) {
+    return this._tokenCallingStates.find(tokenCallingState => tokenCallingState.operator.getUserInfo().username === username);
+  }
+
 
   public set byPassStrategy(byPassStrategy: BypassTokenStrategy) {
     this.bypass.strategy = byPassStrategy;
@@ -49,27 +68,27 @@ export default class TokenCallingFacadeSingleton {
     this.tokenForward.strategy = tokenForwardStrategy;
   }
 
-  public callNextToken(tokenNumber: number): void {
-    this._currentlyProcessingNumber = tokenNumber;
-    this.callNext.callToken(tokenNumber);
+  public async callNextToken(handledToken: Token): Promise<Token> {
+    const nextToken = await this.callNext.callToken(handledToken);
+    return nextToken;
   }
-  public callTokenAgain(tokenNumber: number): void {
-    this._currentlyProcessingNumber = tokenNumber;
-    this.callAgain.callToken(tokenNumber);
+  public async callTokenAgain(handledToken: Token): Promise<Token> {
+    const nextToken = await this.callAgain.callToken(handledToken);
+    return nextToken;
   }
-  public byPassToken(tokenNumber: number): void {
-    this._currentlyProcessingNumber = tokenNumber;
-    this.bypass.callToken(tokenNumber);
-  }
-
-  public callRandomToken(tokenNumber: number): void {
-    this._currentlyProcessingNumber = tokenNumber;
-    this.randomCall.callToken(tokenNumber);
+  public async byPassToken(handledToken: Token): Promise<Token> {
+    const nextToken = await this.bypass.callToken(handledToken);
+    return nextToken;
   }
 
-  public forwardToken(tokenNumber: number): void {
-    this._currentlyProcessingNumber = tokenNumber;
-    this.tokenForward.callToken(tokenNumber);
+  public async callRandomToken(handledToken: Token): Promise<Token> {
+    const nextToken = await this.randomCall.callToken(handledToken);
+    return nextToken;
+  }
+
+  public async forwardToken(handledToken: Token): Promise<Token> {
+    const nextToken = await this.tokenForward.callToken(handledToken);
+    return nextToken;
   }
 
   public pipeNextTokenFeature(feature: Feature): void {

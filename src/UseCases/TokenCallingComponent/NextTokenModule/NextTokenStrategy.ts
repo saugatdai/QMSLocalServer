@@ -1,7 +1,8 @@
+import Token from '../../../Entities/TokenCore/Token';
 import Feature from '../Feature';
 
 export default interface NextTokenStrategy {
   features: Feature[];
-  callNextToken: (tokenNumber: number) => void;
+  callNextToken: (handledToken: Token) => Promise<Token>;
   pipeFeature: (feature: Feature) => void;
 }

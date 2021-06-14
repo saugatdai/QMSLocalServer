@@ -8,7 +8,7 @@ export default interface TokenBaseStorageInteractorAdapter {
     resetTokenBase: () => Promise<void>;
     modifyATokenBase: (token: TokenBaseObject) => Promise<void>;
     getTodaysTokenBaseByTokenNumber: (tokenNumber: number, cateogory?: string) => Promise<TokenBaseObject>;
-    getNextAvailableTokenNumberInACategory: (tokenCategory: string) => Promise<number>;
+    getNextAvailableTokenNumberInACategoryForToday: (tokenCategory: string) => Promise<number>;
     getTokenBasesByTokenCategory: (tokenBases: TokenBaseObject[], tokenCategory: string) => TokenBaseObject[];
     getTokenBaseByTokenId: (tokenId: number) => Promise<TokenBaseObject>;
 }

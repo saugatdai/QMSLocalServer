@@ -10,8 +10,16 @@ import TokenCallingFacadeSingleton from '../../UseCases/TokenCallingComponent/To
 import EventManagerSingleton from '../../UseCases/EventManagementComponent/EventManagerSingleton';
 import PipelineTypes from '../../UseCases/PluginManagementComponent/PluginModule/PipelineTypes';
 import Plugin from '../../UseCases/PluginManagementComponent/PluginModule/Plugin';
+import { preCallRunnerForCallNext } from './DefaultStrategies/NextTokenDefaultStrategyHelper';
 
-export default class AppKernel {
+export default class AppKernelSingleton {
+
+  private static instance = new AppKernelSingleton();
+
+  public static getInstance() {
+    return this.instance;
+  }
+
   public async initializeCoreCallingActivities(pluginPath: string) {
     this.initializeTokenCallingFacadeWithDefaultStrategies();
     const pluginFinder = new PluginFinder(pluginPath);
@@ -83,12 +91,13 @@ export default class AppKernel {
   }
 
   private initializeTokenCallingFacadeWithDefaultStrategies() {
-    const callAgainDefault = new CallAgainDefault(async (tokenNumber: number) => { });
-    const callNextTokenDefault = new CallNextTokenDefault(async (tokenNumber: number) => {
-      console.log('CallNextTokenDefaultFeature');
-    });
-    const randomTokenCallDefault = new RandomTokenCallDefault(async (tokenNumber: number) => { })
-    const tokenBypassDefault = new TokenBypassDefault(async (tokenNumber: number) => { });
+    const callAgainDefault = new CallAgainDefault(async () => { });
+
+    const callNextTokenDefault = new CallNextTokenDefault(preCallRunnerForCallNext, async () => { });
+
+
+    const randomTokenCallDefault = new RandomTokenCallDefault(async () => { })
+    const tokenBypassDefault = new TokenBypassDefault(async () => { }, async () => { });
     const tokenCallingFacadeSingleton = TokenCallingFacadeSingleton.getInstance();
     tokenCallingFacadeSingleton.byPassStrategy = tokenBypassDefault;
     tokenCallingFacadeSingleton.callAgainStrategy = callAgainDefault;

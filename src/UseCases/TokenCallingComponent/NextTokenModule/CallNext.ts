@@ -1,3 +1,4 @@
+import Token from '../../../Entities/TokenCore/Token';
 import NextTokenStrategy from './NextTokenStrategy';
 
 export default class CallNext {
@@ -11,7 +12,8 @@ export default class CallNext {
     return this._strategy;
   }
 
-  public callToken(tokenNumber: number): void {
-    this._strategy.callNextToken(tokenNumber);
+  public async callToken(token: Token): Promise<Token> {
+    const nextToken = await this._strategy.callNextToken(token);
+    return nextToken;
   }
 }

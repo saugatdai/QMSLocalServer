@@ -88,7 +88,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
 }
 
 export const checkAUthorityForCreatingAUser = async (req: Request, res: Response, next: NextFunction) => {
-  if (req.body.role === UserRoles.ADMIN && req.body.user.getUserInfo().role != UserRoles.SUPERADMIN) {
+  if (req.body.role === UserRoles.ADMIN && req.body.user.getUserInfo().role !== UserRoles.SUPERADMIN) {
     res.status(400).send({ error: 'Only superadmins can create admin' });
   } else if (req.body.role === UserRoles.SUPERADMIN) {
     res.status(400).send({ error: 'Can not create a superadmin from this route' });
@@ -100,8 +100,16 @@ export const checkAUthorityForCreatingAUser = async (req: Request, res: Response
 }
 
 export const checkAdminAuthority = async (req: Request, res: Response, next: NextFunction) => {
-  if (req.body.user && req.body.user.getUserInfo().role != UserRoles.ADMIN) {
+  if (req.body.user && req.body.user.getUserInfo().role !== UserRoles.ADMIN) {
     res.status(401).send({ error: 'Must be Admin' });
+  } else {
+    next();
+  }
+}
+
+export const checkOperatorAuthority = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.user && req.body.user.getUserInfo().role !== UserRoles.OPERATOR) {
+    res.status(401).send({ error: 'Only operator has access to this route' });
   } else {
     next();
   }
