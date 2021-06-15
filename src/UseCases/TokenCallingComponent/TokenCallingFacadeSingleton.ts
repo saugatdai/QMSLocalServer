@@ -11,6 +11,8 @@ import TokenForwardStrategy from './TokenForwardModule/TokenForwardStrategy';
 import TokenForward from './TokenForwardModule/TokenForward';
 import TokenCallingState from './TokenCallingState';
 import Token from '../../Entities/TokenCore/Token';
+import TokenCalingStateManager from './TokenCallingStateManager';
+import TokenCallingStateManager from './TokenCallingStateManager';
 
 export default class TokenCallingFacadeSingleton {
   private bypass = new Bypass();
@@ -18,8 +20,7 @@ export default class TokenCallingFacadeSingleton {
   private callNext = new CallNext();
   private randomCall = new RandomCall();
   private tokenForward = new TokenForward();
-
-  private _tokenCallingStates: TokenCallingState[] = [];
+  private _tokenCallingStateManager: TokenCalingStateManager = TokenCallingStateManager.getinstance();
 
   private static instance = new TokenCallingFacadeSingleton();
 
@@ -29,38 +30,9 @@ export default class TokenCallingFacadeSingleton {
     return this.instance;
   }
 
-  public addTokenCallingState(tokenCallingState: TokenCallingState) {
-    const existingState = this.getATokenCallingStateByOperatorName(tokenCallingState.operator.getUserInfo().username);
-    if (existingState) {
-      this._tokenCallingStates = this._tokenCallingStates.map(loopTokenCallingState => {
-        if (loopTokenCallingState.operator.getUserInfo().username === tokenCallingState.operator.getUserInfo().username) {
-          return tokenCallingState;
-        }
-        return loopTokenCallingState;
-      });
-    } else {
-      this._tokenCallingStates.push(tokenCallingState);
-    }
+  public get tokenCallingStateManager() {
+    return this._tokenCallingStateManager;
   }
-
-  public get tokenCallingStates() {
-    return this._tokenCallingStates;
-  }
-
-  public getATokenCallingStateByOperatorName(username: string) {
-    return this._tokenCallingStates.find(tokenCallingState => tokenCallingState.operator.getUserInfo().username === username);
-  }
-
-  public getATokenCallingStateByCurrentToken(token: Token) {
-    return this._tokenCallingStates.find(tokenCallingState =>
-      tokenCallingState.currentToken.tokenNumber === token.tokenNumber &&
-      tokenCallingState.currentToken.tokenCategory === token.tokenCategory);
-  }
-
-  public removeATokenCallingStateForAUser(username: string) {
-    this._tokenCallingStates = this._tokenCallingStates.filter(tokenCallingState => tokenCallingState.operator.getUserInfo().username !== username);
-  }
-
 
   public set byPassStrategy(byPassStrategy: BypassTokenStrategy) {
     this.bypass.strategy = byPassStrategy;

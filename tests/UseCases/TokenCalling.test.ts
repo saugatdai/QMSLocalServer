@@ -48,47 +48,44 @@ describe('Testing of Token Calling Use Cases', () => {
 
   describe('Testing of token calling facade', () => {
     describe('Testing of tokencallingstate', () => {
-      it('Should add brand new token calling state', () => {
-        tokenCallingFacade.addTokenCallingState(tokenCallingState);
-        expect(tokenCallingFacade.getATokenCallingStateByOperatorName(userData.username).operator).toEqual(operator);
-      });
-
-      it('Should get the operator', () => {
-        const operator = tokenCallingState.operator;
-        expect(operator).toEqual(operator);
-      });
-
-      it('Should allow to set next token', () => {
-        tokenCallingState.nextToken = nextDummyToken;
-        expect(tokenCallingState.nextToken).toEqual(nextDummyToken);
-      });
-
-      it('Should allow to set canChange property', () => {
-        tokenCallingState.canChange = false;
-        expect(tokenCallingState.canChange).toBeFalsy();
-      });
-
-      it('Should not allow to set next token', () => {
-        tokenCallingState.nextToken = dummyToken;
-        expect(tokenCallingState.nextToken).toEqual(nextDummyToken);
-      });
-
-      it('Should not allow set canChange property', () => {
-        tokenCallingState.canChange = true;
-        expect(tokenCallingState.canChange).toBeFalsy();
-      });
+      tokenCallingFacade.tokenCallingStateManager.addTokenCallingState(tokenCallingState);
+      expect(tokenCallingFacade.tokenCallingStateManager.getATokenCallingStateByOperatorName(userData.username).operator).toEqual(operator);
     });
 
+    it('Should get the operator', () => {
+      const operator = tokenCallingState.operator;
+      expect(operator).toEqual(operator);
+    });
+
+    it('Should allow to set next token', () => {
+      tokenCallingState.nextToken = nextDummyToken;
+      expect(tokenCallingState.nextToken).toEqual(nextDummyToken);
+    });
+
+    it('Should allow to set canChange property', () => {
+      tokenCallingState.canChange = false;
+      expect(tokenCallingState.canChange).toBeFalsy();
+    });
+
+    it('Should not allow to set next token', () => {
+      tokenCallingState.nextToken = dummyToken;
+      expect(tokenCallingState.nextToken).toEqual(nextDummyToken);
+    });
+
+    it('Should not allow set canChange property', () => {
+      tokenCallingState.canChange = true;
+      expect(tokenCallingState.canChange).toBeFalsy();
+    });
     describe('Testing of token calling facade tokenState management component', () => {
       it('Should add a tokenCallingState to the currentState', () => {
-        tokenCallingFacade.addTokenCallingState(tokenCallingState);
-        tokenCallingFacade.addTokenCallingState(anotherTokenCallingState);
-        expect(tokenCallingFacade.tokenCallingStates.length).toBe(2);
+        tokenCallingFacade.tokenCallingStateManager.addTokenCallingState(tokenCallingState);
+        tokenCallingFacade.tokenCallingStateManager.addTokenCallingState(anotherTokenCallingState);
+        expect(tokenCallingFacade.tokenCallingStateManager.tokenCallingStates.length).toBe(2);
       });
 
       it('Should remove a tokenCallingState by userName', () => {
-        tokenCallingFacade.removeATokenCallingStateForAUser(operator2.getUserInfo().username);
-        console.log(tokenCallingFacade.tokenCallingStates);
+        tokenCallingFacade.tokenCallingStateManager.removeATokenCallingStateForAUser(operator2.getUserInfo().username);
+        console.log(tokenCallingFacade.tokenCallingStateManager.tokenCallingStates);
       });
     });
 
