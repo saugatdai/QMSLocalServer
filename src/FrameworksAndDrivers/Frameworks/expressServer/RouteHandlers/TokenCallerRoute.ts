@@ -12,6 +12,7 @@ class TokenCallerRoute {
   @use(auth)
   @use(checkOperatorAuthority)
   public async callNextToken(req: Request, res: Response) {
+
     res.status(200).send({ message: 'OK' });
   }
 }

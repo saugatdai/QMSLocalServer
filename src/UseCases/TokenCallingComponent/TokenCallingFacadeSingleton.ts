@@ -51,6 +51,16 @@ export default class TokenCallingFacadeSingleton {
     return this._tokenCallingStates.find(tokenCallingState => tokenCallingState.operator.getUserInfo().username === username);
   }
 
+  public getATokenCallingStateByCurrentToken(token: Token) {
+    return this._tokenCallingStates.find(tokenCallingState =>
+      tokenCallingState.currentToken.tokenNumber === token.tokenNumber &&
+      tokenCallingState.currentToken.tokenCategory === token.tokenCategory);
+  }
+
+  public removeATokenCallingStateForAUser(username: string) {
+    this._tokenCallingStates = this._tokenCallingStates.filter(tokenCallingState => tokenCallingState.operator.getUserInfo().username !== username);
+  }
+
 
   public set byPassStrategy(byPassStrategy: BypassTokenStrategy) {
     this.bypass.strategy = byPassStrategy;

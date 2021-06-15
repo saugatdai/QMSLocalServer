@@ -20,38 +20,76 @@ describe('Testing of Token Calling Use Cases', () => {
     tokenNumber: 123,
     tokenCategory: ''
   }
+
+  const tokenCallingFacade = TokenCallingFacadeSingleton.getInstance();
+
+  const userData: UserData = {
+    username: 'holusBahadur',
+    id: 1,
+    password: 'holus123',
+    role: UserRoles.OPERATOR,
+  }
+
+  const userData2: UserData = {
+    username: 'helloworld',
+    id: 1,
+    password: 'hello123',
+    role: UserRoles.OPERATOR
+  }
+
+  const nextDummyToken = { ...dummyToken, tokenId: 2, tokenNumber: 124, tokenCategory: 'F' };
+
+  const operator: Operator = new UserFactory().getUser(userData) as Operator;
+  operator.setCounter('4');
+  const operator2: Operator = new UserFactory().getUser(userData2) as Operator;
+
+  const tokenCallingState = new TokenCallingState(operator, dummyToken);
+  const anotherTokenCallingState = new TokenCallingState(operator2, nextDummyToken);
+
   describe('Testing of token calling facade', () => {
-    const tokenCallingFacade = TokenCallingFacadeSingleton.getInstance();
+    describe('Testing of tokencallingstate', () => {
+      it('Should add brand new token calling state', () => {
+        tokenCallingFacade.addTokenCallingState(tokenCallingState);
+        expect(tokenCallingFacade.getATokenCallingStateByOperatorName(userData.username).operator).toEqual(operator);
+      });
 
-    const userData: UserData = {
-      username: 'holusBahadur',
-      id: 1,
-      password: 'holus123',
-      role: UserRoles.OPERATOR,
-    }
+      it('Should get the operator', () => {
+        const operator = tokenCallingState.operator;
+        expect(operator).toEqual(operator);
+      });
 
-    const operator: Operator = new UserFactory().getUser(userData) as Operator;
-    operator.setCounter('4');
+      it('Should allow to set next token', () => {
+        tokenCallingState.nextToken = nextDummyToken;
+        expect(tokenCallingState.nextToken).toEqual(nextDummyToken);
+      });
 
-    const tokenCallingState: TokenCallingState = {
-      category: "C",
-      completion: false,
-      operator: operator,
-      tokenNumber: 123
-    }
+      it('Should allow to set canChange property', () => {
+        tokenCallingState.canChange = false;
+        expect(tokenCallingState.canChange).toBeFalsy();
+      });
 
-    it('Should add brand new token calling state', () => {
-      tokenCallingFacade.addTokenCallingState(tokenCallingState);
-      expect(tokenCallingFacade.getATokenCallingStateByOperatorName(userData.username).operator).toEqual(operator);
+      it('Should not allow to set next token', () => {
+        tokenCallingState.nextToken = dummyToken;
+        expect(tokenCallingState.nextToken).toEqual(nextDummyToken);
+      });
+
+      it('Should not allow set canChange property', () => {
+        tokenCallingState.canChange = true;
+        expect(tokenCallingState.canChange).toBeFalsy();
+      });
     });
 
-    it('Should alter existing token calling state', () => {
-      tokenCallingState.category = "F";
-      tokenCallingState.completion = true;
+    describe('Testing of token calling facade tokenState management component', () => {
+      it('Should add a tokenCallingState to the currentState', () => {
+        tokenCallingFacade.addTokenCallingState(tokenCallingState);
+        tokenCallingFacade.addTokenCallingState(anotherTokenCallingState);
+        expect(tokenCallingFacade.tokenCallingStates.length).toBe(2);
+      });
 
-      tokenCallingFacade.addTokenCallingState(tokenCallingState);
-      expect(tokenCallingFacade.getATokenCallingStateByOperatorName(userData.username).category).toEqual("F");
-      expect(tokenCallingFacade.getATokenCallingStateByOperatorName(userData.username).completion).toEqual(true);
+      it('Should remove a tokenCallingState by userName', () => {
+        tokenCallingFacade.removeATokenCallingStateForAUser(operator2.getUserInfo().username);
+        console.log(tokenCallingFacade.tokenCallingStates);
+      });
     });
 
   });
