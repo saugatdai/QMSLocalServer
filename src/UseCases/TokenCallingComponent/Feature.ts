@@ -1,4 +1,6 @@
+import TokenCallingState from "./TokenCallingState";
+
 export default interface feature {
   goToNextFeature?: boolean;
-  runFeature: () => void;
+  runFeature: (tokenCallingState?: TokenCallingState) => void;
 }

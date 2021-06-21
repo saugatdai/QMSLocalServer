@@ -69,16 +69,13 @@ export default () => describe('Testing of TokenCount Route', () => {
     expect(res.body.currentCustomerCountOfCategory).toBe(0);
   });
 
-  it('Should preset token count of a category', async () => {
+  it('Should preset and reset token count of a category', async () => {
     let res = await request(server).put('/tokencount/categorytokencount/categorycountpreset/123').set('Authorization', `Bearer ${registratorToken}`).send({
       "category": "T"
     });
     res = await request(server).get('/tokencount/categorytokencount/T').set('Authorization', `Bearer ${registratorToken}`).send();
     expect(res.body.currentCustomerCountOfCategory).toBe(123);
-  });
-
-  it('Should reset token count of a category', async () => {
-    let res = await request(server).put('/tokencount/categorytokencount/categorycountreset').set('Authorization', `Bearer ${registratorToken}`).send({
+    res = await request(server).put('/tokencount/categorytokencount/categorycountreset').set('Authorization', `Bearer ${registratorToken}`).send({
       "category": "T"
     });
     res = await request(server).get('/tokencount/categorytokencount/T').set('Authorization', `Bearer ${registratorToken}`).send();

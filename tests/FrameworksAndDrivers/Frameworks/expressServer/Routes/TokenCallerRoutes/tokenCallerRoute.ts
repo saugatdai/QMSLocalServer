@@ -3,8 +3,9 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 import request from 'supertest';
-import server from '../../../../../src/FrameworksAndDrivers/Frameworks/expressServer/server';
-import AppKernelSingleton from '../../../../../src/FrameworksAndDrivers/Drivers/AppKernelSingleton';
+import server from '../../../../../../src/FrameworksAndDrivers/Frameworks/expressServer/server';
+import AppKernelSingleton from '../../../../../../src/FrameworksAndDrivers/Drivers/AppKernelSingleton';
+import { byPassCategoryTokens, callCategoryTokens, callNonCategoryTokens, createCustomers } from './callNextHelper';
 
 
 const readFile = (filename: string) =>
@@ -37,7 +38,8 @@ const setTokens = async () => {
   operatorToken = operatorResponse.body.token;
 }
 
-const pulginPath = path.join(__dirname, '/../../../../../plugins');
+const pulginPath = path.join(__dirname, '/../../../../../../plugins');
+
 
 export default () => describe('Testing of TokenCount Route', () => {
   beforeAll(async () => {
@@ -47,13 +49,24 @@ export default () => describe('Testing of TokenCount Route', () => {
     server.set('appKernel', appKernelSingleton);
   });
 
-  it('Should call again next token', async () => {
-    const res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  it('Should call next token', async () => {
+    let res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
       "category": "",
       "actedTokenNumber": 0
     });
 
-    console.log(res.body);
+    expect(res.body).toHaveProperty('tokenNumber');
+  });
+
+  it('Should perform all calling functions', async () => {
+    await createCustomers("M");
+    await callCategoryTokens("M");
+    await callNonCategoryTokens();
+  });
+
+  it('Should perform all byPass Functions', async () => {
+    await createCustomers("G");
+    await byPassCategoryTokens("G");
   });
 
 });

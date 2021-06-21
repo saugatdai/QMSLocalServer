@@ -6,6 +6,8 @@ import RandomTokenCallStrategy from '../UseCases/TokenCallingComponent/RandomTok
 import EventTypes from '../UseCases/EventManagementComponent/EventTypes';
 import EventManagerSingleton from '../UseCases/EventManagementComponent/EventManagerSingleton';
 import Token from '../Entities/TokenCore/Token';
+import TokenCallingState from '../UseCases/TokenCallingComponent/TokenCallingState';
+import TokenCallingStateManagerSingleton from '../UseCases/TokenCallingComponent/TokenCallingStateManagerSingleton';
 
 
 class FeaturesHandler {
@@ -19,55 +21,56 @@ class FeaturesHandler {
 export class TokenBypassDefault extends FeaturesHandler implements BypassTokenStrategy {
   private continuation = true;
 
-  constructor(private precallRunner: () => Promise<void>,
-    private postCallRunner?: () => Promise<void>) {
+
+  constructor(private preCallRunner: (tokenCallingState?: TokenCallingState) => Promise<void>,
+    private postCallRunner?: (tokenCallingState?: TokenCallingState) => Promise<void>) {
     super();
   }
 
   public async bypassToken(handledToken: Token): Promise<Token> {
-    await this.precallRunner();
-
-    EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
+    const tokenCallingState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByCurrentToken(handledToken);
+    await this.preCallRunner(tokenCallingState);
+    EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT, tokenCallingState);
     this.features.every(feature => {
-      feature.runFeature();
+      feature.runFeature(tokenCallingState);
       this.continuation = (feature.goToNextFeature);
       return this.continuation;
     });
     if (this.continuation && this.postCallRunner) {
-      await this.postCallRunner();
+      await this.postCallRunner(tokenCallingState);
     }
-    EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT);
-    const dummyToken: Token = {
-      date: new Date(),
-      tokenCategory: '',
-      tokenId: 123,
-      tokenNumber: 1
+    EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT, tokenCallingState);
+    if (TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByCurrentToken(handledToken)) {
+      const nextToken = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByCurrentToken(handledToken).nextToken;
+      return nextToken;
+    } else {
+      return null;
     }
-    return dummyToken;
   }
 }
 
 export class CallAgainDefault extends FeaturesHandler implements CallAgainTokenStrategy {
   private continuation = true;
 
-  constructor(private precallRunner: () => Promise<void>,
-    private postCallRunner?: () => Promise<void>) {
+  constructor(private precallRunner: (tokenCallingState?: TokenCallingState) => Promise<void>,
+    private postCallRunner?: (tokenCallingState?: TokenCallingState) => Promise<void>) {
     super();
   }
 
 
   public async callAgainToken(handledToken: Token): Promise<Token> {
-    await this.precallRunner();
-    EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
+    const tokenCallingState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByCurrentToken(handledToken);
+    await this.precallRunner(tokenCallingState);
+    EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT, tokenCallingState);
     this.features.every(feature => {
-      feature.runFeature();
+      feature.runFeature(tokenCallingState);
       this.continuation = (feature.goToNextFeature) ? true : false;
       return this.continuation;
     });
     if (this.continuation && this.postCallRunner) {
-      await this.postCallRunner();
+      await this.postCallRunner(tokenCallingState);
     }
-    EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT);
+    EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT), tokenCallingState;
     const dummyToken: Token = {
       date: new Date(),
       tokenId: 1,
@@ -81,53 +84,54 @@ export class CallNextTokenDefault extends FeaturesHandler implements NextTokenSt
   private continuation = true;
 
 
-  constructor(private preCallRunner: () => Promise<void>,
-    private postCallRunner?: () => Promise<void>) {
+  constructor(private preCallRunner: (tokenCallingState?: TokenCallingState) => Promise<void>,
+    private postCallRunner?: (tokenCallingState?: TokenCallingState) => Promise<void>) {
     super();
   }
 
   public async callNextToken(handledToken: Token): Promise<Token> {
-    await this.preCallRunner();
-    EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
+    const tokenCallingState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByCurrentToken(handledToken);
+    await this.preCallRunner(tokenCallingState);
+    EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT, tokenCallingState);
     this.features.every(feature => {
-      feature.runFeature();
+      feature.runFeature(tokenCallingState);
       this.continuation = (feature.goToNextFeature);
       return this.continuation;
     });
     if (this.continuation && this.postCallRunner) {
-      await this.postCallRunner();
+      await this.postCallRunner(tokenCallingState);
     }
-    EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT);
-    const dummyToken: Token = {
-      date: new Date(),
-      tokenId: 1,
-      tokenNumber: 123,
-      tokenCategory: ''
+    EventManagerSingleton.getInstance().emit(EventTypes.POST_CALL_EVENT, tokenCallingState);
+    if (TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByCurrentToken(handledToken)) {
+      const nextToken = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByCurrentToken(handledToken).nextToken;
+      return nextToken;
+    } else {
+      return null;
     }
-    return dummyToken;
   }
 }
 
 export class RandomTokenCallDefault extends FeaturesHandler implements RandomTokenCallStrategy {
   private continuation = true;
 
-  constructor(private precallRunner: () => Promise<void>,
-    private postCallRunner?: () => Promise<void>) {
+  constructor(private precallRunner: (tokenCallingState?: TokenCallingState) => Promise<void>,
+    private postCallRunner?: (tokenCallingState?: TokenCallingState) => Promise<void>) {
     super();
   }
 
   public async callRandomToken(handledToken: Token): Promise<Token> {
-    await this.precallRunner();
-    EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
+    const tokenCallingState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByCurrentToken(handledToken);
+    await this.precallRunner(tokenCallingState);
+    EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT, tokenCallingState);
     this.features.every(feature => {
-      feature.runFeature();
+      feature.runFeature(tokenCallingState);
       this.continuation = (feature.goToNextFeature) ? true : false;
       return this.continuation;
     });
     if (this.continuation && this.postCallRunner) {
-      await this.postCallRunner();
+      await this.postCallRunner(tokenCallingState);
     }
-    EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT);
+    EventManagerSingleton.getInstance().emit(EventTypes.PRE_CALL_EVENT, tokenCallingState);
     const dummyToken: Token = {
       date: new Date(),
       tokenId: 1,

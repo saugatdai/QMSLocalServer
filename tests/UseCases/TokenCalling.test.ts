@@ -12,6 +12,7 @@ import Operator from '../../src/Entities/UserCore/Operator';
 import TokenCallingFacadeSingleton from '../../src/UseCases/TokenCallingComponent/TokenCallingFacadeSingleton';
 import TokenCallingState from '../../src/UseCases/TokenCallingComponent/TokenCallingState';
 import Token from '../../src/Entities/TokenCore/Token';
+import TokenCallingStateManagerSingleton from '../../src/UseCases/TokenCallingComponent/TokenCallingStateManagerSingleton';
 
 describe('Testing of Token Calling Use Cases', () => {
   const dummyToken: Token = {
@@ -38,6 +39,7 @@ describe('Testing of Token Calling Use Cases', () => {
   }
 
   const nextDummyToken = { ...dummyToken, tokenId: 2, tokenNumber: 124, tokenCategory: 'F' };
+  const dummyToken3 = { ...dummyToken, tokenId: 5, tokenNumber: 14, tokenCategory: 'X' };
 
   const operator: Operator = new UserFactory().getUser(userData) as Operator;
   operator.setCounter('4');
@@ -48,8 +50,8 @@ describe('Testing of Token Calling Use Cases', () => {
 
   describe('Testing of token calling facade', () => {
     describe('Testing of tokencallingstate', () => {
-      tokenCallingFacade.tokenCallingStateManager.addTokenCallingState(tokenCallingState);
-      expect(tokenCallingFacade.tokenCallingStateManager.getATokenCallingStateByOperatorName(userData.username).operator).toEqual(operator);
+      TokenCallingStateManagerSingleton.getInstance().addTokenCallingState(tokenCallingState);
+      expect(TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByOperatorName(userData.username).operator).toEqual(operator);
     });
 
     it('Should get the operator', () => {
@@ -77,16 +79,69 @@ describe('Testing of Token Calling Use Cases', () => {
       expect(tokenCallingState.canChange).toBeFalsy();
     });
     describe('Testing of token calling facade tokenState management component', () => {
-      it('Should add a tokenCallingState to the currentState', () => {
-        tokenCallingFacade.tokenCallingStateManager.addTokenCallingState(tokenCallingState);
-        tokenCallingFacade.tokenCallingStateManager.addTokenCallingState(anotherTokenCallingState);
-        expect(tokenCallingFacade.tokenCallingStateManager.tokenCallingStates.length).toBe(2);
+      it('Should add a tokenCallingState to the currentStates', () => {
+        TokenCallingStateManagerSingleton.getInstance().addTokenCallingState(tokenCallingState);
+        TokenCallingStateManagerSingleton.getInstance().addTokenCallingState(anotherTokenCallingState);
+        expect(TokenCallingStateManagerSingleton.getInstance().tokenCallingStates.length).toBe(2);
       });
 
-      it('Should remove a tokenCallingState by userName', () => {
-        tokenCallingFacade.tokenCallingStateManager.removeATokenCallingStateForAUser(operator2.getUserInfo().username);
-        console.log(tokenCallingFacade.tokenCallingStateManager.tokenCallingStates);
+      // TODO add nextToken and alter NextToken
+      it('Should set the nextTokenProperty', () => {
+        TokenCallingStateManagerSingleton.getInstance().setNextTokenOfTokenStateForOperatorName(operator2.getUserInfo().username, dummyToken3);
+        const tokenState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByOperatorName(operator2.getUserInfo().username);
+        expect(tokenState.nextToken).toEqual(dummyToken3);
       });
+
+      it('Should alter the changeable property of a state', () => {
+        TokenCallingStateManagerSingleton.getInstance().falsifyChangeablePropertyOfOperatorTokenState(operator2.getUserInfo().username);
+        const tokenCallingState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByOperatorName(operator2.getUserInfo().username);
+        expect(tokenCallingState.canChange).toBeFalsy();
+      });
+
+      it('Should fail to set the nextToken property because of unchangeable value', () => {
+        TokenCallingStateManagerSingleton.getInstance().setNextTokenOfTokenStateForOperatorName(operator2.getUserInfo().username, dummyToken);
+        const tokenState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByOperatorName(operator2.getUserInfo().username);
+        expect(tokenState.nextToken).toEqual(dummyToken3);
+      });
+
+      it('Should set the endOfQueue property', () => {
+        TokenCallingStateManagerSingleton.getInstance().setEndOfQueuePropertyForOperatorTokenState(operator2.getUserInfo().username);
+        const tokenState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByOperatorName(operator2.getUserInfo().username);
+        expect(tokenState.endOfQueue).toBeTruthy();
+      });
+
+      it('Should add a locker to a token calling states', () => {
+        TokenCallingStateManagerSingleton.getInstance().addStateLockerForOperatorCallingState(anotherTokenCallingState.operator.getUserInfo().username, "state1");
+        const tokenCallingState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByOperatorName(operator2.getUserInfo().username);
+        expect(tokenCallingState.stateLockers.length).toBe(1);
+      });
+
+      it('Should not remove a tokenCallingState by userName because it is locked', () => {
+        TokenCallingStateManagerSingleton.getInstance().removeATokenCallingStateForAUser(operator2.getUserInfo().username);
+        expect(TokenCallingStateManagerSingleton.getInstance().tokenCallingStates.length).toBe(2);
+      });
+
+      it('Should detect the lock state of a token and expect true', () => {
+        const lockedState = TokenCallingStateManagerSingleton.getInstance().isTokenStateForOperatorLocked(operator2.getUserInfo().username);
+        expect(lockedState).toBeTruthy();
+      });
+
+      it('Should remove a locker of a token calling state', () => {
+        TokenCallingStateManagerSingleton.getInstance().removeStateLockerForOperatorCallingState(operator2.getUserInfo().username, "state1");
+        const tokenCallingState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByOperatorName(operator2.getUserInfo().username);
+        expect(tokenCallingState.stateLockers.length).toBe(0);
+      });
+
+      it('Should detect the lock state of a token and expect false', () => {
+        const lockedState = TokenCallingStateManagerSingleton.getInstance().isTokenStateForOperatorLocked(operator2.getUserInfo().username);
+        expect(lockedState).toBeFalsy();
+      });
+
+      it('Should remove a tokenCallingState by userName because it is unlocked', () => {
+        TokenCallingStateManagerSingleton.getInstance().removeATokenCallingStateForAUser(operator2.getUserInfo().username);
+        expect(TokenCallingStateManagerSingleton.getInstance().tokenCallingStates.length).toBe(1);
+      });
+
     });
 
   });

@@ -9,10 +9,9 @@ import RandomCallStrategy from './RandomTokenCallModule/RandomTokenCallStrategy'
 import Feature from './Feature';
 import TokenForwardStrategy from './TokenForwardModule/TokenForwardStrategy';
 import TokenForward from './TokenForwardModule/TokenForward';
-import TokenCallingState from './TokenCallingState';
 import Token from '../../Entities/TokenCore/Token';
-import TokenCalingStateManager from './TokenCallingStateManager';
-import TokenCallingStateManager from './TokenCallingStateManager';
+import TokenCalingStateManager from './TokenCallingStateManagerSingleton';
+import TokenCallingStateManager from './TokenCallingStateManagerSingleton';
 
 export default class TokenCallingFacadeSingleton {
   private bypass = new Bypass();
@@ -20,7 +19,6 @@ export default class TokenCallingFacadeSingleton {
   private callNext = new CallNext();
   private randomCall = new RandomCall();
   private tokenForward = new TokenForward();
-  private _tokenCallingStateManager: TokenCalingStateManager = TokenCallingStateManager.getinstance();
 
   private static instance = new TokenCallingFacadeSingleton();
 
@@ -30,9 +28,6 @@ export default class TokenCallingFacadeSingleton {
     return this.instance;
   }
 
-  public get tokenCallingStateManager() {
-    return this._tokenCallingStateManager;
-  }
 
   public set byPassStrategy(byPassStrategy: BypassTokenStrategy) {
     this.bypass.strategy = byPassStrategy;

@@ -68,7 +68,7 @@ class TokenBaseRoutes {
   public async createACategory(req: Request, res: Response) {
     const categoryTokenCountManager = getCategoryTokenCountManager(req.body.category);
     await categoryTokenCountManager.createACategory(req.body.category);
-    res.status(200).send();
+    res.status(201).send();
   }
 
   @get('/filterbystatus/:status')

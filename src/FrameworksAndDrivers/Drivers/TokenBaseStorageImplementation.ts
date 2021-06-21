@@ -143,6 +143,7 @@ const editATokenBase = async (tokenBase: TokenBaseObject) => {
     }
     return looptokenBase;
   });
+  await writeFile(tokenBaseTestStoragePath, JSON.stringify(allTokenBases));
 }
 
 const readTodaysTokenBaseByTokenNumber = async (tokenNumber: number, category?: string) => {

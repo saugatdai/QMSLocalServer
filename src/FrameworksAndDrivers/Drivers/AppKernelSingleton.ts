@@ -10,7 +10,7 @@ import TokenCallingFacadeSingleton from '../../UseCases/TokenCallingComponent/To
 import EventManagerSingleton from '../../UseCases/EventManagementComponent/EventManagerSingleton';
 import PipelineTypes from '../../UseCases/PluginManagementComponent/PluginModule/PipelineTypes';
 import Plugin from '../../UseCases/PluginManagementComponent/PluginModule/Plugin';
-import { preCallRunnerForCallNext } from './DefaultStrategies/NextTokenDefaultStrategyHelper';
+import { defaultPostCaller, preCallRunnerForByPass, preCallRunnerForCallNext } from './DefaultStrategies/TokenCalllingDefaultHelper';
 
 export default class AppKernelSingleton {
 
@@ -93,11 +93,11 @@ export default class AppKernelSingleton {
   private initializeTokenCallingFacadeWithDefaultStrategies() {
     const callAgainDefault = new CallAgainDefault(async () => { });
 
-    const callNextTokenDefault = new CallNextTokenDefault(preCallRunnerForCallNext, async () => { });
+    const callNextTokenDefault = new CallNextTokenDefault(preCallRunnerForCallNext, defaultPostCaller);
 
 
     const randomTokenCallDefault = new RandomTokenCallDefault(async () => { })
-    const tokenBypassDefault = new TokenBypassDefault(async () => { }, async () => { });
+    const tokenBypassDefault = new TokenBypassDefault(preCallRunnerForByPass, defaultPostCaller);
     const tokenCallingFacadeSingleton = TokenCallingFacadeSingleton.getInstance();
     tokenCallingFacadeSingleton.byPassStrategy = tokenBypassDefault;
     tokenCallingFacadeSingleton.callAgainStrategy = callAgainDefault;

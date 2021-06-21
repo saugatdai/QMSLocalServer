@@ -112,7 +112,7 @@ const getLatestCustomerTokenCount = async (category: string) => {
 }
 
 
-const tokenCategoryCountStorageImplementation: TokenCountStorageAdapter = {
+const TokenCategoryCountStorageImplementation: TokenCountStorageAdapter = {
   updateCurrentCount,
   getCurrentCount,
   resetCount,
@@ -121,4 +121,4 @@ const tokenCategoryCountStorageImplementation: TokenCountStorageAdapter = {
   getLatestCustomerTokenCount
 }
 
-export default tokenCategoryCountStorageImplementation;
+export default TokenCategoryCountStorageImplementation;

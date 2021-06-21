@@ -44,7 +44,7 @@ export default () => describe('Testing of tokenBaseRoute', () => {
     const res = await request(server).post('/tokenbase/createtokencategory').set('Authorization', `Bearer ${adminToken}`).send({
       "category": "A"
     });
-    expect(res.statusCode).toBe(200);
+    expect(res.statusCode).toBe(201);
   });
 
   it('Should create a new tokenBase with a category', async () => {

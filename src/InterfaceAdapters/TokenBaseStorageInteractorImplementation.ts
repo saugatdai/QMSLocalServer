@@ -8,7 +8,7 @@ export interface TokenBaseStorageAdapter {
   getTokenBaseByTokenDate: (date: string) => Promise<TokenBaseObject[]>;
   resetTokenBase: () => Promise<void>;
   editATokenBase: (tokenBaseObject: TokenBaseObject) => Promise<void>;
-  readTodaysTokenBaseByTokenNumber: (tokenNumber: number) => Promise<TokenBaseObject>;
+  readTodaysTokenBaseByTokenNumber: (tokenNumber: number, category?: string) => Promise<TokenBaseObject>;
   readNextAvailableTokenNumberInACategoryForToday: (category: string) => Promise<number>;
   readTokenBasesByTokenCategory: (tokenBases: TokenBaseObject[], category: string) => TokenBaseObject[];
   readTokenBaseByTokenId: (tokenId: number) => Promise<TokenBaseObject>;
@@ -45,9 +45,14 @@ export default class TokenBaseStorageInteractorImplementation implements TokenBa
     await this.tokenBaseSorageAdapter.editATokenBase(tokenBaseObject);
   }
 
-  public async getTodaysTokenBaseByTokenNumber(tokenNumber: number) {
-    const tokenBases = await this.tokenBaseSorageAdapter.readTodaysTokenBaseByTokenNumber(tokenNumber);
-    return tokenBases;
+  public async getTodaysTokenBaseByTokenNumber(tokenNumber: number, category?: string) {
+    let tokenBase: TokenBaseObject;
+    if (category) {
+      tokenBase = await this.tokenBaseSorageAdapter.readTodaysTokenBaseByTokenNumber(tokenNumber, category);
+    } else {
+      tokenBase = await this.tokenBaseSorageAdapter.readTodaysTokenBaseByTokenNumber(tokenNumber);
+    }
+    return tokenBase;
   }
 
   public async getNextAvailableTokenNumberInACategoryForToday(category: string) {
