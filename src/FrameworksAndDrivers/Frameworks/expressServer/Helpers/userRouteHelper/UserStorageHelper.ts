@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import Operator from '../../../../../Entities/UserCore/Operator';
 
 import User, { UserData } from "../../../../../Entities/UserCore/User";
 import UserFactory from "../../../../../Entities/UserCore/UserFactory";
@@ -86,6 +87,16 @@ export default class UserStorageHelper {
       await userManager.update();
       const createdUser = await this.userStorageInteractorImplementation.getUserById(user.getUserInfo().id);
       return createdUser;
+    }
+  }
+
+  public async setOperatorCounter(operatorId: number, counter: string): Promise<void> {
+    const user: Operator = await this.userStorageInteractorImplementation.getUserById(operatorId) as Operator;
+    if (user.getUserInfo().role === UserRoles.OPERATOR) {
+      user.setCounter(counter);
+      await this.userStorageInteractorImplementation.setCounterForOperator(user);
+    } else {
+      throw new Error("Can set counter only for operator");
     }
   }
 

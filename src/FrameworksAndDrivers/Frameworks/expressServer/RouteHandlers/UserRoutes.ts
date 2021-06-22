@@ -68,11 +68,25 @@ class UserRoute {
     }
   }
 
+  @patch('/setcounter/:operatorid/:counter')
+  @use(auth)
+  @use(checkAdminAuthority)
+  public async setCounterForOperator(req: Request, res: Response) {
+    try {
+      const counter = req.params.counter;
+      const operatorId = parseInt(req.params.operatorid);
+      await new UserStorageHelper().setOperatorCounter(operatorId, counter);
+      res.status(200).send();
+    } catch (error) {
+      res.status(500).send({ error: error.toString() })
+    }
+  }
+
   @del('/:userId')
   @use(auth)
   @use(checkAdminAuthority)
   public async deleteAUser(req: Request, res: Response) {
-    res.status(200).send('holsu')
+    res.status(200).send()
   }
 
   @post('/superAdmin')

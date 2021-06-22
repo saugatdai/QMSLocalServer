@@ -5,7 +5,11 @@ import * as path from 'path';
 import request from 'supertest';
 import server from '../../../../../../src/FrameworksAndDrivers/Frameworks/expressServer/server';
 import AppKernelSingleton from '../../../../../../src/FrameworksAndDrivers/Drivers/AppKernelSingleton';
-import { byPassCategoryTokens, callCategoryTokens, callNonCategoryTokens, createCustomers } from './callNextHelper';
+import { callCategoryTokens, callNonCategoryTokens } from './callNextHelper';
+import { createCustomers } from './customerCreator';
+import { byPassCategoryTokens, bypassNonCategoryToken } from './byPassTokenHelper';
+import { callAgainCategoryTokens, callAgainNonCategoryTokens } from './callAgainHelper';
+import { callRandomCategoryTokens, callRandomNonCategoryTokens } from './randomCallHelper';
 
 
 const readFile = (filename: string) =>
@@ -67,6 +71,17 @@ export default () => describe('Testing of TokenCount Route', () => {
   it('Should perform all byPass Functions', async () => {
     await createCustomers("G");
     await byPassCategoryTokens("G");
+    await bypassNonCategoryToken();
+  });
+
+  it('Should perform all callAgainFunctions', async () => {
+    await callAgainCategoryTokens("G");
+    await callAgainNonCategoryTokens();
+  });
+
+  it('Should perform all callRandomFunctions', async () => {
+    await callRandomCategoryTokens('G');
+    await callRandomNonCategoryTokens();
   });
 
 });

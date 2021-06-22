@@ -7,7 +7,8 @@ enum TokenStatus {
     FORWARD = " Forward",
     UNPROCESSED = "Unprocessed",
     PROCESSED = "Processed",
-    ASSIGNED = "Assigned"
+    ASSIGNED = "Assigned",
+    RANDOMPROCESSED = "RandomlyProcessed"
 }
 
 class TokenProcessing {

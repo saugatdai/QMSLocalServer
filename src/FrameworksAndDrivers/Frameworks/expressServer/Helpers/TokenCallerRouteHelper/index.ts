@@ -28,9 +28,13 @@ export const getTokenAfterRegistrationToTokenCallingState = async (operator: Ope
       tokenBaseObject = await tokenBaseStorageInteractor.getTodaysTokenBaseByTokenNumber(tokenInfo.tokenNumber);
     }
   }
-  const tokenCallingState = new TokenCallingState(operator, tokenBaseObject.token);
-  TokenCallingStateManagerSingleton.getInstance().addTokenCallingState(tokenCallingState);
-  return tokenBaseObject.token;
+  if (tokenBaseObject) {
+    const tokenCallingState = new TokenCallingState(operator, tokenBaseObject.token);
+    TokenCallingStateManagerSingleton.getInstance().addTokenCallingState(tokenCallingState);
+    return tokenBaseObject.token;
+  } else {
+    throw new Error(`Token base for token number ${tokenInfo.tokenNumber} not found`);
+  }
 }
 
 export const getTodaysTokenByTokenNumber = async (tokenNumber: number) => {
@@ -64,6 +68,10 @@ export const sendCallingResponse = async (token: Token, httpObject: { req: Reque
       newToken = await TokenCallingFacadeSingleton.getInstance().callNextToken(token);
     } else if (httpObject.tokenStatus === TokenStatus.BYPASS) {
       newToken = await TokenCallingFacadeSingleton.getInstance().byPassToken(token);
+    } else if (httpObject.tokenStatus === TokenStatus.CALLAGAIN) {
+      newToken = await TokenCallingFacadeSingleton.getInstance().callTokenAgain(token);
+    } else if (httpObject.tokenStatus === TokenStatus.RANDOMPROCESSED) {
+      newToken = await TokenCallingFacadeSingleton.getInstance().callRandomToken(token);
     }
     if (newToken) {
       httpObject.res.status(200).send(newToken);

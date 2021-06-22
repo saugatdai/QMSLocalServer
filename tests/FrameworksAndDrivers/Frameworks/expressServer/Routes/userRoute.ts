@@ -455,6 +455,8 @@ export default () => describe('Testing of userRoutes', () => {
     operatorId = res1.body._userInfo.id;
     res1 = await request(server).delete(`/users/admins/${operatorId}`).set('Authorization', `Bearer ${token}`).send();
     expect(res1.statusCode).toEqual(401);
+    res1 = await request(server).patch(`/users/setcounter/${operatorId}/4`).set('Authorization', `Bearer ${token}`).send();
+    expect(res1.statusCode).toBe(200);
   });
 
   it('Should not allow other users to delete admin', async () => {

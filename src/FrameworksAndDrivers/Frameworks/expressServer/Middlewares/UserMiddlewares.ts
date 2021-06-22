@@ -115,6 +115,14 @@ export const checkOperatorAuthority = async (req: Request, res: Response, next: 
   }
 }
 
+export const checkForOperatorcounter = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.body.user && !req.body.user.getUserInfo().counter) {
+    res.status(401).send({ error: 'Operator must have a counter' });
+  } else {
+    next();
+  }
+}
+
 export const checkSuperAdminAuthority = async (req: Request, res: Response, next: NextFunction) => {
   if (req.body.user && req.body.user.getUserInfo().role !== UserRoles.SUPERADMIN) {
     res.status(401).send({ error: 'Must be superadmin to access admins' });

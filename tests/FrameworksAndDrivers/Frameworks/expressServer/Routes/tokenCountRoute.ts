@@ -31,6 +31,9 @@ const setTokens = async () => {
 export default () => describe('Testing of TokenCount Route', () => {
   beforeAll(async () => {
     await setTokens();
+    await request(server).post('/tokenbase/createtokencategory').set('Authorization', `Bearer ${adminToken}`).send({
+      "category": "T"
+    });
   });
 
   it('Should get the current cutomer token count', async () => {
@@ -62,10 +65,7 @@ export default () => describe('Testing of TokenCount Route', () => {
   });
 
   it('Should get the current customer token count of a category', async () => {
-    let res = await request(server).post('/tokenbase/createtokencategory').set('Authorization', `Bearer ${adminToken}`).send({
-      "category": "T"
-    });
-    res = await request(server).get('/tokencount/categorytokencount/T').set('Authorization', `Bearer ${registratorToken}`).send();
+    const res = await request(server).get('/tokencount/categorytokencount/T').set('Authorization', `Bearer ${registratorToken}`).send();
     expect(res.body.currentCustomerCountOfCategory).toBe(0);
   });
 

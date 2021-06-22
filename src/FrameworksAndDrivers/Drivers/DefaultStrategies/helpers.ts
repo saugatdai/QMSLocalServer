@@ -25,39 +25,13 @@ const getTokenCountManager = () => {
   return tokenCountManager;
 }
 
-export const preCallRunnerForCallNext = async (tokenCallingState: TokenCallingState) => {
-  const tokenCategory = tokenCallingState.currentToken.tokenCategory;
-
-  if (tokenCallingState.currentToken.tokenNumber !== 0) {
-    const actedTokenProcessingInfo: ActedTokenProcessingInfoArgument = {
-      actedToken: tokenCallingState.currentToken,
-      operator: tokenCallingState.operator,
-      tokenStatus: TokenStatus.PROCESSED
-    }
-    await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
-  }
-}
-
-export const preCallRunnerForByPass = async (tokenCallingState: TokenCallingState) => {
-  const tokenCategory = tokenCallingState.currentToken.tokenCategory;
-
-  if (tokenCallingState.currentToken.tokenNumber !== 0) {
-    const actedTokenProcessingInfo: ActedTokenProcessingInfoArgument = {
-      actedToken: tokenCallingState.currentToken,
-      operator: tokenCallingState.operator,
-      tokenStatus: TokenStatus.BYPASS
-    }
-    await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
-  }
-}
-
 export type ActedTokenProcessingInfoArgument = {
   actedToken: Token;
   operator: Operator;
   tokenStatus: TokenStatus
 }
 
-const storeActedTokenProcessingInfo = async (actedTokenProcessingInfo: ActedTokenProcessingInfoArgument) => {
+export const storeActedTokenProcessingInfo = async (actedTokenProcessingInfo: ActedTokenProcessingInfoArgument) => {
   const tokenBaseManager = await getTokenBaseManagerOfAToken(actedTokenProcessingInfo.actedToken);
   const tokenProcessingInfo = getTokenProcessingInfoObject(actedTokenProcessingInfo.operator, actedTokenProcessingInfo.tokenStatus);
   tokenBaseManager.tokenBase.addTokenProcessingInfo(tokenProcessingInfo);
@@ -86,27 +60,7 @@ const getTokenProcessingInfoObject = (operator: Operator, tokenStatus: TokenStat
   return tokenProcessingInfo;
 }
 
-export const defaultPostCaller = async (tokenCallingState: TokenCallingState) => {
-  const tokenCategory = tokenCallingState.currentToken.tokenCategory;
-  const unprocessedTokenBases = await getUnprocessedTokenBasesAfterCurrentCustomer(tokenCategory);
-
-  if (unprocessedTokenBases.length === 0) {
-    setEndOfQueueAndNullNextTokenForState(tokenCallingState);
-  } else {
-    unprocessedTokenBases.sort((tb1, tb2) => (tb1.token.tokenNumber - tb2.token.tokenNumber));
-    const nextToken = getNextTokenFromUnprocessedTokenBases(unprocessedTokenBases);
-    if (nextToken.tokenNumber === 0) {
-      setEndOfQueueAndNullNextTokenForState(tokenCallingState);
-    } else {
-      const nextTokenNumber = getNextTokenNumberAfterUpdatingNextTokenForTokenCallingState(tokenCallingState, nextToken);
-      await presetCurrentTokenCountFromNextToken(nextToken);
-      await storeOperatorAssignedToken(tokenCallingState.operator, nextToken);
-    }
-  }
-}
-
-
-const getUnprocessedTokenBasesAfterCurrentCustomer = async (tokenCategory: string) => {
+export const getUnprocessedTokenBasesAfterCurrentCustomer = async (tokenCategory: string) => {
   const tokenBaseStorageInteractorImplementation = new TokenBaseStorageInteractorImplementation(TokenBaseStorageImplementation);
   const allUnprocessedTokenBases = await tokenBaseStorageInteractorImplementation.filterTokenBaseByStatus(TokenStatus.UNPROCESSED);
   let unprocessedTokenBases: TokenBaseObject[];
@@ -136,12 +90,12 @@ const getUnprocessedTokenBases = async (allUnprocessedTokenBases: TokenBaseObjec
   return unprocessedTokenBases;
 }
 
-const setEndOfQueueAndNullNextTokenForState = (tokenCallingState: TokenCallingState) => {
+export const setEndOfQueueAndNullNextTokenForState = (tokenCallingState: TokenCallingState) => {
   TokenCallingStateManagerSingleton.getInstance().setEndOfQueuePropertyForOperatorTokenState(tokenCallingState.operator.getUserInfo().username);
   TokenCallingStateManagerSingleton.getInstance().setNextTokenOfTokenStateForOperatorName(tokenCallingState.operator.getUserInfo().username, null);
 }
 
-const getNextTokenFromUnprocessedTokenBases = (unprocessedTokenBases: TokenBaseObject[]) => {
+export const getNextTokenFromUnprocessedTokenBases = (unprocessedTokenBases: TokenBaseObject[]) => {
   let i = 0;
   let nextToken: Token;
   do {
@@ -168,14 +122,14 @@ const isAlreadyInState = (token: Token) => {
   }
 }
 
-const getNextTokenNumberAfterUpdatingNextTokenForTokenCallingState = (tokenCallingState: TokenCallingState, nextToken: Token) => {
+export const getNextTokenNumberAfterUpdatingNextTokenForTokenCallingState = (tokenCallingState: TokenCallingState, nextToken: Token) => {
   TokenCallingStateManagerSingleton.getInstance().setNextTokenOfTokenStateForOperatorName(tokenCallingState.operator.getUserInfo().username, nextToken);
   const updatedTokenCallingState = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByOperatorName(tokenCallingState.operator.getUserInfo().username);
   const nextTokenNumber = updatedTokenCallingState.nextToken.tokenNumber;
   return nextTokenNumber;
 }
 
-const presetCurrentTokenCountFromNextToken = async (token: Token) => {
+export const presetCurrentTokenCountFromNextToken = async (token: Token) => {
   if (token.tokenCategory) {
     const tokenCategoryCountManager = getCategoryTokenCountManager(token.tokenCategory);
     await tokenCategoryCountManager.presetTokenCount(token.tokenNumber);
@@ -185,7 +139,7 @@ const presetCurrentTokenCountFromNextToken = async (token: Token) => {
   }
 }
 
-const storeOperatorAssignedToken = async (operator: Operator, token: Token) => {
+export const storeOperatorAssignedToken = async (operator: Operator, token: Token) => {
   const tokenBaseObject = new TokenBaseObject(token);
   const tokenProcessingInfo = getTokenProcessingInfoObject(operator, TokenStatus.ASSIGNED);
   const tokenBaseManager = getTokenBaseManager();
@@ -193,4 +147,3 @@ const storeOperatorAssignedToken = async (operator: Operator, token: Token) => {
   tokenBaseManager.tokenBase.addTokenProcessingInfo(tokenProcessingInfo);
   await tokenBaseManager.updateTokenBase();
 }
-

@@ -27,16 +27,16 @@ const setTokens = async () => {
 
 let runningToken: number;
 
-export const callCategoryTokens = async (category: string) => {
+export const byPassCategoryTokens = async (category: string) => {
   await setTokens();
-  let res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  let res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": `${category}`,
     "actedTokenNumber": 0
   });
   runningToken = res.body.tokenNumber;
   expect(runningToken).toBe(1);
 
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": `${category}`,
     "actedTokenNumber": runningToken
   });
@@ -47,84 +47,83 @@ export const callCategoryTokens = async (category: string) => {
     "category": `${category}`
   });
 
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": `${category}`,
     "actedTokenNumber": runningToken
   });
   runningToken = res.body.tokenNumber;
   expect(runningToken).toBe(6);
 
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": `${category}`,
     "actedTokenNumber": runningToken
   });
   runningToken = res.body.tokenNumber;
   expect(runningToken).toBe(7);
 
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": `${category}`,
     "actedTokenNumber": runningToken
   });
   expect(res.body).toHaveProperty('error');
 }
 
-export const callNonCategoryTokens = async () => {
-  setTokens();
-
-  let res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+export const bypassNonCategoryToken = async () => {
+  await setTokens();
+  let res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": "",
     "actedTokenNumber": 0
   });
   runningToken = res.body.tokenNumber;
-  expect(runningToken).toBe(124);
-
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  expect(res.body.tokenNumber).toBe(131);
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": "",
     "actedTokenNumber": runningToken
   });
   runningToken = res.body.tokenNumber;
-  expect(runningToken).toBe(125);
+  expect(res.body.tokenNumber).toBe(132);
 
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": "",
     "actedTokenNumber": runningToken
   });
   runningToken = res.body.tokenNumber;
-  expect(runningToken).toBe(126);
+  expect(res.body.tokenNumber).toBe(133);
 
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": "",
     "actedTokenNumber": runningToken
   });
   runningToken = res.body.tokenNumber;
-  expect(runningToken).toBe(127);
+  expect(res.body.tokenNumber).toBe(134);
 
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": "",
     "actedTokenNumber": runningToken
   });
   runningToken = res.body.tokenNumber;
-  expect(runningToken).toBe(128);
+  expect(res.body.tokenNumber).toBe(135);
 
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": "",
     "actedTokenNumber": runningToken
   });
   runningToken = res.body.tokenNumber;
-  expect(runningToken).toBe(129);
+  expect(res.body.tokenNumber).toBe(136);
 
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": "",
     "actedTokenNumber": runningToken
   });
   runningToken = res.body.tokenNumber;
-  expect(runningToken).toBe(130);
+  expect(res.body.tokenNumber).toBe(137);
 
-  res = await request(server).post('/tokencaller/nexttoken').set('Authorization', `Bearer ${operatorToken}`).send({
+  res = await request(server).post('/tokencaller/bypasstoken').set('Authorization', `Bearer ${operatorToken}`).send({
     "category": "",
     "actedTokenNumber": runningToken
   });
-
   expect(res.body).toHaveProperty('error');
 
+  // res = await request(server).get('/tokenbase').set('Authorization', `Bearer ${adminToken}`).send();
+  // console.log(res.body);
 }
