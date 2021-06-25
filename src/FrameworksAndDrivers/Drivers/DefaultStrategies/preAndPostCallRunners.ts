@@ -60,6 +60,20 @@ export const preCallRunnerForRandomCall = async (tokenCallingState: TokenCalling
   await setNextToken(tokenCallingState);
 }
 
+export const preCallRunnerForTokenForward = async (tokenCallingState: TokenCallingState) => {
+  const tokenCategory = tokenCallingState.currentToken.tokenCategory;
+
+  if (tokenCallingState.currentToken.tokenNumber !== 0) {
+    const actedTokenProcessingInfo: ActedTokenProcessingInfoArgument = {
+      actedToken: tokenCallingState.currentToken,
+      operator: tokenCallingState.operator,
+      tokenStatus: TokenStatus.PROCESSED
+    }
+    await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
+  }
+  await setNextToken(tokenCallingState);
+}
+
 export const defaultPostCaller = async (tokenCallingState: TokenCallingState) => {
   const nextToken = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByOperatorName(tokenCallingState.operator.getUserInfo().username).nextToken;
   await presetCurrentTokenCountFromNextToken(nextToken);

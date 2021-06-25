@@ -7,6 +7,9 @@ import TokenCallingState from "../../../../../UseCases/TokenCallingComponent/Tok
 import TokenCallingStateManagerSingleton from "../../../../../UseCases/TokenCallingComponent/TokenCallingStateManagerSingleton";
 import { Request, Response } from "express";
 import TokenCallingFacadeSingleton from "../../../../../UseCases/TokenCallingComponent/TokenCallingFacadeSingleton";
+import TokenForwardListManager, { TokenForwardObject } from "../../../../../UseCases/TokenForwardListManagement/TokenForwardListManager";
+import TokenForwardListStorageInteractorImplementation from "../../../../../InterfaceAdapters/TokenForwardListStorageInteractorImplementation";
+import { tokenForwardListStorageImplementation } from "../../../../Drivers/TokenForwardListStorageImplementation";
 
 export const getTokenAfterRegistrationToTokenCallingState = async (operator: Operator, tokenInfo: { tokenNumber: number, tokenCategory: string }) => {
   let tokenBaseObject: TokenBaseObject;
@@ -72,6 +75,15 @@ export const sendCallingResponse = async (token: Token, httpObject: { req: Reque
       newToken = await TokenCallingFacadeSingleton.getInstance().callTokenAgain(token);
     } else if (httpObject.tokenStatus === TokenStatus.RANDOMPROCESSED) {
       newToken = await TokenCallingFacadeSingleton.getInstance().callRandomToken(token);
+    } else if (httpObject.tokenStatus === TokenStatus.FORWARD) {
+      const tokenForwardListStorageInteractorImplementation = new TokenForwardListStorageInteractorImplementation(tokenForwardListStorageImplementation);
+      const tokenForwardListManager = new TokenForwardListManager(tokenForwardListStorageInteractorImplementation);
+      const tokenForwardObject: TokenForwardObject = {
+        counter: httpObject.req.body.counterToForward,
+        tokens: [token]
+      }
+      await tokenForwardListManager.storeATokenForwardObject(tokenForwardObject);
+      newToken = await TokenCallingFacadeSingleton.getInstance().forwardToken(token);
     }
     if (newToken) {
       httpObject.res.status(200).send(newToken);
@@ -80,5 +92,22 @@ export const sendCallingResponse = async (token: Token, httpObject: { req: Reque
     }
   } catch (error) {
     httpObject.res.status(500).send({ error: error.toString() });
+  }
+}
+
+export const processTokenCallingTask = async (helperParameters: { req: Request, res: Response, tokenStatus: TokenStatus }) => {
+  const { tokenNumber, tokenCategory, operator } = getCallerParameters(helperParameters.req, helperParameters.res);
+  const tokenLockStatusForOperator = TokenCallingStateManagerSingleton.getInstance().isTokenStateForOperatorLocked(operator.getUserInfo().username);
+
+  if (tokenLockStatusForOperator) {
+    helperParameters.res.status(400).send({ error: 'Some processing for your previous request still in progress' });
+  } else {
+    const tokenInfo = { tokenNumber, tokenCategory };
+    try {
+      const token = await getTokenAfterRegistrationToTokenCallingState(helperParameters.req.body.user, tokenInfo);
+      await sendCallingResponse(token, { req: helperParameters.req, res: helperParameters.res, tokenStatus: helperParameters.tokenStatus });
+    } catch (error) {
+      helperParameters.res.status(500).send({ error: error.toString() });
+    }
   }
 }

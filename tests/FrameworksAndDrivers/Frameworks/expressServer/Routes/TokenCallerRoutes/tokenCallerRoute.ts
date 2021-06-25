@@ -10,6 +10,7 @@ import { createCustomers } from './customerCreator';
 import { byPassCategoryTokens, bypassNonCategoryToken } from './byPassTokenHelper';
 import { callAgainCategoryTokens, callAgainNonCategoryTokens } from './callAgainHelper';
 import { callRandomCategoryTokens, callRandomNonCategoryTokens } from './randomCallHelper';
+import { forwardCateogyrTokens, forwardNonCategoryTokens } from './forwardTokenHelper';
 
 
 const readFile = (filename: string) =>
@@ -82,6 +83,12 @@ export default () => describe('Testing of TokenCount Route', () => {
   it('Should perform all callRandomFunctions', async () => {
     await callRandomCategoryTokens('G');
     await callRandomNonCategoryTokens();
+  });
+
+  it('Should perform all tokenForwardFunctions', async () => {
+    await createCustomers("Z");
+    await forwardCateogyrTokens("Z");
+    await forwardNonCategoryTokens();
   });
 
 });

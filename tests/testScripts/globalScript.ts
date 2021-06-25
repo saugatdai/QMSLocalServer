@@ -7,6 +7,7 @@ const tokenBaseFileStoragePath = path.join(__dirname, '../../Data/tokenBase.json
 const usersFileStoragePath = path.join(__dirname, '../../Data/users.json');
 const tokenCountFileStoragePath = path.join(__dirname, '../../Data/tokenCount.json');
 const tokenCategoryCountFileStoragePath = path.join(__dirname, '../../Data/tokenCategoryCount.json');
+const tokenForwardListStoragePath = path.join(__dirname, '../../Data/tokenForwardList.json');
 const authTokenStoragePath = path.join(__dirname, '../../src/FrameworksAndDrivers/Frameworks/expressServer/Helpers/userRouteHelper/auths.json')
 
 const writeFile = (filename: string, data: string) =>
@@ -24,4 +25,5 @@ export default async () => {
   await writeFile(authTokenStoragePath, '');
   await writeFile(tokenCategoryCountFileStoragePath, '');
   await writeFile(tokenCountFileStoragePath, JSON.stringify(temporaryCountData));
+  await writeFile(tokenForwardListStoragePath, '');
 }
