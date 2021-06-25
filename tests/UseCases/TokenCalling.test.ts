@@ -117,7 +117,7 @@ describe('Testing of Token Calling Use Cases', () => {
       });
 
       it('Should not remove a tokenCallingState by userName because it is locked', () => {
-        TokenCallingStateManagerSingleton.getInstance().removeATokenCallingStateForAUser(operator2.getUserInfo().username);
+        TokenCallingStateManagerSingleton.getInstance().removeATokenCallingStateForAnOperatorIfNotLocked(operator2.getUserInfo().username);
         expect(TokenCallingStateManagerSingleton.getInstance().tokenCallingStates.length).toBe(2);
       });
 
@@ -138,8 +138,15 @@ describe('Testing of Token Calling Use Cases', () => {
       });
 
       it('Should remove a tokenCallingState by userName because it is unlocked', () => {
-        TokenCallingStateManagerSingleton.getInstance().removeATokenCallingStateForAUser(operator2.getUserInfo().username);
+        TokenCallingStateManagerSingleton.getInstance().removeATokenCallingStateForAnOperatorIfNotLocked(operator2.getUserInfo().username);
         expect(TokenCallingStateManagerSingleton.getInstance().tokenCallingStates.length).toBe(1);
+      });
+      it('Should clear all tokenCallignStates that has unlocked status', () => {
+        TokenCallingStateManagerSingleton.getInstance().addTokenCallingState(anotherTokenCallingState);
+        TokenCallingStateManagerSingleton.getInstance().addStateLockerForOperatorCallingState(tokenCallingState.operator.getUserInfo().username, 'Holus');
+        TokenCallingStateManagerSingleton.getInstance().removeAllStateUnlockedTokenCallingStateObjects();
+        const allStates = TokenCallingStateManagerSingleton.getInstance().tokenCallingStates;
+        expect(allStates.length).toBe(1);
       });
 
     });

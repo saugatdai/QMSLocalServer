@@ -86,10 +86,16 @@ export default class TokenCallingStateManagerSingleton {
     });
   }
 
-  public removeATokenCallingStateForAUser(username: string) {
+  public removeATokenCallingStateForAnOperatorIfNotLocked(username: string) {
     const tokenCallingState = this.getATokenCallingStateByOperatorName(username);
     if (tokenCallingState.stateLockers.length === 0) {
       this._tokenCallingStates = this._tokenCallingStates.filter(tokenCallingState => tokenCallingState.operator.getUserInfo().username !== username);
+    }
+  }
+
+  public removeAllStateUnlockedTokenCallingStateObjects() {
+    if (this.tokenCallingStates.length) {
+      this._tokenCallingStates = this._tokenCallingStates.filter(tokenCallingState => this.isTokenStateForOperatorLocked(tokenCallingState.operator.getUserInfo().username));
     }
   }
 
