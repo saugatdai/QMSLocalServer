@@ -141,7 +141,7 @@ class UserRoute {
 
   @get('/logoutall')
   @use(auth)
-  public async logOutUserFromALlDevices(req: Request, res: Response) {
+  public async logOutUserFromAllDevices(req: Request, res: Response) {
     const authTokenHelper = new AuthTokenHelper();
     await authTokenHelper.deleteAllTokensOfUserId(req.body.user.getUserInfo().id);
     const userWithTokens = await new UserStorageHelper().userStorageInteractorImplementation.getUserById(req.body.user.getUserInfo().id);
@@ -198,6 +198,12 @@ class UserRoute {
     } catch (error) {
       res.status(500).send(error.toString());
     }
+  }
+
+  @get('/currentprofile')
+  @use(auth)
+  public async getCurrentProfile(req: Request, res: Response) {
+    res.status(200).send(req.body.user);
   }
 
 }

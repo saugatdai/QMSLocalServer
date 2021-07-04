@@ -508,4 +508,15 @@ export default () => describe('Testing of userRoutes', () => {
     superAdministratorResopnse = await request(server).get('/users/logoutall').set('Authorization', `Bearer ${superAdminToken}`).send();
     expect(superAdministratorResopnse.body.tokens.length).toBe(0);
   });
+
+  it('Should get the currently logged in user', async () => {
+    let superAdministratorResopnse = await request(server).post('/users/login').send({
+      'username': 'saugatdai',
+      'password': 'mypassword'
+    });
+    const superAdminToken = superAdministratorResopnse.body.token;
+    const response = await request(server).get('/users/currentprofile').set('Authorization', `Bearer ${superAdminToken}`).send();
+    expect(response.body).toHaveProperty('_userInfo');
+  });
+
 });

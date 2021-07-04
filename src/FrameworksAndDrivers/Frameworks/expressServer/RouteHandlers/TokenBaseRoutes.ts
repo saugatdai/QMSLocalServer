@@ -15,9 +15,6 @@ import TokenBaseStorageInteractorImplementation from '../../../../InterfaceAdapt
 import { getCategoryTokenCountManager } from '../Helpers/tokenCountHelper';
 import { TokenStatus } from '../../../../UseCases/TokenBaseManagementComponent/TokenBaseModule';
 import { createNewCategoryTokenBaseObject, createNewNonCategoryTokenBaseObject } from '../Helpers/tokenBaseRouteHelper';
-import TokenCountManager from '../../../../UseCases/TokenCountManagementComponent/TokenCountManager';
-import TokenCategoryCountStorageInteractorImplementation from '../../../../InterfaceAdapters/TokenCategoryCountStorageInteractorImplementation';
-import TokenCountStorageImplementation from '../../../Drivers/TokenCountStorageImplementation';
 
 const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
@@ -87,7 +84,7 @@ class TokenBaseRoutes {
   @get('/filterbystatusanddate/:status/:date')
   @use(auth)
   @use(checkAdminAuthority)
-  public async filterTokenBaseByCategoryAndDate(req: Request, res: Response) {
+  public async filterTokenBaseByStatusAndDate(req: Request, res: Response) {
     try {
       const tokenBaseStorageInteractorImplementation = new TokenBaseStorageInteractorImplementation(TokenBaseStorageImplementation);
       const date = new Date(req.params.date);

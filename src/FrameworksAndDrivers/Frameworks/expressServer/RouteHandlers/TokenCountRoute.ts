@@ -95,7 +95,7 @@ class TokenCountRoute {
   @get('/categorytokencount/latestcustomercount/:category')
   @use(auth)
   @use(checkForAdminOrRegistrator)
-  public async getLatestCustomerTokenCount(req: Request, res: Response) {
+  public async getLatestCustomerTokenCountForCategory(req: Request, res: Response) {
     try {
       const tokenCategoryCountManager = getCategoryTokenCountManager(req.params.category);
       const lastCustomerCount = tokenCategoryCountManager.getLatestCustomerTokenCount();
@@ -108,7 +108,7 @@ class TokenCountRoute {
   @put('/categorytokencount/latestcustomercountset/:count')
   @use(auth)
   @use(checkForAdminOrRegistrator)
-  public async setLatestCustomerTokenCount(req: Request, res: Response) {
+  public async setLatestCustomerTokenCountForCategory(req: Request, res: Response) {
     const tokenCategoryCountManager = getCategoryTokenCountManager(req.body.category);
     await tokenCategoryCountManager.setLatestCustomerTokenCount(parseInt(req.params.count));
     res.status(200).send();
