@@ -86,7 +86,12 @@ class UserRoute {
   @use(auth)
   @use(checkAdminAuthority)
   public async deleteAUser(req: Request, res: Response) {
-    res.status(200).send()
+    try {
+      await new UserStorageHelper().deleteUser(req, res);
+      res.status(200).send();
+    } catch (error) {
+      res.status(500).send({ error: error.toString() });
+    }
   }
 
   @post('/superAdmin')

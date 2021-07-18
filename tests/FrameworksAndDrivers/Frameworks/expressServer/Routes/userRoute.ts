@@ -471,7 +471,12 @@ export default () => describe('Testing of userRoutes', () => {
   });
 
   it('Should allow admin to delete other users', async () => {
-    const res = await request(server).delete(`/users/${workingId}`).set('Authorization', `Bearer ${token}`).send();
+    const res1 = await request(server).post('/users').set('Authorization', `Bearer ${token}`).send({
+      'username': 'zayed',
+      'password': 'holusmondus',
+      'role': 'Registrator'
+    });
+    const res = await request(server).delete(`/users/${res1.body._userInfo.id}`).set('Authorization', `Bearer ${token}`).send();
     expect(res.statusCode).toBe(200);
   });
 

@@ -86,22 +86,26 @@ class CustomerRoutes {
   @use(auth)
   @use(checkForRegistrator)
   public async createCustomer(req: Request, res: Response) {
-    const customerStorageInteractorImplementation = new CustomerStorageInteractorImplementation(CustomerStorageImplementation);
-    const customer: Customer = await getCustomerFromReqeust(req);
+    try {
+      const customerStorageInteractorImplementation = new CustomerStorageInteractorImplementation(CustomerStorageImplementation);
+      const customer: Customer = await getCustomerFromReqeust(req);
 
-    const customerManager = new CustomerManager(customer);
-    customerManager.customerStorageInteractorAdapter = customerStorageInteractorImplementation;
+      const customerManager = new CustomerManager(customer);
+      customerManager.customerStorageInteractorAdapter = customerStorageInteractorImplementation;
 
-    if (req.body.additionalProperty) {
-      if (req.body.additionalProperty.propertyDataType === 'string')
-        customerManager.addCustomerInfo<string>(req.body.additionalProperty.propertyName, req.body.additionalProperty.propertyValue);
-      else if (req.body.additionalProperty.propertyDataType === 'number')
-        customerManager.addCustomerInfo<number>(req.body.additionalProperty.propertyName, req.body.additionalProperty.propertyValue);
+      if (req.body.additionalProperty) {
+        if (req.body.additionalProperty.propertyDataType === 'string')
+          customerManager.addCustomerInfo<string>(req.body.additionalProperty.propertyName, req.body.additionalProperty.propertyValue);
+        else if (req.body.additionalProperty.propertyDataType === 'number')
+          customerManager.addCustomerInfo<number>(req.body.additionalProperty.propertyName, req.body.additionalProperty.propertyValue);
+      }
+
+      await customerManager.store();
+
+      res.status(201).send(customer);
+    } catch (error) {
+      res.status(500).send({ error: error.toString() });
     }
-
-    await customerManager.store();
-
-    res.status(201).send(customer);
   }
 
   @del('/delete/allcustomers')

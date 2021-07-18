@@ -16,7 +16,7 @@ export const getCustomerFromReqeust = async (request: Request) => {
   }
   const customer: Customer = {
     customerId: 0,
-    customerName: request.body.name,
+    customerName: request.body.customerName,
     remarks: request.body.remarks,
     token: token
   };
