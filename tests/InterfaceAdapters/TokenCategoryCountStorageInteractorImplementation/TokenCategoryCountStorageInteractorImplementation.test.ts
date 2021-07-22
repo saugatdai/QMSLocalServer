@@ -30,17 +30,17 @@ describe('Testing of TokenCategoryCountStorageInteractorImplementation', () => {
   });
 
   it('Shuold register a new token category', async () => {
-    await tokenCategoryCountStorageInteractorImplementation.registerANewCategory(category);
+    await tokenCategoryCountStorageInteractorImplementation.registerANewCategory(category, "test");
     const currentTokenCount = await tokenCategoryCountStorageInteractorImplementation.getCurrentTokenCount(category);
     expect(currentTokenCount).toBe(0);
   });
 
   it('Should reject creating existing token Category', async () => {
-    expect(async () => { await tokenCategoryCountStorageInteractorImplementation.registerANewCategory(category) }).rejects.toThrow();
+    expect(async () => { await tokenCategoryCountStorageInteractorImplementation.registerANewCategory(category, "test") }).rejects.toThrow();
   });
 
   it('Should create a new category in a non-empty collection', async () => {
-    await tokenCategoryCountStorageInteractorImplementation.registerANewCategory(anotherCategory);
+    await tokenCategoryCountStorageInteractorImplementation.registerANewCategory(anotherCategory, "test");
     const currentCount = await tokenCategoryCountStorageInteractorImplementation.getCurrentTokenCount(anotherCategory);
     expect(currentCount).toBe(0);
   })
@@ -86,6 +86,28 @@ describe('Testing of TokenCategoryCountStorageInteractorImplementation', () => {
 
   });
 
+  it('Should get all the categories', async () => {
+    const tokenCategories = await tokenCategoryCountStorageInteractorImplementation.getAllCategories();
+    if (tokenCategories.length) {
+      expect(tokenCategories[0]).toHaveProperty('categoryName');
+    }
+  });
+
+  it('should update a category', async () => {
+    await tokenCategoryCountStorageInteractorImplementation.registerANewCategory('L', 'LMAO');
+    await tokenCategoryCountStorageInteractorImplementation.updateCategory('L', 'Any Name');
+    const allCategories = await tokenCategoryCountStorageInteractorImplementation.getAllCategories();
+    const updatedCategory = allCategories.find(category => category.category === 'L');
+    expect(updatedCategory.categoryName).toEqual('Any Name');
+  });
+
+  it('Should delete a category', async () => {
+    await tokenCategoryCountStorageInteractorImplementation.registerANewCategory('O', 'LMAO');
+    await tokenCategoryCountStorageInteractorImplementation.deleteCategory('O');
+    const allCategories = await tokenCategoryCountStorageInteractorImplementation.getAllCategories();
+    const updatedCategory = allCategories.find(category => category.category === 'O');
+    expect(updatedCategory).toBeFalsy();
+  });
 
 
 });

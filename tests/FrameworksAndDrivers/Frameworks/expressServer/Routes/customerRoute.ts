@@ -42,7 +42,7 @@ export default () => describe('Testing of Customer Route', () => {
 
   it('Should create a new customer with token category', async () => {
     const tokenCategoryCountStorageInteractorImplementation = new TokenCategoryCountStorateInteractorImplementation(TokenCategoryCountStorageImplementation);
-    await tokenCategoryCountStorageInteractorImplementation.registerANewCategory("X");
+    await tokenCategoryCountStorageInteractorImplementation.registerANewCategory("X", "test");
     const res = await request(server).post('/customer').set('Authorization', `Bearer ${registratorToken}`).send({
       "customerName": "Holus Mondus",
       "tokenCategory": "X",

@@ -12,7 +12,8 @@ export const writeFile = (filename: string, data: string) =>
 type TokenStatusObject = {
   currentTokenCount: number;
   latestCustomerTokenCount: number;
-  category: string
+  category: string,
+  categoryName: string
 }
 const tokenCountStatusStoragePath = path.join(__dirname, '../../../Data/tokenCategoryCount.json');
 
@@ -28,12 +29,13 @@ const getTokenStatusObjectsCollection = async () => {
   }
 }
 
-const registerANewCategory = async (category: string) => {
+const registerANewCategory = async (category: string, categoryName: string) => {
   const tokenStatusObjectsCollection = await getTokenStatusObjectsCollection();
   const tokenStatusObject = tokenStatusObjectsCollection.find(tokenStatusObject => tokenStatusObject.category === category);
   if (!tokenStatusObject) {
     const newTokenStatusObject: TokenStatusObject = {
       category,
+      categoryName,
       currentTokenCount: 0,
       latestCustomerTokenCount: 0
     }
@@ -111,6 +113,28 @@ const getLatestCustomerTokenCount = async (category: string) => {
   return tokenStatusObject.latestCustomerTokenCount;
 }
 
+const getAllCategories = async () => {
+  const allTokenStatusObject = await getTokenStatusObjectsCollection();
+  return allTokenStatusObject;
+}
+
+const updateCategory = async (category: string, categoryName: string) => {
+  const allTokenStatusObject = await getTokenStatusObjectsCollection();
+  const updatedTokenStatusObject = allTokenStatusObject.map(tokenStatusObject => {
+    if (tokenStatusObject.category === category) {
+      tokenStatusObject.categoryName = categoryName;
+    }
+    return tokenStatusObject;
+  });
+  await writeFile(tokenCountStatusStoragePath, JSON.stringify(updatedTokenStatusObject));
+}
+
+const deleteCategory = async (category: string) => {
+  const allTokenStatusObject = await getTokenStatusObjectsCollection();
+  const updatedTokenStatusObjects = allTokenStatusObject.filter(tokenStatusObject => tokenStatusObject.category !== category);
+  await writeFile(tokenCountStatusStoragePath, JSON.stringify(updatedTokenStatusObjects));
+}
+
 
 const TokenCategoryCountStorageImplementation: TokenCountStorageAdapter = {
   updateCurrentCount,
@@ -118,7 +142,10 @@ const TokenCategoryCountStorageImplementation: TokenCountStorageAdapter = {
   resetCount,
   registerANewCategory,
   setLatestCustomerTokenCount,
-  getLatestCustomerTokenCount
+  getLatestCustomerTokenCount,
+  getAllCategories,
+  deleteCategory,
+  updateCategory
 }
 
 export default TokenCategoryCountStorageImplementation;

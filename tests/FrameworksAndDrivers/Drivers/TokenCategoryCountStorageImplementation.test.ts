@@ -29,17 +29,17 @@ describe('Testing of TokenCategoryCountStorageInteractorImplementation', () => {
   });
 
   it('Shuold register a new token category', async () => {
-    await TokenCategoryCountStorageImplementation.registerANewCategory(category);
+    await TokenCategoryCountStorageImplementation.registerANewCategory(category, "test1");
     const currentTokenCount = await TokenCategoryCountStorageImplementation.getCurrentCount(category);
     expect(currentTokenCount).toBe(0);
   });
 
   it('Should reject creating existing token Category', async () => {
-    expect(async () => { await TokenCategoryCountStorageImplementation.registerANewCategory(category) }).rejects.toThrow();
+    expect(async () => { await TokenCategoryCountStorageImplementation.registerANewCategory(category, "test1") }).rejects.toThrow();
   });
 
   it('Should create a new category in a non-empty collection', async () => {
-    await TokenCategoryCountStorageImplementation.registerANewCategory(anotherCategory);
+    await TokenCategoryCountStorageImplementation.registerANewCategory(anotherCategory, "test2");
     const currentCount = await TokenCategoryCountStorageImplementation.getCurrentCount(anotherCategory);
     expect(currentCount).toBe(0);
   })

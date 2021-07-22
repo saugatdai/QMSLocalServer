@@ -7,6 +7,9 @@ const clearCurrentTokenCount = jest.fn();
 const registerANewCategory = jest.fn();
 const setLatestCustomerTokenCount = jest.fn();
 const getLatestCustomerTokenCount = jest.fn();
+const getAllCategories = jest.fn();
+const deleteCategory = jest.fn();
+const updateCategory = jest.fn();
 
 const interactorAdapter: TokenCategoryCountStorageInteractorAdapter = {
   updateCurrentTokenCount,
@@ -14,7 +17,10 @@ const interactorAdapter: TokenCategoryCountStorageInteractorAdapter = {
   clearCurrentTokenCount,
   registerANewCategory,
   setLatestCustomerTokenCount,
-  getLatestCustomerTokenCount
+  getLatestCustomerTokenCount,
+  getAllCategories,
+  deleteCategory,
+  updateCategory
 }
 
 const category = 'A';
@@ -38,7 +44,7 @@ describe('Testing of tokenCategoryCountManager', () => {
   });
 
   it('Should create a new category', () => {
-    tokenCategoryCountManager.createACategory('A');
+    tokenCategoryCountManager.createACategory('A', "test3");
     expect(registerANewCategory.mock.calls.length).toBe(1);
   });
   it('Should set latest customer token count', async () => {
@@ -49,5 +55,15 @@ describe('Testing of tokenCategoryCountManager', () => {
   it('Should get the latest customer token count', async () => {
     tokenCategoryCountManager.getLatestCustomerTokenCount();
     expect(getLatestCustomerTokenCount.mock.calls.length).toBe(1);
+  });
+
+  it('should update a category name', () => {
+    tokenCategoryCountManager.updateCategoryName("test");
+    expect(updateCategory.mock.calls.length).toBe(1);
+  });
+
+  it('Should delete a category', () => {
+    tokenCategoryCountManager.deleteCategory();
+    expect(deleteCategory.mock.calls.length).toBe(1);
   });
 })

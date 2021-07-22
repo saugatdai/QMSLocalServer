@@ -5,7 +5,7 @@ import * as path from 'path';
 import { Request, Response } from 'express';
 
 import Controller from "../Decorators/Controller";
-import { del, get, post } from "../Decorators/PathAndRequestMethodDecorator";
+import { del, get, patch, post } from "../Decorators/PathAndRequestMethodDecorator";
 import { auth } from '../Middlewares/UserMiddlewares';
 import use from '../Decorators/MiddlewareDecorator';
 import { checkForAdminOrRegistrator, checkForRegistrator } from '../Middlewares/TokenBaseRoutesMiddleware';
@@ -15,6 +15,8 @@ import TokenBaseStorageInteractorImplementation from '../../../../InterfaceAdapt
 import { getCategoryTokenCountManager } from '../Helpers/tokenCountHelper';
 import { TokenStatus } from '../../../../UseCases/TokenBaseManagementComponent/TokenBaseModule';
 import { createNewCategoryTokenBaseObject, createNewNonCategoryTokenBaseObject } from '../Helpers/tokenBaseRouteHelper';
+import TokenCountStorageInteractorImplementation from '../../../../InterfaceAdapters/TokenCategoryCountStorageInteractorImplementation';
+import TokenCategoryCountStorageImplementation from '../../../Drivers/TokenCategoryCountStorageImplementation';
 
 const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
@@ -64,9 +66,37 @@ class TokenBaseRoutes {
   @use(checkAdminAuthority)
   public async createACategory(req: Request, res: Response) {
     const categoryTokenCountManager = getCategoryTokenCountManager(req.body.category);
-    await categoryTokenCountManager.createACategory(req.body.category);
+    await categoryTokenCountManager.createACategory(req.body.category, req.body.categoryName);
     res.status(201).send();
   }
+
+  @get('/getalltokencategories')
+  @use(auth)
+  @use(checkForAdminOrRegistrator)
+  public async getAllTokenCategories(req: Request, res: Response) {
+    const tokenCategoryCountStorageInteractorImplementation = new TokenCountStorageInteractorImplementation(TokenCategoryCountStorageImplementation);
+    const allTokenCategories = await tokenCategoryCountStorageInteractorImplementation.getAllCategories();
+    res.status(200).send(allTokenCategories);
+  }
+
+  @patch('/updatecategoryname')
+  @use(auth)
+  @use(checkAdminAuthority)
+  public async updateATokenCategory(req: Request, res: Response) {
+    const categoryTokenCountManager = getCategoryTokenCountManager(req.body.category);
+    await categoryTokenCountManager.updateCategoryName(req.body.categoryName);
+    res.status(200).send();
+  }
+
+  @del('/deletecategory/:category')
+  @use(auth)
+  @use(checkAdminAuthority)
+  public async deleteATokenCategory(req: Request, res: Response) {
+    const categoryTokenCountManager = getCategoryTokenCountManager(req.params.category);
+    await categoryTokenCountManager.deleteCategory();
+    res.status(200).send();
+  }
+
 
   @get('/filterbystatus/:status')
   @use(auth)

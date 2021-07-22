@@ -46,7 +46,7 @@ const setTokens = async () => {
 const pulginPath = path.join(__dirname, '/../../../../../../plugins');
 
 
-export default () => describe('Testing of TokenCount Route', () => {
+export default () => describe('Testing of TokenCallerRoute Route', () => {
   beforeAll(async () => {
     await setTokens();
     const appKernelSingleton = AppKernelSingleton.getInstance();

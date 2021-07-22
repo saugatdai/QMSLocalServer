@@ -19,8 +19,8 @@ export default class TokenCountManager {
     return currentCount;
   }
 
-  public async createACategory(category: string) {
-    await this.tokenCountStorageInteractorAdapter.registerANewCategory(category);
+  public async createACategory(category: string, categoryName: string) {
+    await this.tokenCountStorageInteractorAdapter.registerANewCategory(category, categoryName);
   }
 
   public async setLatestCustomerTokenCount(count: number) {
@@ -30,5 +30,13 @@ export default class TokenCountManager {
   public async getLatestCustomerTokenCount() {
     const latestCount = await this.tokenCountStorageInteractorAdapter.getLatestCustomerTokenCount(this.category);
     return latestCount;
+  }
+
+  public async updateCategoryName(categoryName: string) {
+    await this.tokenCountStorageInteractorAdapter.updateCategory(this.category, categoryName);
+  }
+
+  public async deleteCategory() {
+    await this.tokenCountStorageInteractorAdapter.deleteCategory(this.category);
   }
 }

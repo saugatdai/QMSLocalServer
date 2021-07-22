@@ -42,9 +42,44 @@ export default () => describe('Testing of tokenBaseRoute', () => {
 
   it('Should create a new category', async () => {
     const res = await request(server).post('/tokenbase/createtokencategory').set('Authorization', `Bearer ${adminToken}`).send({
-      "category": "A"
+      "category": "A",
+      "categoryName": "Holus Molus"
     });
     expect(res.statusCode).toBe(201);
+  });
+
+  it('Should get all categories', async () => {
+    const res = await request(server).get('/tokenbase/getalltokencategories').set('Authorization', `Beaerer ${adminToken}`).send();
+    if (res.body.length) {
+      expect(res.body[0]).toHaveProperty('categoryName');
+    }
+  });
+
+  it('Should update a category', async () => {
+    let res = await request(server).post('/tokenbase/createtokencategory').set('Authorization', `Bearer ${adminToken}`).send({
+      "category": "H",
+      "categoryName": "Holus Molus"
+    });
+    res = await request(server).patch('/tokenbase/updatecategoryname').set('Authorization', `Bearer ${adminToken}`).send({
+      "category": "H",
+      "categoryName": "Hospital"
+    });
+    res = await request(server).get('/tokenbase/getalltokencategories').set('Authorization', `Bearer ${adminToken}`).send();
+    const categoryCollection = res.body as { category: string; categoryName: string }[];
+    const updatedCategory = categoryCollection.find(category => category.category === "H");
+    expect(updatedCategory.categoryName).toEqual("Hospital");
+  });
+
+  it('Should delete a category', async () => {
+    let res = await request(server).post('/tokenbase/createtokencategory').set('Authorization', `Bearer ${adminToken}`).send({
+      "category": "I",
+      "categoryName": "Holus Molus"
+    });
+    res = await request(server).delete('/tokenbase/deletecategory/I').set('Authorization', `Bearer ${adminToken}`).send();
+    res = await request(server).get('/tokenbase/getalltokencategories').set('Authorization', `Bearer ${adminToken}`).send();
+    const categoryCollection = res.body as { category: string; categoryName: string }[];
+    const updatedCategory = categoryCollection.find(category => category.category === "I");
+    expect(updatedCategory).toBeFalsy();
   });
 
   it('Should create a new tokenBase with a category', async () => {
