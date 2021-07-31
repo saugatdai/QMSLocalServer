@@ -42,8 +42,8 @@ class TokenProcessing {
 }
 
 class TokenBaseObject {
-    private tokenProcessingInfo: TokenProcessing[] = [];
     private _currentStatus: TokenStatus = TokenStatus.UNPROCESSED;
+    private tokenProcessingInfo: TokenProcessing[] = [];
 
     constructor(private _token: Token) { }
 

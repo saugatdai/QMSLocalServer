@@ -17,6 +17,7 @@ import { TokenStatus } from '../../../../UseCases/TokenBaseManagementComponent/T
 import { createNewCategoryTokenBaseObject, createNewNonCategoryTokenBaseObject } from '../Helpers/tokenBaseRouteHelper';
 import TokenCountStorageInteractorImplementation from '../../../../InterfaceAdapters/TokenCategoryCountStorageInteractorImplementation';
 import TokenCategoryCountStorageImplementation from '../../../Drivers/TokenCategoryCountStorageImplementation';
+import CustomerStorageImplementation from '../../../Drivers/CustomerStorageImplementation';
 
 const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
@@ -200,15 +201,22 @@ class TokenBaseRoutes {
     await tokenBaseStorageInteractorImplementation.resetTokenBase();
 
     const tokenCountStoragePath = path.join(__dirname, '../../../../../Data/tokenCount.json');
-    const tokenCategoryCountStoragePath = path.join(__dirname, '../../../../../Data/tokenCategoryCount.json');
-
     const resetCountData = {
       currentTokenCount: 0,
       latestCustomerTokenCount: 0
     }
 
     await writeFile(tokenCountStoragePath, JSON.stringify(resetCountData));
-    await writeFile(tokenCategoryCountStoragePath, '');
+    await CustomerStorageImplementation.resetCustomers();
+
+    const tokenCategoryCountStorageInteractorImplementation = new TokenCountStorageInteractorImplementation(TokenCategoryCountStorageImplementation);
+    const allTokenCategories = await tokenCategoryCountStorageInteractorImplementation.getAllCategories();
+
+    for (let tokenCategory of allTokenCategories) {
+      const categoryTokenCountManager = getCategoryTokenCountManager(tokenCategory.category);
+      await categoryTokenCountManager.resetTokenCount();
+      await categoryTokenCountManager.setLatestCustomerTokenCount(0);
+    }
 
     res.status(200).send({ messae: 'Successfully deleted all token bases' });
   }
