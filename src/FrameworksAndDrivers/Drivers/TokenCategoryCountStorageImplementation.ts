@@ -9,7 +9,7 @@ export const readFile = (filename: string) =>
 export const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
-type TokenStatusObject = {
+export type TokenStatusObject = {
   currentTokenCount: number;
   latestCustomerTokenCount: number;
   category: string,

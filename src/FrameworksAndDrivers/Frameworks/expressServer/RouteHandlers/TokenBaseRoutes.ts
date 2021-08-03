@@ -16,7 +16,7 @@ import { getCategoryTokenCountManager } from '../Helpers/tokenCountHelper';
 import { TokenStatus } from '../../../../UseCases/TokenBaseManagementComponent/TokenBaseModule';
 import { createNewCategoryTokenBaseObject, createNewNonCategoryTokenBaseObject } from '../Helpers/tokenBaseRouteHelper';
 import TokenCountStorageInteractorImplementation from '../../../../InterfaceAdapters/TokenCategoryCountStorageInteractorImplementation';
-import TokenCategoryCountStorageImplementation from '../../../Drivers/TokenCategoryCountStorageImplementation';
+import TokenCategoryCountStorageImplementation, { TokenStatusObject } from '../../../Drivers/TokenCategoryCountStorageImplementation';
 import CustomerStorageImplementation from '../../../Drivers/CustomerStorageImplementation';
 
 const writeFile = (filename: string, data: string) =>
@@ -209,6 +209,7 @@ class TokenBaseRoutes {
     await tokenBaseStorageInteractorImplementation.resetTokenBase();
 
     const tokenCountStoragePath = path.join(__dirname, '../../../../../Data/tokenCount.json');
+    const tokenCategoryCountStoragePath = path.join(__dirname, '../../../../../Data/tokenCategoryCount.json');
     const resetCountData = {
       currentTokenCount: 0,
       latestCustomerTokenCount: 0
@@ -220,11 +221,20 @@ class TokenBaseRoutes {
     const tokenCategoryCountStorageInteractorImplementation = new TokenCountStorageInteractorImplementation(TokenCategoryCountStorageImplementation);
     const allTokenCategories = await tokenCategoryCountStorageInteractorImplementation.getAllCategories();
 
-    for (let tokenCategory of allTokenCategories) {
-      const categoryTokenCountManager = getCategoryTokenCountManager(tokenCategory.category);
-      await categoryTokenCountManager.resetTokenCount();
-      await categoryTokenCountManager.setLatestCustomerTokenCount(0);
-    }
+
+    const tokenStatusObjects: TokenStatusObject[] = [];
+
+    allTokenCategories.forEach(tokenCategory => {
+      const tempStatusObject: TokenStatusObject = {
+        category: tokenCategory.category,
+        categoryName: tokenCategory.categoryName,
+        currentTokenCount: 0,
+        latestCustomerTokenCount: 0
+      }
+      tokenStatusObjects.push(tempStatusObject);
+    });
+
+    await writeFile(tokenCategoryCountStoragePath, JSON.stringify(tokenStatusObjects));
 
     res.status(200).send({ messae: 'Successfully deleted all token bases' });
   }
