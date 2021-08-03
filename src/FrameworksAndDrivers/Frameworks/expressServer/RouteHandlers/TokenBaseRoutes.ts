@@ -68,13 +68,14 @@ class TokenBaseRoutes {
   public async createACategory(req: Request, res: Response) {
     if (!req.body.category) {
       res.status(400).send({ error: "Please Enter a Category Character" });
-    }
-    try {
-      const categoryTokenCountManager = getCategoryTokenCountManager(req.body.category);
-      await categoryTokenCountManager.createACategory(req.body.category, req.body.categoryName);
-      res.status(201).send();
-    } catch (error) {
-      res.status(500).send({ error: error.toString() });
+    } else {
+      try {
+        const categoryTokenCountManager = getCategoryTokenCountManager(req.body.category);
+        await categoryTokenCountManager.createACategory(req.body.category, req.body.categoryName);
+        res.status(201).send();
+      } catch (error) {
+        res.status(500).send({ error: error.toString() });
+      }
     }
   }
 
@@ -228,5 +229,3 @@ class TokenBaseRoutes {
     res.status(200).send({ messae: 'Successfully deleted all token bases' });
   }
 }
-
-// commenting because testing for git...
