@@ -66,9 +66,16 @@ class TokenBaseRoutes {
   @use(auth)
   @use(checkAdminAuthority)
   public async createACategory(req: Request, res: Response) {
-    const categoryTokenCountManager = getCategoryTokenCountManager(req.body.category);
-    await categoryTokenCountManager.createACategory(req.body.category, req.body.categoryName);
-    res.status(201).send();
+    if (!req.body.category) {
+      res.status(400).send({ error: "Please Enter a Category Character" });
+    }
+    try {
+      const categoryTokenCountManager = getCategoryTokenCountManager(req.body.category);
+      await categoryTokenCountManager.createACategory(req.body.category, req.body.categoryName);
+      res.status(201).send();
+    } catch (error) {
+      res.status(500).send({ error: error.toString() });
+    }
   }
 
   @get('/getalltokencategories')

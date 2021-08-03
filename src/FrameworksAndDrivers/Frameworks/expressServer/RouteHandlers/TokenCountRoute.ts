@@ -98,7 +98,7 @@ class TokenCountRoute {
   public async getLatestCustomerTokenCountForCategory(req: Request, res: Response) {
     try {
       const tokenCategoryCountManager = getCategoryTokenCountManager(req.params.category);
-      const lastCustomerCount = tokenCategoryCountManager.getLatestCustomerTokenCount();
+      const lastCustomerCount = await tokenCategoryCountManager.getLatestCustomerTokenCount();
       res.status(200).send({ lastCustomerCount })
     } catch (error) {
       res.status(500).send({ error: error.toString() })
