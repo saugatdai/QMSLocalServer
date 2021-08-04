@@ -81,7 +81,6 @@ class TokenBaseRoutes {
 
   @get('/getalltokencategories')
   @use(auth)
-  @use(checkForAdminOrRegistrator)
   public async getAllTokenCategories(req: Request, res: Response) {
     const tokenCategoryCountStorageInteractorImplementation = new TokenCountStorageInteractorImplementation(TokenCategoryCountStorageImplementation);
     const allTokenCategories = await tokenCategoryCountStorageInteractorImplementation.getAllCategories();
@@ -136,7 +135,7 @@ class TokenBaseRoutes {
 
   @get('/filterbydate/:date')
   @use(auth)
-  @use(checkAdminAuthority)
+  @use(checkForAdminOrRegistrator)
   public async filterTokenBaseByDate(req: Request, res: Response) {
     try {
       const tokenBaseStorageInteractorImplementation = new TokenBaseStorageInteractorImplementation(TokenBaseStorageImplementation);

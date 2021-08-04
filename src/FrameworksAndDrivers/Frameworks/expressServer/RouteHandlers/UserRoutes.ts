@@ -24,7 +24,6 @@ import UserRoles from '../../../../Entities/UserCore/UserRoles';
 class UserRoute {
   @get('/')
   @use(auth)
-  @use(checkAdminAuthority)
   public async getAllUsers(req: Request, res: Response) {
     const userStorageHelper = new UserStorageHelper();
     let users = await userStorageHelper.userStorageInteractorImplementation.getAllUsers();

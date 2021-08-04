@@ -333,28 +333,13 @@ export default () => describe('Testing of userRoutes', () => {
     expect(res3.body.error).toEqual('invalid userdata');
   });
 
-  it('Should not allow other to view the general users', async () => {
+  it('Should not allow a user to view another user profile ', async () => {
     let res = await request(server).post('/users/login').send({
       'username': 'abcd',
       'password': 'mypassword'
     });
     token = res.body.token;
-
-    res = await request(server).get('/users').set('Authorization', `Bearer ${token}`).send();
-    expect(res.statusCode).toEqual(401);
-
-    res = await request(server).post('/users/login').send({
-      'username': 'saugatdai',
-      'password': 'mypassword'
-    });
-    token = res.body.token;
-
-    res = await request(server).get('/users').set('Authorization', `Bearer ${token}`).send();
-    expect(res.statusCode).toEqual(401);
-  });
-
-  it('Should not allow a user to view another user profile ', async () => {
-    const res = await request(server).get(`/users/getuser/${workingId}`).set('Authorization', `Bearer ${token}`).send();
+    res = await request(server).get(`/users/getuser/${workingId}`).set('Authorization', `Bearer ${token}`).send();
     expect(res.statusCode).toEqual(401);
   });
 
