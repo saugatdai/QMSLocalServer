@@ -100,11 +100,17 @@ const setNextToken = async (tokenCallingState: TokenCallingState) => {
   const tokenCategory = tokenCallingState.currentToken.tokenCategory;
   const unprocessedTokenBases = await getUnprocessedTokenBasesAfterCurrentCustomer(tokenCategory);
 
-  if (unprocessedTokenBases.length === 0) {
+  const unprocessedTokenBasesForToday = unprocessedTokenBases.filter(tokenBaseObject => {
+    const today = new Date();
+    const tokenDate = new Date(tokenBaseObject.token.date);
+    return (today.getDate() === tokenDate.getDate() && today.getMonth() === today.getMonth() && today.getFullYear() === tokenDate.getFullYear());
+  });
+
+  if (unprocessedTokenBasesForToday.length === 0) {
     setEndOfQueueAndNullNextTokenForState(tokenCallingState);
   } else {
-    unprocessedTokenBases.sort((tb1, tb2) => (tb1.token.tokenNumber - tb2.token.tokenNumber));
-    const nextToken = getNextTokenFromUnprocessedTokenBases(unprocessedTokenBases);
+    unprocessedTokenBasesForToday.sort((tb1, tb2) => (tb1.token.tokenNumber - tb2.token.tokenNumber));
+    const nextToken = getNextTokenFromUnprocessedTokenBases(unprocessedTokenBasesForToday);
     if (nextToken.tokenNumber === 0) {
       setEndOfQueueAndNullNextTokenForState(tokenCallingState);
     } else {
