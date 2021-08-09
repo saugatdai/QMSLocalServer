@@ -10,6 +10,56 @@ import TokenCallingFacadeSingleton from "../../../../../UseCases/TokenCallingCom
 import TokenForwardListManager, { TokenForwardObject } from "../../../../../UseCases/TokenForwardListManagement/TokenForwardListManager";
 import TokenForwardListStorageInteractorImplementation from "../../../../../InterfaceAdapters/TokenForwardListStorageInteractorImplementation";
 import { tokenForwardListStorageImplementation } from "../../../../Drivers/TokenForwardListStorageImplementation";
+import { storeActedTokenProcessingInfo, ActedTokenProcessingInfoArgument } from "../../../../Drivers/DefaultStrategies/helpers";
+
+export const beginTokenCallTask = async (helperParameters: { req: Request, res: Response, tokenStatus: TokenStatus }) => {
+  if (helperParameters.req.body.processedCategory !== undefined) {
+    const processedTokenNumber = helperParameters.req.body.actedTokenNumber;
+    const processedCategory = helperParameters.req.body.processedCategory;
+    helperParameters.req.body.actedTokenNumber = 0;
+
+    const tokenBaseStorageInteractor = new TokenBaseStorageInteractorImplementation(TokenBaseStorageImplementation);
+    const processedTokenBaseObject = await tokenBaseStorageInteractor.getTodaysTokenBaseByTokenNumber(processedTokenNumber, processedCategory);
+
+    const actedTokenProcessingInfoArgument: ActedTokenProcessingInfoArgument = {
+      actedToken: processedTokenBaseObject.token,
+      operator: helperParameters.req.body.user,
+      tokenStatus: helperParameters.tokenStatus
+    }
+
+    await storeActedTokenProcessingInfo(actedTokenProcessingInfoArgument);
+    await processTokenCallingTask(helperParameters);
+
+  } else {
+    await processTokenCallingTask(helperParameters);
+  }
+}
+
+export const processTokenCallingTask = async (helperParameters: { req: Request, res: Response, tokenStatus: TokenStatus }) => {
+  const { tokenNumber, tokenCategory, operator } = getCallerParameters(helperParameters.req, helperParameters.res);
+  const tokenLockStatusForOperator = TokenCallingStateManagerSingleton.getInstance().isTokenStateForOperatorLocked(operator.getUserInfo().username);
+
+  if (tokenLockStatusForOperator) {
+    helperParameters.res.status(400).send({ error: 'Some processing for your previous request still in progress' });
+  } else {
+    const tokenInfo = { tokenNumber, tokenCategory };
+    try {
+      const token = await getTokenAfterRegistrationToTokenCallingState(helperParameters.req.body.user, tokenInfo);
+      await sendCallingResponse(token, { req: helperParameters.req, res: helperParameters.res, tokenStatus: helperParameters.tokenStatus });
+    } catch (error) {
+      helperParameters.res.status(500).send({ error: error.toString() });
+    }
+  }
+}
+
+export const getCallerParameters = (req: Request, res: Response) => {
+  const tokenNumber: number = parseInt(req.body.actedTokenNumber);
+  const tokenCategory: string = req.body.category;
+  const operator: Operator = req.body.user as Operator;
+
+  return { tokenNumber, tokenCategory, operator }
+}
+
 
 export const getTokenAfterRegistrationToTokenCallingState = async (operator: Operator, tokenInfo: { tokenNumber: number, tokenCategory: string }) => {
   let tokenBaseObject: TokenBaseObject;
@@ -56,13 +106,6 @@ export const sendErrorMessage = (req: Request, res: Response) => {
   }
 }
 
-export const getCallerParameters = (req: Request, res: Response) => {
-  const tokenNumber: number = parseInt(req.body.actedTokenNumber);
-  const tokenCategory: string = req.body.category;
-  const operator: Operator = req.body.user as Operator;
-
-  return { tokenNumber, tokenCategory, operator }
-}
 
 export const sendCallingResponse = async (token: Token, httpObject: { req: Request, res: Response, tokenStatus: TokenStatus }) => {
   try {
@@ -95,19 +138,3 @@ export const sendCallingResponse = async (token: Token, httpObject: { req: Reque
   }
 }
 
-export const processTokenCallingTask = async (helperParameters: { req: Request, res: Response, tokenStatus: TokenStatus }) => {
-  const { tokenNumber, tokenCategory, operator } = getCallerParameters(helperParameters.req, helperParameters.res);
-  const tokenLockStatusForOperator = TokenCallingStateManagerSingleton.getInstance().isTokenStateForOperatorLocked(operator.getUserInfo().username);
-
-  if (tokenLockStatusForOperator) {
-    helperParameters.res.status(400).send({ error: 'Some processing for your previous request still in progress' });
-  } else {
-    const tokenInfo = { tokenNumber, tokenCategory };
-    try {
-      const token = await getTokenAfterRegistrationToTokenCallingState(helperParameters.req.body.user, tokenInfo);
-      await sendCallingResponse(token, { req: helperParameters.req, res: helperParameters.res, tokenStatus: helperParameters.tokenStatus });
-    } catch (error) {
-      helperParameters.res.status(500).send({ error: error.toString() });
-    }
-  }
-}

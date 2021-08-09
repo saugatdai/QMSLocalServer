@@ -4,7 +4,7 @@ import Operator from '../../Entities/UserCore/Operator';
 enum TokenStatus {
     CALLAGAIN = "CallAgain",
     BYPASS = "ByPass",
-    FORWARD = " Forward",
+    FORWARD = "Forward",
     UNPROCESSED = "Unprocessed",
     PROCESSED = "Processed",
     ASSIGNED = "Assigned",

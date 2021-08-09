@@ -67,7 +67,7 @@ export const preCallRunnerForTokenForward = async (tokenCallingState: TokenCalli
     const actedTokenProcessingInfo: ActedTokenProcessingInfoArgument = {
       actedToken: tokenCallingState.currentToken,
       operator: tokenCallingState.operator,
-      tokenStatus: TokenStatus.PROCESSED
+      tokenStatus: TokenStatus.FORWARD
     }
     await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
   }
@@ -76,8 +76,10 @@ export const preCallRunnerForTokenForward = async (tokenCallingState: TokenCalli
 
 export const defaultPostCaller = async (tokenCallingState: TokenCallingState) => {
   const nextToken = TokenCallingStateManagerSingleton.getInstance().getATokenCallingStateByOperatorName(tokenCallingState.operator.getUserInfo().username).nextToken;
-  await presetCurrentTokenCountFromNextToken(nextToken);
-  await storeOperatorAssignedToken(tokenCallingState.operator, nextToken);
+  if (nextToken) {
+    await presetCurrentTokenCountFromNextToken(nextToken);
+    await storeOperatorAssignedToken(tokenCallingState.operator, nextToken);
+  }
 }
 
 
@@ -99,13 +101,11 @@ export const postCallRunnerForRandomCall = async (tokenCallingState: TokenCallin
 const setNextToken = async (tokenCallingState: TokenCallingState) => {
   const tokenCategory = tokenCallingState.currentToken.tokenCategory;
   const unprocessedTokenBases = await getUnprocessedTokenBasesAfterCurrentCustomer(tokenCategory);
-
   const unprocessedTokenBasesForToday = unprocessedTokenBases.filter(tokenBaseObject => {
     const today = new Date();
     const tokenDate = new Date(tokenBaseObject.token.date);
     return (today.getDate() === tokenDate.getDate() && today.getMonth() === today.getMonth() && today.getFullYear() === tokenDate.getFullYear());
   });
-
   if (unprocessedTokenBasesForToday.length === 0) {
     setEndOfQueueAndNullNextTokenForState(tokenCallingState);
   } else {

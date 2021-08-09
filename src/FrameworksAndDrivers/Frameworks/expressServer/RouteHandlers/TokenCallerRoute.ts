@@ -3,7 +3,7 @@ import Controller from "../Decorators/Controller";
 import use from "../Decorators/MiddlewareDecorator";
 import { get, post } from "../Decorators/PathAndRequestMethodDecorator";
 import { auth, checkForOperatorcounter, checkOperatorAuthority } from "../Middlewares/UserMiddlewares";
-import { processTokenCallingTask } from "../Helpers/TokenCallerRouteHelper";
+import { beginTokenCallTask, processTokenCallingTask } from "../Helpers/TokenCallerRouteHelper";
 import { TokenStatus } from "../../../../UseCases/TokenBaseManagementComponent/TokenBaseModule";
 
 @Controller('/tokencaller')
@@ -13,7 +13,7 @@ class TokenCallerRoute {
   @use(checkOperatorAuthority)
   @use(checkForOperatorcounter)
   public async callNextToken(req: Request, res: Response) {
-    processTokenCallingTask({ req, res, tokenStatus: TokenStatus.PROCESSED });
+    await beginTokenCallTask({ req, res, tokenStatus: TokenStatus.PROCESSED });
   }
 
   @post('/bypasstoken')
@@ -21,7 +21,7 @@ class TokenCallerRoute {
   @use(checkOperatorAuthority)
   @use(checkForOperatorcounter)
   public async byPassToken(req: Request, res: Response) {
-    processTokenCallingTask({ req, res, tokenStatus: TokenStatus.BYPASS });
+    await beginTokenCallTask({ req, res, tokenStatus: TokenStatus.BYPASS });
   }
 
   @post('/callagaintoken')
@@ -29,7 +29,7 @@ class TokenCallerRoute {
   @use(checkOperatorAuthority)
   @use(checkForOperatorcounter)
   public async callAgainToken(req: Request, res: Response) {
-    processTokenCallingTask({ req, res, tokenStatus: TokenStatus.CALLAGAIN });
+    await processTokenCallingTask({ req, res, tokenStatus: TokenStatus.CALLAGAIN });
   }
 
   @post('/callrandom')
@@ -37,7 +37,7 @@ class TokenCallerRoute {
   @use(checkOperatorAuthority)
   @use(checkForOperatorcounter)
   public async callRandom(req: Request, res: Response) {
-    processTokenCallingTask({ req, res, tokenStatus: TokenStatus.RANDOMPROCESSED });
+    await processTokenCallingTask({ req, res, tokenStatus: TokenStatus.RANDOMPROCESSED });
   }
 
   @post('/forwardtoken')
@@ -45,6 +45,6 @@ class TokenCallerRoute {
   @use(checkOperatorAuthority)
   @use(checkForOperatorcounter)
   public async forwardToken(req: Request, res: Response) {
-    processTokenCallingTask({ req, res, tokenStatus: TokenStatus.FORWARD });
+    beginTokenCallTask({ req, res, tokenStatus: TokenStatus.FORWARD });
   }
 }
