@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings</title>
+  <style>
+    @font-face {
+      font-family: "condensedFont";
+      src: url("fonts/rclight.woff") format("woff");
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #001a33;
+      padding: .5em;
+      color: #e6f3ff;
+      font-family: "condensedFont";
+    }
+
+    form input {
+      border: none;
+      border-bottom: 2px solid #af3245;
+      outline: none;
+      background: inherit;
+      outline: none;
+      margin: .5em 0;
+      color: #e6f3ff;
+      padding: .3em;
+    }
+
+    #button {
+      display: flex;
+      width: 100%;
+      flex-direction: row;
+      justify-content: center;
+    }
+
+    button {
+      margin: 0 .5em;
+      color: #e6f3ff;
+      border: none;
+      outline: none;
+      background: #267326;
+      padding: .3em;
+      border-radius: .3em;
+      font-family: condensedFont;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #af3245;
+    }
+
+    #message {
+      margin-top: .5em;
+      color: #e6f3ff;
+    }
+  </style>
+</head>
+
+<body>
+  <form id="settingsForm">
+    <label for="portNumber">
+      Port Number:
+      <input type="number" name="portNumber" id="portNumber" />
+    </label>
+    <div id="button">
+      <button type="submit">Save</button>
+      <button type="button" id="cancelButton">Cancel</button>
+    </div>
+  </form>
+  <div id="message"></div>
+</body>
+
+</html>

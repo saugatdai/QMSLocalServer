@@ -1,0 +1,126 @@
+@font-face {
+  font-family: "condensedFont";
+  src: url("fonts/rclight.woff") format("woff");
+}
+
+:root{
+  --blue: #001a33;
+  --white: #e6f3ff;
+  --green: #267326;
+  --red: #af3245;
+  font-family: "condensedFont";
+}
+*{
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: url('icons/background.svg') var(--blue) no-repeat;
+  background-position: 95% 85%;
+  color: var(--white);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  height: 100vh;
+  align-items: center;
+  user-select: none;
+  -webkit-app-region: drag;
+}
+
+header {
+  padding: .5em 1em;
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  justify-content: space-between;
+  align-self: flex-end;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+main .heading {
+  font-size: .9em;
+}
+
+#controls {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  -webkit-app-region: no-drag;
+}
+
+#controls svg {
+  color: #fff;
+  height: .9em;
+  width: .9em;
+  margin: 0 .3em;
+}
+
+span.dash, span.cross {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0 .3em;
+  height: 1em;
+  width: .8em;
+  cursor: pointer;
+}
+
+span.dash div{
+  height: 1px;
+  width: 1em;
+  background-color: var(--white);
+  display: inline-block;
+}
+
+
+.stopped{
+  height: 4em;
+  width: 4em;
+  text-align: center;
+  margin-top: 1em;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid var(--green);
+  color: var(--green);
+  border-radius: 50%;
+  font-size: 1.2em;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
+
+.started{
+  color: var(--red);
+  border-color: var(--red);
+}
+
+.stopped:hover, .started:hover {
+  color: var(--white);
+}
+
+footer {
+  margin-top: 1em;
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 100%;
+}
+
+.statusText {
+  font-size: .9em;
+  justify-self: center;
+}
+
+footer svg {
+  height: .9em;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
+}
