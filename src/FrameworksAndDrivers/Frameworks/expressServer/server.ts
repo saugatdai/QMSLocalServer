@@ -6,6 +6,7 @@ import './RouteHandlers/TokenBaseRoutes';
 import './RouteHandlers/CustomerRoutes';
 import './RouteHandlers/TokenCountRoute';
 import './RouteHandlers/TokenCallerRoute';
+import './RouteHandlers/PluginRoute';
 import TokenCallingStateManagerSingleton from '../../../UseCases/TokenCallingComponent/TokenCallingStateManagerSingleton';
 
 const app = express();

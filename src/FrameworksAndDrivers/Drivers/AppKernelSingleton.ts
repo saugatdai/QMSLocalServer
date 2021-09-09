@@ -1,3 +1,5 @@
+import * as fs from 'fs';
+
 import {
   CallAgainDefault,
   CallNextTokenDefault,
@@ -12,6 +14,7 @@ import EventManagerSingleton from '../../UseCases/EventManagementComponent/Event
 import PipelineTypes from '../../UseCases/PluginManagementComponent/PluginModule/PipelineTypes';
 import Plugin from '../../UseCases/PluginManagementComponent/PluginModule/Plugin';
 import { defaultPostCaller, postCallRunnerForCallAgain, postCallRunnerForRandomCall, preCallRunnerForByPass, preCallRunnerForCallAgain, preCallRunnerForCallNext, preCallRunnerForRandomCall, preCallRunnerForTokenForward } from './DefaultStrategies/preAndPostCallRunners';
+import EventTypes from '../../UseCases/EventManagementComponent/EventTypes';
 
 export default class AppKernelSingleton {
 
@@ -31,6 +34,9 @@ export default class AppKernelSingleton {
     sortedPlugins.forEach(plugin => {
       this.registerEventHandlersFromPluginIfExists(plugin);
       this.registerPipelineExecutorsFromPluginIfExists(plugin);
+    });
+    EventManagerSingleton.getInstance().on(EventTypes.PLUGIN_ZIP_EXTRACTED, async (zipFile: string) => {
+      await fs.promises.unlink(zipFile);
     });
   }
 

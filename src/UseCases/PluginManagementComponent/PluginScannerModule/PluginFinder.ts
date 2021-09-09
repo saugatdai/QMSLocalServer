@@ -35,6 +35,7 @@ export default class PluginFinder implements PluginFinderInterface {
                   directory
                 );
                 plugin.default.pluginInfo = pluginInfo;
+                plugin.default.pluginDirectory = directory;
               } catch (error) {
                 console.log(error.toString());
               }

@@ -17,4 +17,5 @@ export default interface Plugin {
   nextTokenStrategy?: NextTokenStrategy;
   randomCallStrategy?: RandomTokenCallStrategy;
   tokenForwardStrategy?: TokenForwardStrategy;
+  pluginDirectory: string;
 }
