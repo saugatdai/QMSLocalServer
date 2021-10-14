@@ -1,5 +1,6 @@
 import { Server } from 'http';
 import * as path from 'path';
+import * as fs from 'fs';
 
 import { ipcRenderer } from 'electron';
 
@@ -8,6 +9,8 @@ import { readFile, ServerSettings } from './helpers/storageHandler';
 import AppKernelSingleton from '../../Drivers/AppKernelSingleton';
 import expressServer from '../expressServer/server';
 import { getIpAddress } from './helpers/network';
+import EventManagerSingleton from '../../../UseCases/EventManagementComponent/EventManagerSingleton';
+import EventTypes from '../../../UseCases/EventManagementComponent/EventTypes';
 
 let serverStatus: Server;
 
@@ -33,6 +36,9 @@ const serverStartEventListener = () => {
     if (!serverStatus) {
       serverStatus = expressServer.listen(5000, async () => {
         const pluginPath = path.join(__dirname, '../../../../plugins');
+        EventManagerSingleton.getInstance().on(EventTypes.PLUGIN_ZIP_EXTRACTED, async (zipFile: string) => {
+          await fs.promises.unlink(zipFile);
+        });
         await AppKernelSingleton.getInstance().initializeCoreCallingActivities(pluginPath);
         setServerStatusText(await getServerParameterString());
         startedButtonSet();

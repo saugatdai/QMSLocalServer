@@ -8,6 +8,7 @@ import PluginManager from "../../../../UseCases/PluginManagementComponent/Plugin
 import { pluginsPath } from "../Constants/OtherConstants";
 import { Request, Response } from "express";
 import FileUploadMiddleware from "../Middlewares/fileUpload/FileUploadMiddleware"; import PluginConfigElement from "../../../../UseCases/PluginManagementComponent/PluginModule/PluginConfigElement";
+import AppKernelSingleton from "../../../Drivers/AppKernelSingleton";
 "../Middlewares/fileUpload/FileUploadMiddleware";
 
 @Controller('/plugins')
@@ -16,26 +17,34 @@ class pluginRoute {
   @use(auth)
   @use(checkAdminAuthority)
   public async getAllPlugins(req: Request, res: Response) {
-    const pluginManagerStorageInteractorImplementation = new PluginManagerStorageInteractorImplementation(PluginManagerStorageImplementation);
-    const pluginManager = new PluginManager(pluginsPath);
-    pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
-    const allPlugins = await pluginManager.getInstalledPlugins();
-    res.status(200).send(allPlugins);
+    try {
+      const pluginManagerStorageInteractorImplementation = new PluginManagerStorageInteractorImplementation(PluginManagerStorageImplementation);
+      const pluginManager = new PluginManager(pluginsPath);
+      pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
+      const allPlugins = await pluginManager.getInstalledPlugins();
+      res.status(200).send(allPlugins);
+    } catch (error) {
+      res.status(500).send({ error: error.toString() });
+    }
   }
 
   @get('/:id')
   @use(auth)
   @use(checkAdminAuthority)
   public async getPluginByPluginId(req: Request, res: Response) {
-    const pluginManagerStorageInteractorImplementation = new PluginManagerStorageInteractorImplementation(PluginManagerStorageImplementation);
-    const pluginManager = new PluginManager(pluginsPath);
-    pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
-    const allPlugins = await pluginManager.getInstalledPlugins();
-    const targetPlugin = allPlugins.find(plugin => plugin.pluginInfo.pluginId === parseInt(req.params.id));
-    if (targetPlugin) {
-      res.status(200).send(targetPlugin);
-    } else {
-      res.status(500).send({ error: `Plugin with plugin id ${req.params.id} not found` });
+    try {
+      const pluginManagerStorageInteractorImplementation = new PluginManagerStorageInteractorImplementation(PluginManagerStorageImplementation);
+      const pluginManager = new PluginManager(pluginsPath);
+      pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
+      const allPlugins = await pluginManager.getInstalledPlugins();
+      const targetPlugin = allPlugins.find(plugin => plugin.pluginInfo.pluginId === parseInt(req.params.id));
+      if (targetPlugin) {
+        res.status(200).send(targetPlugin);
+      } else {
+        res.status(500).send({ error: `Plugin with plugin id ${req.params.id} not found` });
+      }
+    } catch (error) {
+      res.status(500).send({ error: error.toString() });
     }
   }
 
@@ -44,11 +53,16 @@ class pluginRoute {
   @use(checkAdminAuthority)
   @use(FileUploadMiddleware.single('pluginZip'))
   public async installPluginFromZipArchive(req: Request, res: Response) {
-    const pluginManagerStorageInteractorImplementation = new PluginManagerStorageInteractorImplementation(PluginManagerStorageImplementation);
-    const pluginManager = new PluginManager(pluginsPath);
-    pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
-    await pluginManager.installPluginFromArchive(req.file.path);
-    res.status(200).send({ success: "Plugin Installed" });
+    try {
+      const pluginManagerStorageInteractorImplementation = new PluginManagerStorageInteractorImplementation(PluginManagerStorageImplementation);
+      const pluginManager = new PluginManager(pluginsPath);
+      pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
+      await pluginManager.installPluginFromArchive(req.file.path);
+      await AppKernelSingleton.getInstance().initializeCoreCallingActivities(pluginsPath);
+      res.status(200).send({ success: "Plugin Installed" });
+    } catch (error) {
+      res.status(500).send({ error: error.toString() });
+    }
   }
 
   @del('/:pluginId')
@@ -86,12 +100,15 @@ class pluginRoute {
   @use(auth)
   @use(checkAdminAuthority)
   public async setPluginConfigById(req: Request, res: Response) {
-    const pluginsConfig: PluginConfigElement[] = req.body.pluginsConfig;
     const pluginManagerStorageInteractorImplementation = new PluginManagerStorageInteractorImplementation(PluginManagerStorageImplementation);
     const pluginManager = new PluginManager(pluginsPath);
     pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
 
     try {
+      const pluginsConfig: PluginConfigElement[] = req.body.pluginsConfig;
+      if (!pluginsConfig) {
+        throw new Error('Plugin Config Data Error');
+      }
       await pluginManager.setPluginConfigByPluginId(pluginsConfig, parseInt(req.params.pluginId));
       res.status(200).send({ success: "Plugin Configuration updated" });
     } catch (error) {

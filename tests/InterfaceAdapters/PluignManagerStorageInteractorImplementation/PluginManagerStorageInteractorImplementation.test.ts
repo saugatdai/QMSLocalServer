@@ -23,7 +23,7 @@ describe('Testing of PluginManagerStorageInteractorImplementation', () => {
     return null;
   }
 
-  const setPluginConfigByPluginId = async (pluginConfigElement: PluginConfigElement, pluignId: number, pluginPath: string) => {
+  const setPluginConfigByPluginId = async (pluginConfigElement: PluginConfigElement[], pluignId: number, pluginPath: string) => {
     setPluginConfigBYPluginIdMock();
   }
 

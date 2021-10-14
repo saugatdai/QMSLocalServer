@@ -1,8 +1,8 @@
 {
-  "name": "TestPlugin1",
+  "name": "TestPlugin3",
   "version": "1.0.0",
   "minCoreVersion": "1.0.0",
-  "pluginId": 123,
+  "pluginId": 125,
   "pluginValidatorID": "124abc",
   "pluginValidatorId": "holusmolus"
 }
