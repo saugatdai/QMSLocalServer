@@ -80,11 +80,6 @@ describe('Testing of tokenForwardListStorageInteractorImplementation', () => {
     await tokenForwardListStorageInteractorImplementation.addTokenForwardObject(tokenForwardObject5);
     await tokenForwardListStorageInteractorImplementation.removeAllExceptForToday();
     const tokenForwardObjects = await tokenForwardListStorageInteractorImplementation.tokenForwardObjects();
-    tokenForwardObjects.forEach(tokenForwardObject => {
-      tokenForwardObject.tokens.forEach(token => {
-        console.log(token.date.toLocaleString());
-      })
-    });
     expect(tokenForwardObjects.length).toBe(3);
   });
 
