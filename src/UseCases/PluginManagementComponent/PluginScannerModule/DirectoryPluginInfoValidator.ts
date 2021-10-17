@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
+import * as crypto from 'crypto';
 
 import PluginInfo from '../PluginInfo';
 import { DirectoryPluginInfoValidatorInterface } from './PluginFinder';
@@ -37,7 +39,27 @@ export default class PluginInfoValidator
   }
 
   public hasPluginInfoValidPluginValidatorId(pluginInfo: PluginInfo): boolean {
-    // TODO validation task remaining
-    return false;
+    // TODO function not verified
+    let macAddress = this.getMacAddressOfNonLoopBackNetworkInterface();
+    macAddress = macAddress.split(':').join('~');
+    const pluginId = pluginInfo.pluginId;
+    const originalId = `${pluginId}~${macAddress}`;
+    const hash = crypto.createHash('md5').update(originalId).digest('hex');
+
+    return hash == pluginInfo.pluginValidatorId;
+  }
+
+  private getMacAddressOfNonLoopBackNetworkInterface(): string {
+    const interfaces = os.networkInterfaces();
+    for (const devName in interfaces) {
+      const iface = interfaces[devName];
+
+      for (let i = 0; i < iface.length; i++) {
+        const alias = iface[i];
+        if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal)
+          return alias.address;
+      }
+    }
+    return '0.0.0.0';
   }
 }

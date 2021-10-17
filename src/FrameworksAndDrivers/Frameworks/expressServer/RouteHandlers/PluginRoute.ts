@@ -58,7 +58,6 @@ class pluginRoute {
       const pluginManager = new PluginManager(pluginsPath);
       pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
       await pluginManager.installPluginFromArchive(req.file.path);
-      await AppKernelSingleton.getInstance().initializeCoreCallingActivities(pluginsPath);
       res.status(200).send({ success: "Plugin Installed" });
     } catch (error) {
       res.status(500).send({ error: error.toString() });

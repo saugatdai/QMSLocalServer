@@ -36,9 +36,6 @@ const serverStartEventListener = () => {
     if (!serverStatus) {
       serverStatus = expressServer.listen(5000, async () => {
         const pluginPath = path.join(__dirname, '../../../../plugins');
-        EventManagerSingleton.getInstance().on(EventTypes.PLUGIN_ZIP_EXTRACTED, async (zipFile: string) => {
-          await fs.promises.unlink(zipFile);
-        });
         await AppKernelSingleton.getInstance().initializeCoreCallingActivities(pluginPath);
         setServerStatusText(await getServerParameterString());
         startedButtonSet();

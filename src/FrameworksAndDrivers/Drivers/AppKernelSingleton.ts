@@ -35,7 +35,10 @@ export default class AppKernelSingleton {
       this.registerEventHandlersFromPluginIfExists(plugin);
       this.registerPipelineExecutorsFromPluginIfExists(plugin);
     });
-
+    EventManagerSingleton.getInstance().on(EventTypes.PLUGIN_ZIP_EXTRACTED, async (zipFile: string) => {
+      await fs.promises.unlink(zipFile);
+    });
+    console.log("Kernel initialized...");
   }
 
   private registerStrategiesFromPluginIfExists(plugin: Plugin) {

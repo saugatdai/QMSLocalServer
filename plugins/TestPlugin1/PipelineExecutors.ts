@@ -1,11 +1,18 @@
 import { PipelineExecutor } from './Interfaces';
 import { Feature } from './Interfaces';
 
-export const pipeline1Feature1Mock = jest.fn();
-export const pipeline1Feature2Mock = jest.fn();
-export const pipeline2Feature1Mock = jest.fn();
-export const pipeline2Feature2Mock = jest.fn();
-
+export const pipeline1Feature1Mock = () => {
+  console.log('Pipeline 1 of plugin 1')
+};
+export const pipeline1Feature2Mock = () => {
+  console.log('Pipeline 2 of plugin 1')
+};
+export const pipeline2Feature1Mock = () => {
+  console.log('Pipeline 3 of plugin 1')
+};
+export const pipeline2Feature2Mock = () => {
+  console.log('Pipeline 1 of plugin 1')
+};
 const pipeline1Feature1: Feature = {
   runFeature() {
     pipeline1Feature1Mock();
