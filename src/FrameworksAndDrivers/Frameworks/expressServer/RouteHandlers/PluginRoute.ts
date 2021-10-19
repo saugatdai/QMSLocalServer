@@ -37,7 +37,7 @@ class pluginRoute {
 
         return pluginWithValidity;
       });
-      res.status(200).send(allPlugins);
+      res.status(200).send(allPluginsWithValidity);
     } catch (error) {
       res.status(500).send({ error: error.toString() });
     }
@@ -127,6 +127,27 @@ class pluginRoute {
       }
       await pluginManager.setPluginConfigByPluginId(pluginsConfig, parseInt(req.params.pluginId));
       res.status(200).send({ success: "Plugin Configuration updated" });
+    } catch (error) {
+      res.status(500).send({ error: error.toString() });
+    }
+  }
+
+  @patch('/setvalidatorid')
+  @use(auth)
+  @use(checkAdminAuthority)
+  public async setPluginValidatorIdOfAPluginId(req: Request, res: Response) {
+    const pluginId = req.body.pluginId;
+    const pluginValidatorId = req.body.pluginValidatorId;
+
+    const pluginManagerStorageInteractorImplementation = new PluginManagerStorageInteractorImplementation(PluginManagerStorageImplementation);
+    const pluginManager = new PluginManager(pluginsPath);
+    pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
+
+    try {
+      await pluginManager.setPluginValidatorIdOfPluginId(pluginValidatorId, pluginId);
+      AppKernelSingleton.getInstance().unloadAllEventsAndPipelines();
+      await AppKernelSingleton.getInstance().initializeCoreCallingActivities(pluginsPath);
+      res.status(200).send({ success: "Plugin serial key set successfully!!!" });
     } catch (error) {
       res.status(500).send({ error: error.toString() });
     }

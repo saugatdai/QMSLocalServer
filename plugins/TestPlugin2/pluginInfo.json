@@ -1,7 +1,1 @@
-{
-  "name": "TestPlugin2",
-  "version": "1.0.0",
-  "minCoreVersion": "1.0.0",
-  "pluginId": 124,
-  "pluginValidatorId": "6a70ac0f5f12ea1203b9524f46395e9c"
-}
+{"name":"TestPlugin2","version":"1.0.0","minCoreVersion":"1.0.0","pluginId":124,"pluginValidatorId":"6a70ac0f5f12ea1203b9524f46395e9c"}
