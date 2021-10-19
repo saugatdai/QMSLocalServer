@@ -15,6 +15,7 @@ import PipelineTypes from '../../UseCases/PluginManagementComponent/PluginModule
 import Plugin from '../../UseCases/PluginManagementComponent/PluginModule/Plugin';
 import { defaultPostCaller, postCallRunnerForCallAgain, postCallRunnerForRandomCall, preCallRunnerForByPass, preCallRunnerForCallAgain, preCallRunnerForCallNext, preCallRunnerForRandomCall, preCallRunnerForTokenForward } from './DefaultStrategies/preAndPostCallRunners';
 import EventTypes from '../../UseCases/EventManagementComponent/EventTypes';
+import PluginInfoValidator from '../../UseCases/PluginManagementComponent/PluginScannerModule/DirectoryPluginInfoValidator';
 
 export default class AppKernelSingleton {
 
@@ -25,20 +26,32 @@ export default class AppKernelSingleton {
   }
 
   public async initializeCoreCallingActivities(pluginPath: string) {
+    await this.loadPlugins(pluginPath);
+    EventManagerSingleton.getInstance().on(EventTypes.PLUGIN_ZIP_EXTRACTED, async (zipFile: string) => {
+      await fs.promises.unlink(zipFile);
+      this.unloadAllEventsAndPipelines();
+      await this.loadPlugins(pluginPath);
+    });
+  }
+
+  private async loadPlugins(pluginPath: string) {
     this.initializeTokenCallingFacadeWithDefaultStrategies();
+    const validPlugins = await this.getValidPlugins(pluginPath);
+    validPlugins.forEach(plugin => {
+      this.registerEventHandlersFromPluginIfExists(plugin);
+      this.registerPipelineExecutorsFromPluginIfExists(plugin);
+    });
+  }
+
+  private async getValidPlugins(pluginPath: string) {
     const pluginFinder = new PluginFinder(pluginPath);
     const sortedPlugins = await pluginFinder.getPrioritySortedPlugins();
     sortedPlugins.forEach(plugin => {
       this.registerStrategiesFromPluginIfExists(plugin);
     });
-    sortedPlugins.forEach(plugin => {
-      this.registerEventHandlersFromPluginIfExists(plugin);
-      this.registerPipelineExecutorsFromPluginIfExists(plugin);
-    });
-    EventManagerSingleton.getInstance().on(EventTypes.PLUGIN_ZIP_EXTRACTED, async (zipFile: string) => {
-      await fs.promises.unlink(zipFile);
-    });
-    console.log("Kernel initialized...");
+    const pluginInfoValidator = new PluginInfoValidator(pluginPath);
+    const validPlugins = sortedPlugins.filter(plugin => pluginInfoValidator.hasPluginInfoValidPluginValidatorId(plugin.pluginInfo));
+    return validPlugins;
   }
 
   private registerStrategiesFromPluginIfExists(plugin: Plugin) {
@@ -111,5 +124,13 @@ export default class AppKernelSingleton {
     tokenCallingFacadeSingleton.nextTokenStrategy = callNextTokenDefault;
     tokenCallingFacadeSingleton.randomCallStrategy = randomTokenCallDefault;
     tokenCallingFacadeSingleton.tokenForwardStrategy = tokenForwardDefault
+  }
+
+  public unloadAllEventsAndPipelines() {
+    const tokenCallingFacadeSingleton = TokenCallingFacadeSingleton.getInstance();
+    tokenCallingFacadeSingleton.clearAllPipelines();
+    EventManagerSingleton.getInstance().removeAllListeners(EventTypes.PLUGIN_ZIP_EXTRACTED)
+      .removeAllListeners(EventTypes.POST_CALL_EVENT)
+      .removeAllListeners(EventTypes.PRE_CALL_EVENT);
   }
 }

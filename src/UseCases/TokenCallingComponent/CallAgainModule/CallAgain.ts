@@ -13,6 +13,10 @@ export default class CallAgain {
     return nextToken;
   }
 
+  public clearPipelines() {
+    this._strategy.features = [];
+  }
+
   public get strategy(): CallAgainStrategy {
     return this._strategy;
   }

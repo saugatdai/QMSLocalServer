@@ -1,1 +1,20 @@
-[{"name":"ConfigOptionsA","configType":"text","value":"ABC123","choiceOptions":["Nothing 1","nothing 2"]},{"name":"ConfigOptionsB","configType":"text","value":"12345","choiceOptions":["Hello 1","hello 2"]}]
+[{
+  "name": "ConfigOptionsA",
+  "configType": "text",
+  "value": "Hello World"
+}, {
+  "name": "ConfigOptionsB",
+  "configType": "radio",
+  "value": "value1",
+  "choiceOptions": ["value1", "value2", "value3"]
+}, {
+  "name": "ConfigOptionsC",
+  "configType": "checkbox",
+  "value": ["check1", "check2"],
+  "choiceOptions": ["check1", "check2", "check3", "check4"]
+}, {
+  "name": "ConfigOptionsD",
+  "configType": "select",
+  "value": "option1",
+  "choiceOptions": ["option1", "option2", "option3", "option4"]
+}]

@@ -2,7 +2,6 @@
   "name": "TestPlugin1",
   "version": "1.0.0",
   "minCoreVersion": "1.0.0",
-  "pluginId": 124,
-  "pluginValidatorID": "124abc",
-  "pluginValidatorId": "holusmolus"
+  "pluginId": 125,
+  "pluginValidatorId": "4a26fd3ade1e58a0e9f780224e28634a"
 }

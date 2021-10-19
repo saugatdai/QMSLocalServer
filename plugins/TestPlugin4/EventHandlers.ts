@@ -1,8 +1,12 @@
 import EventTypes from '../../src/UseCases/EventManagementComponent/EventTypes';
 import { EventHandler } from './Interfaces';
 
-export const eventHandler1MockFunction = jest.fn();
-export const eventHandler2MockFunction = jest.fn();
+export const eventHandler1MockFunction = () => {
+  console.log('Event handler 1 of plugin 3')
+};
+export const eventHandler2MockFunction = () => {
+  console.log('Event handler 2 of plugin 3')
+};
 
 abstract class EventHandlerParent {
   eventType: string;

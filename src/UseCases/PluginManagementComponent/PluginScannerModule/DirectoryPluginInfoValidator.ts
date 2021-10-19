@@ -40,13 +40,34 @@ export default class PluginInfoValidator
 
   public hasPluginInfoValidPluginValidatorId(pluginInfo: PluginInfo): boolean {
     // TODO function not verified
-    let macAddress = this.getMacAddressOfNonLoopBackNetworkInterface();
-    macAddress = macAddress.split(':').join('~');
-    const pluginId = pluginInfo.pluginId;
-    const originalId = `${pluginId}~${macAddress}`;
-    const hash = crypto.createHash('md5').update(originalId).digest('hex');
+    let macAddresses = this.getAllMacAddresses();
+    const macAddressToBeHashed = macAddresses.map(macAddress => {
+      const pluginId = pluginInfo.pluginId;
+      const modifiedMac = macAddress.split(':').join('~');
+      const toBeHashed = `${pluginId}~${modifiedMac}`;
+      const hash = crypto.createHash('md5').update(toBeHashed).digest('hex');
+      return hash;
+    })
 
-    return hash == pluginInfo.pluginValidatorId;
+    return macAddressToBeHashed.some(mac => mac === pluginInfo.pluginValidatorId);
+  }
+
+  private getAllMacAddresses(): string[] {
+    const allMacs: string[] = [];
+    const interfaces = os.networkInterfaces();
+
+    for (const devName in interfaces) {
+      const iface = interfaces[devName];
+      for (let i = 0; i < iface.length; i++) {
+        const alias = iface[i];
+        if (allMacs.some(mac => mac === alias.mac)) {
+          continue;
+        } else {
+          allMacs.push(alias.mac);
+        }
+      }
+    }
+    return allMacs;
   }
 
   private getMacAddressOfNonLoopBackNetworkInterface(): string {

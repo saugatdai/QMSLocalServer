@@ -2,16 +2,16 @@ import { PipelineExecutor } from './Interfaces';
 import { Feature } from './Interfaces';
 
 export const pipeline1Feature1Mock = () => {
-  console.log('Pipeline 1 of plugin 1')
+  console.log('Pipeline 1 of feature 1 for plugin 1')
 };
 export const pipeline1Feature2Mock = () => {
-  console.log('Pipeline 2 of plugin 1')
+  console.log('Pipeline 1 of feature 2 for plugin 1')
 };
 export const pipeline2Feature1Mock = () => {
-  console.log('Pipeline 3 of plugin 1')
+  console.log('Pipeline 2 of feature 1 plugin 1')
 };
 export const pipeline2Feature2Mock = () => {
-  console.log('Pipeline 1 of plugin 1')
+  console.log('Pipeline 2 of feature 2 plugin 1')
 };
 const pipeline1Feature1: Feature = {
   runFeature() {

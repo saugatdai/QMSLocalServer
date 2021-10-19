@@ -9,7 +9,13 @@ import { pluginsPath } from "../Constants/OtherConstants";
 import { Request, Response } from "express";
 import FileUploadMiddleware from "../Middlewares/fileUpload/FileUploadMiddleware"; import PluginConfigElement from "../../../../UseCases/PluginManagementComponent/PluginModule/PluginConfigElement";
 import AppKernelSingleton from "../../../Drivers/AppKernelSingleton";
-"../Middlewares/fileUpload/FileUploadMiddleware";
+import Plugin from "../../../../UseCases/PluginManagementComponent/PluginModule/Plugin";
+import PluginInfoValidator from "../../../../UseCases/PluginManagementComponent/PluginScannerModule/DirectoryPluginInfoValidator";
+
+interface AllPluginsInterface {
+  plugin: Plugin,
+  valid: boolean;
+}
 
 @Controller('/plugins')
 class pluginRoute {
@@ -22,6 +28,15 @@ class pluginRoute {
       const pluginManager = new PluginManager(pluginsPath);
       pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
       const allPlugins = await pluginManager.getInstalledPlugins();
+      const pluginInfoValidator: PluginInfoValidator = new PluginInfoValidator(pluginsPath);
+      const allPluginsWithValidity = allPlugins.map(plugin => {
+        const pluginWithValidity: AllPluginsInterface = {
+          plugin,
+          valid: pluginInfoValidator.hasPluginInfoValidPluginValidatorId(plugin.pluginInfo)
+        }
+
+        return pluginWithValidity;
+      });
       res.status(200).send(allPlugins);
     } catch (error) {
       res.status(500).send({ error: error.toString() });
@@ -73,6 +88,8 @@ class pluginRoute {
     pluginManager.pluginManagerStorageInteractorAdapter = pluginManagerStorageInteractorImplementation;
     try {
       await pluginManager.deleteInstalledPluginByPluginId(parseInt(req.params.pluginId));
+      AppKernelSingleton.getInstance().unloadAllEventsAndPipelines();
+      await AppKernelSingleton.getInstance().initializeCoreCallingActivities(pluginsPath);
       res.status(200).send({ success: "Plugin Deleted" });
     } catch (error) {
       res.status(500).send({ error: error.toString() });
