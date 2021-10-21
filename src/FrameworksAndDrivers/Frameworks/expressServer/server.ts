@@ -23,10 +23,4 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 
 app.use(AppRouterSingleton.getInstance());
 
-app.listen(5000, async () => {
-  const pluginsPath = path.join(__dirname, '../../../../plugins');
-  await AppKernelSingleton.getInstance().initializeCoreCallingActivities(pluginsPath);
-  console.log('Server running at port 5000');
-});
-
 export default app;

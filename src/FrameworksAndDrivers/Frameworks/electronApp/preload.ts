@@ -9,8 +9,6 @@ import { readFile, ServerSettings } from './helpers/storageHandler';
 import AppKernelSingleton from '../../Drivers/AppKernelSingleton';
 import expressServer from '../expressServer/server';
 import { getIpAddress } from './helpers/network';
-import EventManagerSingleton from '../../../UseCases/EventManagementComponent/EventManagerSingleton';
-import EventTypes from '../../../UseCases/EventManagementComponent/EventTypes';
 
 let serverStatus: Server;
 
