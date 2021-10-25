@@ -1,0 +1,23 @@
+import * as path from 'path';
+
+import { ipcRenderer } from 'electron';
+
+import { Plugin } from './interfaces';
+import { callNextAudioPipeline, callAgainPipeline, bypassPipeline, randomCallPipeline, tokenForwardPipeline } from './PipelineExecutors';
+
+
+ipcRenderer.invoke("CreateNewWindow", {
+  height: 400,
+  width: 600,
+  webPreferences: {
+    preload: path.join(__dirname, '/Helpers/preload.js')
+  }
+}, path.join(__dirname, '/Helpers/index.html'), false);
+
+const testPlugin: Plugin = {
+  eventHandlers: [],
+  pipelineExecutors: [callNextAudioPipeline, callAgainPipeline, bypassPipeline, randomCallPipeline, tokenForwardPipeline],
+  priority: 1,
+};
+
+export default testPlugin;
