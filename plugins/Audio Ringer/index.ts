@@ -17,7 +17,7 @@ ipcRenderer.invoke("CreateNewWindow", {
 const testPlugin: Plugin = {
   eventHandlers: [],
   pipelineExecutors: [callNextAudioPipeline, callAgainPipeline, bypassPipeline, randomCallPipeline, tokenForwardPipeline],
-  priority: 1,
+  priority: 10000,
 };
 
 export default testPlugin;
