@@ -12,6 +12,10 @@ export default class RamdomCall {
     return this._strategy;
   }
 
+  public clearPipelines() {
+    this._strategy.features = [];
+  }
+
   public async callToken(handledToken: Token): Promise<Token> {
     const nextToken = this._strategy.callRandomToken(handledToken);
     return nextToken;

@@ -7,7 +7,7 @@
     "emitDecoratorMetadata": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "out",
+    "outDir": "./dist",
     "sourceMap": true,
     "lib": [
       "ES2020",

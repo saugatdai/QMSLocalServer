@@ -12,6 +12,10 @@ export default class CallNext {
     return this._strategy;
   }
 
+  public clearPipelines() {
+    this._strategy.features = [];
+  }
+
   public async callToken(token: Token): Promise<Token> {
     const nextToken = await this._strategy.callNextToken(token);
     return nextToken;

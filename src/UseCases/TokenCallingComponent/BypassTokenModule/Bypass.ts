@@ -12,6 +12,10 @@ export default class Bypass {
     return this._strategy;
   }
 
+  public clearPipelines() {
+    this._strategy.features = [];
+  }
+
   public async callToken(handledToken: Token): Promise<Token> {
     const nextToken = await this._strategy.bypassToken(handledToken);
     return nextToken;

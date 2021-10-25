@@ -25,16 +25,26 @@ export default class PluginFinder implements PluginFinderInterface {
     const scannedPluginsPromises = validPluginDirectories.map(
       async (directory) => {
         try {
-          if (fs.existsSync(path.join(directory, '/index.ts'))) {
-            const plugin: { default: Plugin } = await import(
-              path.join(directory, '/index.ts')
-            );
+          const jsExists = fs.existsSync(path.join(directory, '/index.js'));
+          const tsExists = fs.existsSync(path.join(directory, '/index.ts'));
+          if (tsExists || jsExists) {
+            let plugin: { default: Plugin };
+            if (tsExists) {
+              plugin = await import(
+                path.join(directory, '/index.ts')
+              );
+            } else if (jsExists) {
+              plugin = await import(
+                path.join(directory, '/index.js')
+              );
+            }
             if (plugin.default) {
               try {
                 const pluginInfo: PluginInfo = directoryPluginInfoValidator.getValidPluginInfoForADirectory(
                   directory
                 );
                 plugin.default.pluginInfo = pluginInfo;
+                plugin.default.pluginDirectory = directory;
               } catch (error) {
                 console.log(error.toString());
               }

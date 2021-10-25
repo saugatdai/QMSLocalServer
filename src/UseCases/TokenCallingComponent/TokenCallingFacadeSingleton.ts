@@ -83,4 +83,11 @@ export default class TokenCallingFacadeSingleton {
   public pipeTokenForwardFeature(feature: Feature): void {
     this.tokenForward.strategy.pipeFeature(feature);
   }
+  public clearAllPipelines() {
+    this.callNext.clearPipelines();
+    this.callAgain.clearPipelines();
+    this.bypass.clearPipelines();
+    this.randomCall.clearPipelines();
+    this.tokenForward.clearPipelines();
+  }
 }

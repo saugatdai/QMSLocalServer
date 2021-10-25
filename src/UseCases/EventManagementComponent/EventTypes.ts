@@ -3,6 +3,7 @@ enum EventTypes {
   POST_CALL_EVENT = 'post-call',
   DISPLAY_CLIENT_PREFERENCES = 'displayClientPrefs',
   DISPLAY_SERVER_PREFERENCES = 'displayServerPrefs',
+  PLUGIN_ZIP_EXTRACTED = "pluginZipExtracted"
 }
 
 export default EventTypes;

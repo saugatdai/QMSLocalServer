@@ -43,7 +43,8 @@ export const preCallRunnerForCallAgain = async (tokenCallingState: TokenCallingS
     }
     await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
   }
-  await setNextToken(tokenCallingState);
+  const operatorName = tokenCallingState.operator.getUserInfo().username;
+  TokenCallingStateManagerSingleton.getInstance().setNextTokenOfTokenStateForOperatorName(operatorName, tokenCallingState.currentToken);
 }
 
 export const preCallRunnerForRandomCall = async (tokenCallingState: TokenCallingState) => {
@@ -57,7 +58,8 @@ export const preCallRunnerForRandomCall = async (tokenCallingState: TokenCalling
     }
     await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
   }
-  await setNextToken(tokenCallingState);
+  const operatorName = tokenCallingState.operator.getUserInfo().username;
+  TokenCallingStateManagerSingleton.getInstance().setNextTokenOfTokenStateForOperatorName(operatorName, tokenCallingState.currentToken);
 }
 
 export const preCallRunnerForTokenForward = async (tokenCallingState: TokenCallingState) => {

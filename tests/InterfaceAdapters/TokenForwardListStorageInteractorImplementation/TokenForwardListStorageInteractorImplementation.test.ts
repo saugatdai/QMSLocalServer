@@ -80,7 +80,7 @@ describe('Testing of tokenForwardListStorageInteractorImplementation', () => {
     await tokenForwardListStorageInteractorImplementation.addTokenForwardObject(tokenForwardObject5);
     await tokenForwardListStorageInteractorImplementation.removeAllExceptForToday();
     const tokenForwardObjects = await tokenForwardListStorageInteractorImplementation.tokenForwardObjects();
-    expect(tokenForwardObjects.length).toBe(2);
+    expect(tokenForwardObjects.length).toBe(3);
   });
 
 });

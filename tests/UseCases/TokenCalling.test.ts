@@ -186,6 +186,10 @@ describe('Testing of Token Calling Use Cases', () => {
         callAgain.callToken(dummyToken);
         expect(callMockFunction.mock.calls.length).toBe(1);
       });
+      it('Should clear all pipelines of callTokenAgain Function', () => {
+        callAgain.clearPipelines();
+        expect(callAgain.strategy.features.length).toBe(0);
+      })
     });
 
     describe('Testing of BypassTokenModule', () => {
@@ -211,6 +215,10 @@ describe('Testing of Token Calling Use Cases', () => {
         byPassObject.callToken(dummyToken);
         expect(callMockFunction.mock.calls.length).toBe(1);
       });
+      it("Should clear pipelines of bypassToken function", () => {
+        byPassObject.clearPipelines();
+        expect(byPassObject.strategy.features.length).toBe(0);
+      })
     });
 
     describe('Testing of NextTokenModule', () => {
@@ -234,6 +242,10 @@ describe('Testing of Token Calling Use Cases', () => {
       it('It should call next token', () => {
         callNextObject.callToken(dummyToken);
         expect(callMockFunction.mock.calls.length).toBe(1);
+      });
+      it("Should clear the pipelines of nextToken function", () => {
+        callNextObject.clearPipelines();
+        expect(callNextObject.strategy.features.length).toBe(0);
       });
     });
 
@@ -261,6 +273,10 @@ describe('Testing of Token Calling Use Cases', () => {
         randomCall.callToken(dummyToken);
         expect(callMockFunction.mock.calls.length).toBe(1);
       });
+      it('Should clear the pipeline for RandomCall function', () => {
+        randomCall.clearPipelines();
+        expect(randomCall.strategy.features.length).toBe(0);
+      });
     });
 
     describe('Testing of TokenForwardModule', () => {
@@ -285,7 +301,12 @@ describe('Testing of Token Calling Use Cases', () => {
       it('Should forward a token', () => {
         forwardToken.callToken(dummyToken);
         expect(callMockFunction.mock.calls.length).toBe(1);
-      })
+      });
+
+      it('Should clear pipelines for tokenForward Function', () => {
+        forwardToken.clearPipelines();
+        expect(forwardToken.strategy.features.length).toBe(0);
+      });
 
     });
 

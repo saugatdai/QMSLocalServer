@@ -1,5 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as os from 'os';
+import * as crypto from 'crypto';
 
 import PluginInfo from '../PluginInfo';
 import { DirectoryPluginInfoValidatorInterface } from './PluginFinder';
@@ -37,7 +39,48 @@ export default class PluginInfoValidator
   }
 
   public hasPluginInfoValidPluginValidatorId(pluginInfo: PluginInfo): boolean {
-    // TODO validation task remaining
-    return false;
+    // TODO function not verified
+    let macAddresses = this.getAllMacAddresses();
+    const macAddressToBeHashed = macAddresses.map(macAddress => {
+      const pluginId = pluginInfo.pluginId;
+      const modifiedMac = macAddress.split(':').join('~');
+      const toBeHashed = `${pluginId}~${modifiedMac}`;
+      const hash = crypto.createHash('md5').update(toBeHashed).digest('hex');
+      return hash;
+    })
+
+    return macAddressToBeHashed.some(mac => mac === pluginInfo.pluginValidatorId);
+  }
+
+  private getAllMacAddresses(): string[] {
+    const allMacs: string[] = [];
+    const interfaces = os.networkInterfaces();
+
+    for (const devName in interfaces) {
+      const iface = interfaces[devName];
+      for (let i = 0; i < iface.length; i++) {
+        const alias = iface[i];
+        if (allMacs.some(mac => mac === alias.mac)) {
+          continue;
+        } else {
+          allMacs.push(alias.mac);
+        }
+      }
+    }
+    return allMacs;
+  }
+
+  private getMacAddressOfNonLoopBackNetworkInterface(): string {
+    const interfaces = os.networkInterfaces();
+    for (const devName in interfaces) {
+      const iface = interfaces[devName];
+
+      for (let i = 0; i < iface.length; i++) {
+        const alias = iface[i];
+        if (alias.family === 'IPv4' && alias.address !== '127.0.0.1' && !alias.internal)
+          return alias.address;
+      }
+    }
+    return '0.0.0.0';
   }
 }
