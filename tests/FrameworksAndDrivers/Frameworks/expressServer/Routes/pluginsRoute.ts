@@ -44,14 +44,14 @@ export default () => {
     describe('Getting the plugin by plugin id', () => {
       it('Should get the plugin by plugin id', async () => {
         const response = await request(server).get('/plugins/124').set('Authorization', `Bearer ${adminToken}`).send();
-        expect(response.body.pluginInfo.name).toBe('TestPlugin1');
+        expect(response.body.pluginInfo.name).toBe('TestPlugin2');
       });
     });
 
     describe('Plugin Configuration test', () => {
       it('Should get the plugin configuration of a plugin by plugin id', async () => {
         const response = await request(server).get('/plugins/config/125').set('Authorization', `Bearer ${adminToken}`).send();
-        expect(response.body.length).toBe(2);
+        expect(response.body.length).toBe(4);
       });
 
       it('Should set the plugin configuration for a plugin by pluginId', async () => {

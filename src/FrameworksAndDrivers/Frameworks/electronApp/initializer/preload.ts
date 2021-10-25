@@ -4,11 +4,11 @@ import * as fs from 'fs';
 
 import { ipcRenderer } from 'electron';
 
-import { readFile, ServerSettings } from './helpers/storageHandler';
+import { readFile, ServerSettings } from '../helpers/storageHandler';
 
-import AppKernelSingleton from '../../Drivers/AppKernelSingleton';
-import expressServer from '../expressServer/server';
-import { getIpAddress } from './helpers/network';
+import AppKernelSingleton from '../../../Drivers/AppKernelSingleton';
+import expressServer from '../../expressServer/server';
+import { getIpAddress } from '../helpers/network';
 
 let serverStatus: Server;
 
@@ -32,8 +32,10 @@ const closeButtonEventListener = () => {
 const serverStartEventListener = () => {
   document.querySelector("#start").addEventListener("click", async () => {
     if (!serverStatus) {
-      serverStatus = expressServer.listen(5000, async () => {
-        const pluginPath = path.join(__dirname, '../../../../plugins');
+      const serverSettingsJSON = await readFile(path.join(__dirname, '../../../../../Data/serverSettings.json'));
+      const serverSettings: ServerSettings = JSON.parse(serverSettingsJSON);
+      serverStatus = expressServer.listen(serverSettings.portNumber, async () => {
+        const pluginPath = path.join(__dirname, '../../../../../plugins');
         await AppKernelSingleton.getInstance().initializeCoreCallingActivities(pluginPath);
         setServerStatusText(await getServerParameterString());
         startedButtonSet();
@@ -43,12 +45,13 @@ const serverStartEventListener = () => {
       serverStatus.close();
       serverStatus = null;
       stoppedButtonSet();
+      ipcRenderer.send("ServerStop");
     }
   });
 };
 
 const getServerParameterString = async () => {
-  const serverSettingsJSON = await readFile(path.join(__dirname, '../../../../Data/serverSettings.json'));
+  const serverSettingsJSON = await readFile(path.join(__dirname, '../../../../../Data/serverSettings.json'));
   const serverSettings: ServerSettings = JSON.parse(serverSettingsJSON);
   const serverURL = getIpAddress();
   const serverString = serverURL + ":" + serverSettings.portNumber;

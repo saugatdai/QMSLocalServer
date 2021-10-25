@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { ipcRenderer } from 'electron';
-import { readFile, writeFile, ServerSettings } from './helpers/storageHandler';
+import { readFile, writeFile, ServerSettings } from '../helpers/storageHandler';
 
 document.addEventListener('DOMContentLoaded', () => {
   initializeEventHandlers();
@@ -20,7 +20,7 @@ const submitButtonHandler = (event: Event) => {
     const serverSettings: ServerSettings = {
       portNumber
     }
-    writeFile(path.join(__dirname, '../../../../Data/serverSettings.json'), JSON.stringify(serverSettings));
+    writeFile(path.join(__dirname, '../../../../../Data/serverSettings.json'), JSON.stringify(serverSettings));
     ipcRenderer.send('hideSettingsWindow');
   }
 }
@@ -45,7 +45,7 @@ const cancelButtonHandler = () => {
 }
 
 const loadInitialValue = async () => {
-  const serverSettingsJson = await readFile(path.join(__dirname, '../../../../Data/serverSettings.json'));
+  const serverSettingsJson = await readFile(path.join(__dirname, '../../../../../Data/serverSettings.json'));
   const serverSettings: ServerSettings = JSON.parse(serverSettingsJson) as ServerSettings;
   const portNumberField = <HTMLInputElement>document.querySelector('#portNumber');
   portNumberField.value = `${serverSettings.portNumber}`;

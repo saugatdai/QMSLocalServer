@@ -1,0 +1,7 @@
+{
+  "name": "TestPlugin1",
+  "version": "1.0.0",
+  "minCoreVersion": "1.0.0",
+  "pluginId": 125,
+  "pluginValidatorId": ""
+}
