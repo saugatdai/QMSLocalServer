@@ -14,10 +14,10 @@ ipcRenderer.invoke("CreateNewWindow", {
   }
 }, path.join(__dirname, '/Helpers/index.html'), false);
 
-const testPlugin: Plugin = {
+const AudioRingerPlugin: Plugin = {
   eventHandlers: [],
   pipelineExecutors: [callNextAudioPipeline, callAgainPipeline, bypassPipeline, randomCallPipeline, tokenForwardPipeline],
   priority: 10000,
 };
 
-export default testPlugin;
+export default AudioRingerPlugin;

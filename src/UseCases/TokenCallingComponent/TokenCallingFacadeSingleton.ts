@@ -10,8 +10,6 @@ import Feature from './Feature';
 import TokenForwardStrategy from './TokenForwardModule/TokenForwardStrategy';
 import TokenForward from './TokenForwardModule/TokenForward';
 import Token from '../../Entities/TokenCore/Token';
-import TokenCalingStateManager from './TokenCallingStateManagerSingleton';
-import TokenCallingStateManager from './TokenCallingStateManagerSingleton';
 
 export default class TokenCallingFacadeSingleton {
   private bypass = new Bypass();

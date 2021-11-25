@@ -1,6 +1,6 @@
 import './initializer/initializer';
 import BrowserWindowCreator from './helpers/BrowserWindowCreator';
-import { ipcMain, screen } from 'electron';
+import { BrowserWindow, ipcMain, screen } from 'electron';
 
 ipcMain.handle('CreateNewWindow', (event, properties: any, fileLoadURL: string, show: boolean, secondaryDisplay?: boolean) => {
   properties.show = show;
@@ -19,4 +19,10 @@ ipcMain.handle('CreateNewWindow', (event, properties: any, fileLoadURL: string, 
     }
   }
   BrowserWindowCreator(properties, fileLoadURL, show);
-})
+});
+
+ipcMain.handle('sendMessageToRenderer', (e, arg: {fileName: string, message: any}) => {
+  const browserWindows = BrowserWindow.getAllWindows();
+  const targetWindow = browserWindows.find(browserWindow => browserWindow.webContents.getURL().includes(arg.fileName));
+  targetWindow.webContents.send('messageFromMain', arg.message);
+});

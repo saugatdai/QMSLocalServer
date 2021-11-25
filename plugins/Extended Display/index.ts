@@ -4,13 +4,14 @@ import { ipcRenderer } from 'electron';
 
 import { Plugin } from './interfaces';
 
+import { callNextDisplayPipeline, tokenForwardPipeline, randomCallPipeline, bypassPipeline, callAgainDisplayPipeline } from './PipelineExecutors';
 
 
 ipcRenderer.invoke("CreateNewWindow", {
   height: 400,
   width: 600,
   webPreferences: {
-    preload: path.join(__dirname, '/Helpers/preload.js'),
+    preload: path.join(__dirname, './Helpers/preload.js'),
     nodeIntegration: true
   },
   resizable: false,
@@ -18,12 +19,12 @@ ipcRenderer.invoke("CreateNewWindow", {
   alwaysOnTop: true,
   fullscreen: true,
   focusable: false
-}, path.join(__dirname, '/Helpers/index.html'), true, true);
+}, path.join(__dirname, './Helpers/display.html'), true, true);
 
-const testPlugin: Plugin = {
+const ExtendedDisplayPlugin: Plugin = {
   eventHandlers: [],
-  pipelineExecutors: [],
+  pipelineExecutors: [callNextDisplayPipeline, tokenForwardPipeline, randomCallPipeline, bypassPipeline, callAgainDisplayPipeline],
   priority: 10000,
 };
 
-export default testPlugin;
+export default ExtendedDisplayPlugin;
