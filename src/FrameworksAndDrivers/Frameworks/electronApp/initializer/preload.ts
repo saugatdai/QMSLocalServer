@@ -21,6 +21,7 @@ const assignEventHandlers = () => {
   minimizeButtonEventListener();
   serverStartEventListener();
   handleSettingsIconClicked();
+  handlePrintSettingsIconClicked();
 }
 
 const closeButtonEventListener = () => {
@@ -83,5 +84,11 @@ const stoppedButtonSet = () => {
 const handleSettingsIconClicked = () => {
   document.querySelector("#settings").addEventListener('click', () => {
     ipcRenderer.send('SettingsClicked');
+  });
+}
+
+const handlePrintSettingsIconClicked = () => {
+  document.querySelector('#printSettings').addEventListener('click', () => {
+    ipcRenderer.send('printSettingsIconClicked');
   });
 }

@@ -9,3 +9,7 @@ export const writeFile = (filename: string, data: string) =>
 export type ServerSettings = {
   portNumber: number;
 }
+
+export type KioskSettings = {
+  kioskMode: string;
+}

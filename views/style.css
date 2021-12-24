@@ -17,7 +17,7 @@
 }
 
 body {
-  background: url('icons/background.svg') var(--blue) no-repeat;
+  background: url('icons/background.png') var(--blue) no-repeat;
   background-position: 95% 85%;
   color: var(--white);
   display: flex;
@@ -123,4 +123,10 @@ footer svg {
   height: .9em;
   cursor: pointer;
   -webkit-app-region: no-drag;
+}
+
+#printSettings{
+  position: absolute;
+  bottom: 2%;
+  left: 10%;
 }

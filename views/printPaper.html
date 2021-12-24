@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Paper</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 58mm;
+            width: 58mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: .8em;
+            text-align: center;
+            margin: 0;
+        }
+
+        h2 {
+            font-size: .7em;
+            font-weight: normal;
+            margin-bottom: 1em;
+            text-align: center;
+        }
+
+        #timeContainer {
+            display: flex;
+            font-size: .7em;
+            text-align: center;
+        }
+
+        #tokenContainer {
+            display: flex;
+            flex-direction: row;
+            margin-top: 1em;
+            justify-content: space-between;
+        }
+
+        #tokenContainer div {
+            font-size: .9em;
+            padding: .3em;
+        }
+
+        #tokenContainer #large{
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        #tokenNumberHolder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1 1 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="firstLine"></h1>
+    <h2 id="secondLine"></h2>
+    <div id="timeContainer">
+        <span>Date/Time:</span>
+        <span id="time"></span>
+    </div>
+    <div id="tokenContainer">
+        <div id="tokenNumberHolder">
+            <div>Token No.</div>
+            <div id="large"></div>
+        </div>
+        <div id="qrcode"></div>
+    </div>
+</body>
+
+</html>

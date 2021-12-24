@@ -159,7 +159,7 @@ const readTodaysTokenBaseByTokenNumber = async (tokenNumber: number, category?: 
   } else {
     todaysTokenBase = allTokenBases.find(tokenBase => {
       return tokenBase.token.date.getDate() === new Date().getDate() &&
-        tokenBase.token.tokenNumber === tokenNumber;
+        tokenBase.token.tokenNumber === tokenNumber && tokenBase.token.tokenCategory === undefined;
     });
   }
   return todaysTokenBase;

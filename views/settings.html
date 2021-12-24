@@ -15,6 +15,7 @@
     * {
       margin: 0;
       padding: 0;
+      box-sizing: border-box;
     }
 
     body {
@@ -22,6 +23,7 @@
       padding: .5em;
       color: #e6f3ff;
       font-family: "condensedFont";
+      height: 100vh;
     }
 
     form input {
@@ -33,13 +35,20 @@
       margin: .5em 0;
       color: #e6f3ff;
       padding: .3em;
+      margin-bottom: 1.5em;
     }
 
-    #button {
-      display: flex;
-      width: 100%;
-      flex-direction: row;
-      justify-content: center;
+    select {
+      background: inherit;
+      border: none;
+      border-bottom: 2px solid #af3245;
+      padding: .3em;
+      outline: none;
+      color: #af3245;
+    }
+
+    #button{
+      margin-top: 1em;
     }
 
     button {
@@ -70,6 +79,14 @@
     <label for="portNumber">
       Port Number:
       <input type="number" name="portNumber" id="portNumber" />
+    </label>
+    <label for="kioskMode"><br />
+      Kiosk Mode: 
+      <select id="kioskMode">
+        <option value="off">off</option>
+        <option value="auto">Auto</option>
+        <option value="manual">Manual</option>
+      </select>
     </label>
     <div id="button">
       <button type="submit">Save</button>
