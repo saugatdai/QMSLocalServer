@@ -1,7 +1,1 @@
-{
-  "name": "DMD",
-  "version": "1.0.0",
-  "minCoreVersion": "1.0.0",
-  "pluginId": 3,
-  "pluginValidatorId": "f44b83e9307dce81f967d0d5fafcfef5"
-}
+{"name":"DMD","version":"1.0.0","minCoreVersion":"1.0.0","pluginId":3,"pluginValidatorId":"69542fed55a8fccbbe250c8377b0fc8f"}

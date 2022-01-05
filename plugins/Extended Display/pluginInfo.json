@@ -1,7 +1,7 @@
 {
-  "name": "Audio Ringer",
+  "name": "Extended Display",
   "version": "1.0.0",
   "minCoreVersion": "1.0.0",
   "pluginId": 2,
-  "pluginValidatorId": "f44b83e9307dce81f967d0d5fafcfef5"
+  "pluginValidatorId": "3cffefab8bb99109302fac06c7e93731"
 }

@@ -177,7 +177,6 @@ ipcMain.on('startPrinting', (e: Event, tokenString) => {
   printPaper.webContents.print({ 
     silent: true,
     printBackground: true,
-    deviceName: 'ThermalQMS',
     copies: 1,
     pageSize: {
       height: 1000,
