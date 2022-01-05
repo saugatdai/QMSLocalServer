@@ -21,6 +21,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.use(AppRouterSingleton.getInstance());
+
+app.get('/', (req: Request, res: Response) => {
+  res.sendFile(path.join(__dirname,'public','index.html'));
+});
 
 export default app;
