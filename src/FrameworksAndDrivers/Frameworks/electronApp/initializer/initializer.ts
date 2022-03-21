@@ -174,7 +174,7 @@ ipcMain.on('beginTokenPrint', async (event: Event, tokenCategory) => {
 });
 
 ipcMain.on('startPrinting', (e: Event, tokenString) => {
-  printPaper.webContents.print({ 
+  printPaper.webContents.print({
     silent: true,
     printBackground: true,
     copies: 1,
@@ -183,13 +183,15 @@ ipcMain.on('startPrinting', (e: Event, tokenString) => {
       width: 1000
     }
   }, (success, error) => {
-    if(success) {
+    if (success) {
       console.log(`${tokenString} Printed`);
-      printPaper.close();
-      printPaper = null;
-    }else {
+    } else {
       console.log(error);
     }
+
+    printPaper.close();
+    printPaper = null;
+
   });
 });
 

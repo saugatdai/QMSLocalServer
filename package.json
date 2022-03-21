@@ -49,7 +49,7 @@
   "build": {
     "appId": "embeddedSaugat.qms",
     "linux": {
-      "icon": "./views/icons/ShivolatechLogo.png",
+      "icon": "./views/icons/stechLogo@2x.png",
       "target": "deb"
     },
     "files": [
