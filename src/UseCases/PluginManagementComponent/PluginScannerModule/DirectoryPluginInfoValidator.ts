@@ -39,7 +39,6 @@ export default class PluginInfoValidator
   }
 
   public hasPluginInfoValidPluginValidatorId(pluginInfo: PluginInfo): boolean {
-    // TODO function not verified
     let macAddresses = this.getAllMacAddresses();
     const macAddressToBeHashed = macAddresses.map(macAddress => {
       const pluginId = pluginInfo.pluginId;
