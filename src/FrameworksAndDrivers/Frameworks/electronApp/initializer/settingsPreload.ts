@@ -17,6 +17,7 @@ const submitButtonHandler = async (event: Event) => {
   if (validatePortNumber()) {
     const portNumberField = <HTMLInputElement>document.querySelector('#portNumber');
     const kioskField = <HTMLSelectElement>document.querySelector('#kioskMode');
+    const generalCheckbox = <HTMLInputElement>document.querySelector('#generalCheckbox');
 
     const portNumber = parseInt(portNumberField.value);
     const kioskMode = kioskField.value;
@@ -25,8 +26,11 @@ const submitButtonHandler = async (event: Event) => {
       portNumber
     }
     const kioskSettings: KioskSettings = {
-      kioskMode: kioskMode
+      kioskMode: kioskMode,
+      showGeneral: generalCheckbox.checked
     }
+
+    console.log(kioskSettings);
 
     await writeFile(path.join(__dirname, '../../../../../Data/serverSettings.json'), JSON.stringify(serverSettings));
     await writeFile(path.join(__dirname, '../../../../../Data/kioskSettings.json'), JSON.stringify(kioskSettings));
@@ -64,7 +68,9 @@ const loadInitialValue = async () => {
 
   const portNumberField = <HTMLInputElement>document.querySelector('#portNumber');
   const kioskField = <HTMLInputElement>document.querySelector('#kioskMode');
+  const generalCheckbox = <HTMLInputElement>document.querySelector('#generalCheckbox');
 
   portNumberField.value = `${serverSettings.portNumber}`;
   kioskField.value = kioskSettings.kioskMode;
+  generalCheckbox.checked = kioskSettings.showGeneral;
 }

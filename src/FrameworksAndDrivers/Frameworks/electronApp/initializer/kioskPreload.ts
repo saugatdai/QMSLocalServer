@@ -4,7 +4,7 @@ import { ipcRenderer } from 'electron';
 import TokenCategoryCountStorageImplementation from '../../../Drivers/TokenCategoryCountStorageImplementation';
 import AppKernelSingleton from '../../../Drivers/AppKernelSingleton';
 import expressServer from '../../expressServer/server';
-import { readFile, ServerSettings } from '../helpers/storageHandler';
+import { KioskSettings, readFile, ServerSettings } from '../helpers/storageHandler';
 import path from 'path';
 
 
@@ -19,6 +19,9 @@ ipcRenderer.on('stopServer', ()=> {
 document.addEventListener('DOMContentLoaded', async () => {
 
     const serverSettingsJSON = await readFile(path.join(__dirname, '../../../../../Data/serverSettings.json'));
+    const kioskSettingsJson = await readFile(path.join(__dirname, '../../../../../Data/kioskSettings.json'));
+
+    const kioskSettings: KioskSettings = JSON.parse(kioskSettingsJson); 
     const serverSettings: ServerSettings = JSON.parse(serverSettingsJSON);
     serverStatus = expressServer.listen(serverSettings.portNumber, async () => {
         const pluginPath = path.join(__dirname, '../../../../../plugins');
@@ -26,7 +29,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         ipcRenderer.send('showNotification', `Server Started at port : ${serverSettings.portNumber}`);
     });
 
-    createButton('General');
+    if(kioskSettings.showGeneral){
+        createButton('General');
+    }
+
     const allCategories = await TokenCategoryCountStorageImplementation.getAllCategories();
     allCategories.forEach(category => {
         const symbol = category.category;

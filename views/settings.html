@@ -47,6 +47,27 @@
       color: #af3245;
     }
 
+    #settingsForm{
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    label{
+      display: block;
+    }
+
+    label#generalLabel{
+      margin-top: 1em;
+    }
+
+    input[type="checkbox"]{
+      margin: 0;
+      margin-left: .5em;
+      display: inline-block;
+    }
+
     #button{
       margin-top: 1em;
     }
@@ -87,6 +108,9 @@
         <option value="auto">Auto</option>
         <option value="manual">Manual</option>
       </select>
+    </label>
+    <label for="generalCheckbox" id="generalLabel">
+      Show General : <input type="checkbox" id="generalCheckbox" />
     </label>
     <div id="button">
       <button type="submit">Save</button>

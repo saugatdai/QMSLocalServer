@@ -12,4 +12,5 @@ export type ServerSettings = {
 
 export type KioskSettings = {
   kioskMode: string;
+  showGeneral: boolean;
 }
