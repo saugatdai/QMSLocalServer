@@ -49,7 +49,22 @@ const createButton = (buttonContent: string) => {
     const text = document.createTextNode(buttonContent);
     let tokenCategory: string = '';
     holder.appendChild(text);
-    holder.addEventListener('click', async () => {
+    holder.addEventListener('click', async (event: MouseEvent) => {
+        const eventElement = <HTMLElement>event.currentTarget;
+        const originalText: string = eventElement.innerHTML;
+        
+        eventElement.innerHTML = "Printing...";
+        eventElement.style.pointerEvents = "none";
+        
+        const changeTextAndEnable = (text: string) =>{
+            eventElement.innerHTML = text;
+            eventElement.style.pointerEvents = "auto";
+        }
+        setTimeout(()=> {
+            changeTextAndEnable(originalText);
+        }, 2000)
+
+
         if (buttonContent.indexOf('(') > 0) {
             tokenCategory = buttonContent.charAt(buttonContent.indexOf('(') + 1);
         }
