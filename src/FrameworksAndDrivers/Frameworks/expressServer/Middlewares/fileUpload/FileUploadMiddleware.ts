@@ -18,11 +18,11 @@ const storage = multer.diskStorage({
 export default multer({
   storage: storage,
   fileFilter: (req, file, cb) => {
-    if (file.mimetype !== 'application/x-zip-compressed') {
+    if (file.mimetype === 'application/zip' || file.mimetype === 'application/x-zip-compressed') { //for windows check for application/x-zip-compressed
+      cb(null, true);
+    } else {
       cb(null, false);
       return cb(new Error('Only Zip file is allowed for upload'));
-    } else {
-      cb(null, true);
     }
   }
 });
