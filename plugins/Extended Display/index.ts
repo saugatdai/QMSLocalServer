@@ -18,7 +18,8 @@ ipcRenderer.invoke("CreateNewWindow", {
   movable: false,
   alwaysOnTop: true,
   fullscreen: true,
-  focusable: false
+  focusable: false,
+  frame: false
 }, path.join(__dirname, './Helpers/display.html'), true, true);
 
 const ExtendedDisplayPlugin: Plugin = {
