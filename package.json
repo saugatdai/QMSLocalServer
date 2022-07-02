@@ -52,6 +52,13 @@
       "icon": "./views/icons/stechLogo@2x.png",
       "target": "deb"
     },
+    "win": {
+      "icon": "./views/icons/stechLogo@2x.png",
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": "false"
+    },
     "files": [
       "./dist/src/**/*",
       "./views/**/*",
@@ -61,3 +68,4 @@
     "asar": false
   }
 }
+	
