@@ -14,3 +14,11 @@ export type KioskSettings = {
   kioskMode: string;
   showGeneral: boolean;
 }
+
+export type printSettings = {
+  firstLine: string,
+  secondLine: string,
+  enablePrintTime: boolean,
+  printStartTime: string,
+  printStopTime: string
+}

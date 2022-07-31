@@ -1,4 +1,7 @@
 {
     "firstLine":"",
-    "secondLine": ""
+    "secondLine": "",
+    "enablePrintTime": false,
+    "printStartTime" : "",
+    "printStopTime": ""
 }

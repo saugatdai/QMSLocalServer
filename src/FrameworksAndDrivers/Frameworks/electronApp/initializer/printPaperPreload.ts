@@ -3,11 +3,8 @@ import * as path from 'path';
 import { ipcRenderer } from "electron";
 import { readFile } from "../helpers/storageHandler";
 import { createNewCategoryTokenBaseObject, createNewNonCategoryTokenBaseObject } from '../../expressServer/Helpers/tokenBaseRouteHelper';
+import {printSettings as PrintSettings} from '../helpers/storageHandler';
 
-type PrintSettings = {
-    firstLine: string,
-    secondLine: string
-}
 
 ipcRenderer.on('tokenNumber', async (e: Event, tokenCategory) =>{
     let token:string;
