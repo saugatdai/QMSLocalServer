@@ -75,11 +75,17 @@ const createButton = (buttonContent: string) => {
         const changeTextAndEnable = (text: string) => {
             eventElement.innerHTML = text;
             eventElement.style.pointerEvents = "auto";
+            document.querySelectorAll("section").forEach(section => {
+                section.style.pointerEvents = "auto";
+            })
         }
 
         const printFunction = async () => {
             eventElement.innerHTML = "Printing";
             eventElement.style.pointerEvents = "none";
+            document.querySelectorAll('section').forEach(section => {
+                section.style.pointerEvents = "none";
+            });
 
             setTimeout(() => {
                 changeTextAndEnable(originalText);
