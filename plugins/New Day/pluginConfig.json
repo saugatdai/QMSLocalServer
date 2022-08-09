@@ -1,0 +1,11 @@
+[
+    {
+        "name": "Reset Type",
+        "configType": "radio",
+        "value": "Clear",
+        "choiceOptions": [
+            "Preserve",
+            "Clear"
+        ]
+    }
+]

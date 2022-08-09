@@ -21,12 +21,13 @@
             font-family: "condensedFont";
         }
 
-        div{
+        div {
             color: var(--white);
             font-size: .9em;
         }
 
-        textarea{
+        textarea,
+        input[type="time"] {
             background: inherit;
             color: inherit;
             font-size: .9em;
@@ -35,6 +36,11 @@
             outline: none;
             border-bottom: 2px solid var(--red);
             margin-bottom: .5em;
+        }
+
+        input[type="time"] {
+            filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(130deg) brightness(95%) contrast(80%);
+            width: 100%;
         }
 
         button {
@@ -52,7 +58,6 @@
             background: var(--red);
             cursor: pointer;
         }
-
     </style>
 </head>
 
@@ -65,6 +70,20 @@
         <div>Second Line : </div>
         <div>
             <textarea id="secondLine" cols="23" rows="2"></textarea>
+        </div>
+        <br>
+        <div>
+            <input type="checkbox" id="enablePrintTime" />
+            Enable Print time
+        </div>
+        <br>
+        <div>Print Start Time : </div>
+        <div>
+            <input type="time" id="printStartTime" />
+        </div>
+        <div>Print Stop Time : </div>
+        <div>
+            <input type="time" id="printStopTime" />
         </div>
         <button id="saveButton" type="button">Save</button>
         <button id="cancelButton" type="button">Cancel</button>
