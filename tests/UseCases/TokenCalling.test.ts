@@ -148,6 +148,24 @@ describe('Testing of Token Calling Use Cases', () => {
         const allStates = TokenCallingStateManagerSingleton.getInstance().tokenCallingStates;
         expect(allStates.length).toBe(1);
       });
+      it('Should remove all the locker for a token calling state for an operator', () => {
+        TokenCallingStateManagerSingleton.getInstance().addTokenCallingState(anotherTokenCallingState);
+        TokenCallingStateManagerSingleton.getInstance().addStateLockerForOperatorCallingState(anotherTokenCallingState.operator.getUserInfo().username, 'Shaggy');
+        TokenCallingStateManagerSingleton.getInstance().addStateLockerForOperatorCallingState(anotherTokenCallingState.operator.getUserInfo().username, 'maggy');
+        TokenCallingStateManagerSingleton.getInstance().addStateLockerForOperatorCallingState(anotherTokenCallingState.operator.getUserInfo().username, 'raggy');
+
+        let statelockers = TokenCallingStateManagerSingleton.getInstance()
+          .getATokenCallingStateByOperatorName(anotherTokenCallingState.operator.getUserInfo().username).stateLockers;
+
+        expect(statelockers.length).toBe(3);
+
+        TokenCallingStateManagerSingleton.getInstance().removeAllStateLockerForAnOperator(anotherTokenCallingState.operator.getUserInfo().username);
+
+        statelockers = TokenCallingStateManagerSingleton.getInstance()
+          .getATokenCallingStateByOperatorName(anotherTokenCallingState.operator.getUserInfo().username).stateLockers;
+        expect(statelockers.length).toBe(0);
+
+      });
 
     });
 
