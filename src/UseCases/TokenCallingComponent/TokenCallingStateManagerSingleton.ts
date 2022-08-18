@@ -86,6 +86,15 @@ export default class TokenCallingStateManagerSingleton {
     });
   }
 
+  public removeAllStateLockerForAnOperator(operatorName: string) {
+    this._tokenCallingStates = this.tokenCallingStates.map(tokenCallingState => {
+      if(tokenCallingState.operator.getUserInfo().username === operatorName){
+        tokenCallingState.stateLockers = [];
+      }
+      return tokenCallingState;
+    });
+  }
+
   public removeATokenCallingStateForAnOperatorIfNotLocked(username: string) {
     const tokenCallingState = this.getATokenCallingStateByOperatorName(username);
     if (tokenCallingState.stateLockers.length === 0) {
