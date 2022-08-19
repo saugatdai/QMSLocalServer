@@ -89,7 +89,7 @@ const createButton = (buttonContent: string) => {
 
             setTimeout(() => {
                 changeTextAndEnable(originalText);
-            }, 2000)
+            }, printSettings.printHoldTime)
 
 
             if (buttonContent.indexOf('(') > 0) {
