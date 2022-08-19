@@ -20,5 +20,6 @@ export type printSettings = {
   secondLine: string,
   enablePrintTime: boolean,
   printStartTime: string,
-  printStopTime: string
+  printStopTime: string,
+  printHoldTime: number
 }

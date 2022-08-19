@@ -27,7 +27,8 @@
         }
 
         textarea,
-        input[type="time"] {
+        input[type="time"],
+        input[type="number"] {
             background: inherit;
             color: inherit;
             font-size: .9em;
@@ -84,6 +85,10 @@
         <div>Print Stop Time : </div>
         <div>
             <input type="time" id="printStopTime" />
+        </div>
+        <div>Print Hold Time : </div>
+        <div>
+            <input type="number" id="printHoldTime" />
         </div>
         <button id="saveButton" type="button">Save</button>
         <button id="cancelButton" type="button">Cancel</button>

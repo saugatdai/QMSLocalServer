@@ -132,7 +132,7 @@ ipcMain.on('hideSettingsWindow', () => {
 
 ipcMain.on('printSettingsIconClicked', () => {
   printSettingsWindow = new BrowserWindow({
-    height: 360,
+    height: 400,
     width: 200,
     show: false,
     maximizable: false,

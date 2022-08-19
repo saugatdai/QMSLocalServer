@@ -21,7 +21,8 @@ const fillTextAreas = async () => {
     // @ts-expect-error
     (<HTMLTimeElement>document.querySelector('#printStopTime')).value = printSettings.printStopTime;
     (<HTMLInputElement>document.querySelector('#enablePrintTime')).checked = printSettings.enablePrintTime;
-
+    // @ts-expect-error
+    (<HTMLTimeElement>document.querySelector('#printHoldTime')).value = printSettings.printHoldTime;
 }
 
 
@@ -40,6 +41,7 @@ const assignSaveButtonEvent = () => {
         // @ts-expect-error
         const printStopTime = (<HTMLTimeElement>document.querySelector('#printStopTime')).value;
         const enablePrintTime = (<HTMLInputElement>document.querySelector('#enablePrintTime')).checked;
+        const printHoldTime = parseInt((<HTMLInputElement>document.querySelector('#printHoldTime')).value);
 
         const firstLineText = firstLineElement.value;
         const secondLineText = secondLineElement.value;
@@ -49,7 +51,8 @@ const assignSaveButtonEvent = () => {
             secondLine: secondLineText,
             enablePrintTime,
             printStartTime,
-            printStopTime
+            printStopTime,
+            printHoldTime
         }
 
         console.log(printSettings);
