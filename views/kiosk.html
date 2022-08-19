@@ -22,18 +22,19 @@
             justify-content: center;
             align-items: center;
             margin: 0;
-            background: #ddd url('./icons/ShivolatechBranding.png');
+            background: #ddd url('./icons/logo.png');
             background-repeat: no-repeat;
             background-position: 98% 98%;
             background-size: 100px;
         }
 
         #main {
-            background: rgb(160, 182, 189);
+            background: rgb(255, 255, 255);
             height: 80%;
             width: 80%;
             margin: 0 auto;
             display: flex;
+            flex-direction: column;
             justify-content: space-evenly;
             flex-wrap: wrap;
             align-content: center;
@@ -42,27 +43,43 @@
         }
 
         main section {
-            background: white;
+            background: #cd171f;
             box-shadow: 3px 4px 15px rgb(128, 128, 128);
             height: 16%;
             margin: 2%;
             flex: 0 0 16%;
             display: flex;
             justify-content: center;
+            padding: .3em;
             align-items: center;
             border-radius: .3em;
-            color: rgb(0, 0, 0);
+            color: #fff;
             font-weight: bold;
             cursor: pointer;
             flex: 1 1 calc(30% - 2em);
             user-select: none;
             font-size: 2.5em;
         }
+
+        footer{
+            margin-top: 1em;
+            font-size: 2em;
+            background: #cd171f;
+            width: 80%;
+            margin: 1em auto;
+            color: #fff;
+            border-radius: .5em;
+            padding: .3em;
+        }
     </style>
 </head>
 
 <body>
     <main id="main"></main>
+    <footer>
+        <marquee>
+            Welcome to Prabhu Bank. Please Keep distance, Wear Mask and Use Sanitizer.
+        </marquee>
+    </footer>
 </body>
-
 </html>
