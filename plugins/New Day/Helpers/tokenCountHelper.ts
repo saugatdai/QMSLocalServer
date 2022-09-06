@@ -4,10 +4,8 @@ import * as path from 'path';
 
 import { PrismaClient } from '@prisma/client';
 
-import PluginConfigElement from '../../../src/UseCases/PluginManagementComponent/PluginModule/PluginConfigElement';
 import TokenBaseStorageInteractorImplementation from '../../../src/InterfaceAdapters/TokenBaseStorageInteractorImplementation';
 import TokenBaseStorageImplementation from '../../../src/FrameworksAndDrivers/Drivers/TokenBaseStorageImplementation';
-import { TokenStatusObject as CategoryTokenStatusObject } from '../../../src/FrameworksAndDrivers/Drivers/TokenCategoryCountStorageImplementation';
 
 const prisma = new PrismaClient();
 
