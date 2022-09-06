@@ -1,214 +1,434 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import * as util from 'util';
-
 import { TokenBaseStorageAdapter } from '../../InterfaceAdapters/TokenBaseStorageInteractorImplementation';
+import { Prisma, PrismaClient } from '@prisma/client';
 import { TokenBaseObject, TokenProcessing, TokenStatus } from '../../UseCases/TokenBaseManagementComponent/TokenBaseModule';
 import UserRoles from '../../Entities/UserCore/UserRoles';
 import Token from '../../Entities/TokenCore/Token';
 import { UserData } from '../../Entities/UserCore/User';
 import Operator from '../../Entities/UserCore/Operator';
+import UserFactory from '../../Entities/UserCore/UserFactory';
 
-const readFile = (filename: string) =>
-  util.promisify(fs.readFile)(filename, 'utf-8');
-const writeFile = (filename: string, data: string) =>
-  util.promisify(fs.writeFile)(filename, data, 'utf-8');
-
-const tokenBaseTestStoragePath = path.join(__dirname, '../../../Data/tokenBase.json');
-
-// Define structure of json object stored in file
-
-type userInfo = {
-  id: number;
-  password: string;
-  role: UserRoles;
-  username: string;
-}
-
-type operator = {
-  _userInfo: UserData;
-  counter?: string;
-}
-
-type tokenProcessingInfo = {
-  _timeStamp: Date;
-  _operator: operator;
-  _status: TokenStatus;
-}
-
-
-type tokenBaseObjectJSONStructure = {
-  _token: Token;
-  tokenProcessingInfo: tokenProcessingInfo[];
-  _currentStatus: TokenStatus;
-};
+const prisma = new PrismaClient();
 
 const getAllTokenBases: () => Promise<TokenBaseObject[]> = async () => {
-  const allTokenBasesJSON = await readFile(tokenBaseTestStoragePath);
-  if (!allTokenBasesJSON) {
+  const allPrismaTokenBases = await prisma.tokenBaseObject.findMany({
+    include: {
+      token: {
+        include: {
+          tokenCategory: true
+        }
+      },
+      tokenProcessingInfo: {
+        include: {
+          operator: true
+        }
+      }
+    }
+  });
+
+  if (allPrismaTokenBases.length == 0) {
     throw new Error('Empty Token Base');
   }
-  const temporaryTokenBases: tokenBaseObjectJSONStructure[] = JSON.parse(allTokenBasesJSON);
-  const tokenBases = getTokenBasesFromTemporaryTokenBase(temporaryTokenBases);
-  return tokenBases;
-}
 
-const getTokenBasesFromTemporaryTokenBase = (temporaryTokenBases: tokenBaseObjectJSONStructure[]) => {
-  const tokenBases: TokenBaseObject[] = [];
-
-  temporaryTokenBases.forEach(temporaryTokenBase => {
-    const token = getTokenByConvertingDateStringToDateObject(temporaryTokenBase._token);
+  const allTokenBaseObjects: TokenBaseObject[] = allPrismaTokenBases.map(prismaTokenBase => {
+    const token: Token = {
+      date: new Date(prismaTokenBase.token.date),
+      tokenId: prismaTokenBase.token.tokenId,
+      tokenNumber: prismaTokenBase.token.tokenNumber,
+      tokenCategory: prismaTokenBase.token.tokenCategory.category
+    }
 
     const tokenBaseObject = new TokenBaseObject(token);
 
-    temporaryTokenBase.tokenProcessingInfo.forEach(tokenProcessingInfo => {
-      const tokenProcessing = getTokenProcessingObjectFromTokenProcessingInfo(tokenProcessingInfo);
+    prismaTokenBase.tokenProcessingInfo.forEach(prismaTokenProcessing => {
+      const tokenProcessing = new TokenProcessing();
+
+      tokenProcessing.status = prismaTokenProcessing.status as TokenStatus;
+      tokenProcessing.timeStamp = new Date(prismaTokenProcessing.timeStamp);
+
+
+
+      const userData: UserData = {
+        id: prismaTokenProcessing.operator.id,
+        username: prismaTokenProcessing.operator.username,
+        password: prismaTokenProcessing.operator.password,
+        role: prismaTokenProcessing.operator.role as UserRoles,
+        counter: prismaTokenProcessing.operator.counter
+      }
+
+      const operator = new Operator(userData);
+
+      tokenProcessing.operator = operator;
+
       tokenBaseObject.addTokenProcessingInfo(tokenProcessing);
     });
 
-    tokenBaseObject.currentStatus = temporaryTokenBase._currentStatus;
-    tokenBases.push(tokenBaseObject);
+    return tokenBaseObject;
   });
+
+  return allTokenBaseObjects;
+}
+
+
+const putATokenBase = async (tokenBase: TokenBaseObject) => {
+  if (!tokenBase.token.tokenCategory) {
+    tokenBase.token.tokenCategory = '!';
+  }
+  const prismaTokenBase: Prisma.tokenBaseObjectCreateInput = {
+    currentStatus: tokenBase.currentStatus,
+    token: {
+      create: {
+        date: tokenBase.token.date.toString(),
+        tokenNumber: tokenBase.token.tokenNumber,
+        tokenCategory: {
+          connectOrCreate: {
+            where: {
+              category: tokenBase.token.tokenCategory
+            },
+            create: {
+              categoryName: tokenBase.token.tokenCategory,
+              currentTokenCount: 0,
+              latestCustomerTokenCount: 0,
+              category: tokenBase.token.tokenCategory
+            }
+          }
+        }
+      }
+    },
+  }
+
+  await prisma.tokenBaseObject.create({
+    data: prismaTokenBase
+  });
+}
+
+
+const getTokenBasesByStatus = async (status: TokenStatus, date?: Date) => {
+  let prismaTokenBases = await prisma.tokenBaseObject.findMany({
+    where: {
+      currentStatus: status
+    },
+    include: {
+      token: {
+        include: {
+          tokenCategory: true
+        }
+      },
+      tokenProcessingInfo: {
+        include: {
+          operator: true
+        }
+      }
+    }
+  });
+
+  if (date) {
+    prismaTokenBases = prismaTokenBases.filter(prismaTokenBase => {
+      const tokenDate = new Date(prismaTokenBase.token.date);
+      const match = tokenDate.getDate() === date.getDate() && tokenDate.getMonth() === date.getMonth() && tokenDate.getFullYear() === date.getFullYear();
+      return match;
+    });
+  }
+  const tokenBases: TokenBaseObject[] = prismaTokenBases.map(prismaTokenBase => {
+    const tokenBaseObject: TokenBaseObject = new TokenBaseObject({
+      date: new Date(prismaTokenBase.token.date),
+      tokenId: prismaTokenBase.token.tokenId,
+      tokenNumber: prismaTokenBase.token.tokenNumber,
+      tokenCategory: prismaTokenBase.token.tokenCategory.category
+    });
+
+    prismaTokenBase.tokenProcessingInfo.forEach(prismaTokenProcessingInfo => {
+      const tokenProcessing: TokenProcessing = new TokenProcessing();
+
+      const prismaOperator = prismaTokenProcessingInfo.operator;
+      const operator: Operator = new Operator({
+        id: prismaOperator.id,
+        password: prismaOperator.password,
+        role: prismaOperator.role as UserRoles,
+        username: prismaOperator.username,
+        counter: prismaOperator.counter
+      });
+
+      tokenProcessing.operator = operator;
+      tokenProcessing.timeStamp = new Date(prismaTokenProcessingInfo.timeStamp);
+      tokenProcessing.status = prismaTokenProcessingInfo.status as TokenStatus;
+
+      tokenBaseObject.addTokenProcessingInfo(tokenProcessing);
+    });
+
+    return tokenBaseObject;
+  });
+
   return tokenBases;
 }
 
-const getTokenByConvertingDateStringToDateObject = (token: Token) => {
-  return { ...token, date: new Date(token.date) }
-}
-
-const getTokenProcessingObjectFromTokenProcessingInfo = (tokenProcessingInfo: tokenProcessingInfo) => {
-  const tokenProcessing = new TokenProcessing();
-
-  const operator = new Operator(tokenProcessingInfo._operator._userInfo);
-  if (tokenProcessingInfo._operator.counter) {
-    operator.setCounter(tokenProcessingInfo._operator.counter);
-  }
-  tokenProcessing.operator = operator;
-
-  tokenProcessing.timeStamp = new Date(tokenProcessingInfo._timeStamp);
-  tokenProcessing.status = tokenProcessingInfo._status;
-
-  return tokenProcessing;
-}
-
-const putATokenBase = async (tokenBase: TokenBaseObject) => {
-  tokenBase.token.tokenId = await getNextAvailableTokenId();
-  let allTokenBases: TokenBaseObject[];
-  try {
-    allTokenBases = await getAllTokenBases();
-    allTokenBases.push(tokenBase);
-  } catch (error) {
-    allTokenBases = [tokenBase];
-  }
-  await writeFile(tokenBaseTestStoragePath, JSON.stringify(allTokenBases));
-}
-
-const getTokenBasesByStatus = async (status: TokenStatus, date?: Date) => {
-  const allTokenBases = await getAllTokenBases();
-  if (date) {
-    return allTokenBases.filter(tokenBase =>
-      tokenBase.currentStatus === status &&
-      tokenBase.token.date.getDate() === date.getDate() &&
-      tokenBase.token.date.getMonth() === date.getMonth() &&
-      tokenBase.token.date.getFullYear() === date.getFullYear()
-    );
-  } else {
-    return allTokenBases.filter(tokenBase => {
-      return tokenBase.currentStatus === status;
-    });
-  }
-}
 
 const getTokenBaseByTokenDate = async (date: string) => {
-  const allTokenBases = await getAllTokenBases();
   const filterDate = new Date(date);
-  return allTokenBases.filter(tokenBase => {
-    const loopTokenDate = new Date(tokenBase.getBaseObjectDetails().token.date);
-    return (loopTokenDate.getDate() === filterDate.getDate() &&
-      loopTokenDate.getFullYear() === filterDate.getFullYear() &&
-      loopTokenDate.getMonth() === filterDate.getMonth());
+
+  const allPrismaokenBases = await prisma.tokenBaseObject.findMany({
+    include: {
+      token: {
+        include: {
+          tokenCategory: true
+        }
+      },
+      tokenProcessingInfo: {
+        include: {
+          operator: true
+        }
+      }
+    }
   });
+
+  const filteredTokenBasesByDate = allPrismaokenBases.filter(prismaTokenBase => {
+    const localDate = new Date(prismaTokenBase.token.date);
+    return (filterDate.getDate() === localDate.getDate() && filterDate.getMonth() === localDate.getMonth() && filterDate.getFullYear() === localDate.getFullYear());
+  });
+
+  const tokenBaseObjects: TokenBaseObject[] = filteredTokenBasesByDate.map(prismaTokenBase => {
+    const tokenBaseObject: TokenBaseObject = new TokenBaseObject({
+      date: new Date(prismaTokenBase.token.date),
+      tokenId: prismaTokenBase.token.tokenId,
+      tokenNumber: prismaTokenBase.token.tokenNumber,
+      tokenCategory: prismaTokenBase.token.tokenCategory.category
+    });
+
+    prismaTokenBase.tokenProcessingInfo.forEach(prismaTokenProcessingInfo => {
+      const tokenProcessing: TokenProcessing = new TokenProcessing();
+
+      const prismaOperator = prismaTokenProcessingInfo.operator;
+      const operator: Operator = new Operator({
+        id: prismaOperator.id,
+        password: prismaOperator.password,
+        role: prismaOperator.role as UserRoles,
+        username: prismaOperator.username,
+        counter: prismaOperator.counter
+      });
+
+      tokenProcessing.operator = operator;
+      tokenProcessing.timeStamp = new Date(prismaTokenProcessingInfo.timeStamp);
+      tokenProcessing.status = prismaTokenProcessingInfo.status as TokenStatus;
+
+      tokenBaseObject.addTokenProcessingInfo(tokenProcessing);
+    });
+
+    return tokenBaseObject;
+  });
+  return tokenBaseObjects;
 }
+
+
 
 const resetTokenBase = async () => {
-  await writeFile(tokenBaseTestStoragePath, '');
+  await prisma.tokenBaseObject.deleteMany({});
 }
+
 
 const editATokenBase = async (tokenBase: TokenBaseObject) => {
-  let allTokenBases = await getAllTokenBases();
-  allTokenBases = allTokenBases.map(looptokenBase => {
-    if (tokenBase.token.date.getTime() === looptokenBase.token.date.getTime()
-      && tokenBase.token.tokenNumber === looptokenBase.token.tokenNumber) {
-      return tokenBase;
+
+  const tokenBasetoEdit = await prisma.tokenBaseObject.findUnique({
+    where: {
+      tokenId: tokenBase.token.tokenId
     }
-    return looptokenBase;
   });
-  await writeFile(tokenBaseTestStoragePath, JSON.stringify(allTokenBases));
+
+  const lastTokenProcessing = tokenBase.getBaseObjectDetails().tokenProcessingInfo[tokenBase.getBaseObjectDetails().tokenProcessingInfo.length - 1];
+
+  if (lastTokenProcessing) {
+    await prisma.tokenProcessing.create({
+      data: {
+        status: lastTokenProcessing.status,
+        timeStamp: lastTokenProcessing.timestamp.toString(),
+        operator: {
+          connect: {
+            id: lastTokenProcessing.operator.getUserInfo().id
+          }
+        },
+        tokenBaseObject: {
+          connect: {
+            tokenBaseId: tokenBasetoEdit.tokenBaseId
+          }
+        }
+      }
+    });
+  }
+
+  await prisma.tokenBaseObject.update({
+    where: {
+      tokenBaseId: tokenBasetoEdit.tokenBaseId
+    },
+    data: {
+      currentStatus: tokenBase.currentStatus
+    }
+  });
+
+
+
+  // const prismaTokenBase: Prisma.tokenBaseObjectCreateInput = {
+  //   currentStatus: tokenBase.currentStatus,
+  //   token: {
+  //     connect: { tokenId: tokenBase.token.tokenId }
+  //   }
+  // }
+
+  // await prisma.tokenBaseObject.update({
+  //   select: {
+  //     token: true
+  //   }, where: {
+  //     tokenId: tokenBase.token.tokenId
+  //   },
+  //   data: {
+  //     ...prismaTokenBase
+  //   }
+  // });
 }
+
+
 
 const readTodaysTokenBaseByTokenNumber = async (tokenNumber: number, category?: string) => {
-  const allTokenBases = await getAllTokenBases();
-  let todaysTokenBase: TokenBaseObject;
-  if (category) {
-    todaysTokenBase = allTokenBases.find(tokenBase => {
-      return tokenBase.token.date.getDate() === new Date().getDate() &&
-        tokenBase.token.date.getMonth() === new Date().getMonth() &&
-        tokenBase.token.date.getFullYear() === new Date().getFullYear() &&
-        tokenBase.token.tokenNumber === tokenNumber && tokenBase.token.tokenCategory === category;
+  const token = await prisma.token.findFirst({
+    where: {
+      AND: {
+        tokenNumber: tokenNumber,
+        tokenCategory: {
+          category: category ? category : '!'
+        }
+      }
+    },
+    include: {
+      tokenCategory: true
+    }
+  })
+
+  const prismaTokenBase = await prisma.tokenBaseObject.findUnique({
+    where: {
+      tokenId: token.tokenId
+    },
+    include: {
+      token: {
+        include: {
+          tokenCategory: true
+        }
+      },
+      tokenProcessingInfo: {
+        include: {
+          operator: true
+        }
+      }
+    }
+  });
+
+  const tokenBaseObject = new TokenBaseObject({
+    date: new Date(token.date),
+    tokenId: token.tokenId,
+    tokenNumber: token.tokenNumber,
+    tokenCategory: token.tokenCategory.category === '!' ? '' : token.tokenCategory.category
+  });
+
+  prismaTokenBase.tokenProcessingInfo.forEach(prismaTokenProcessingInfo => {
+    const tokenProcessing: TokenProcessing = new TokenProcessing();
+
+    const operator: Operator = new Operator({
+      id: prismaTokenProcessingInfo.operator.id,
+      password: prismaTokenProcessingInfo.operator.password,
+      username: prismaTokenProcessingInfo.operator.username,
+      role: prismaTokenProcessingInfo.operator.role as UserRoles,
+      counter: prismaTokenProcessingInfo.operator.counter
     });
-  } else {
-    todaysTokenBase = allTokenBases.find(tokenBase => {
-      return tokenBase.token.date.getDate() === new Date().getDate() &&
-        tokenBase.token.tokenNumber === tokenNumber && tokenBase.token.tokenCategory === undefined;
-    });
-  }
-  return todaysTokenBase;
+
+    tokenProcessing.operator = operator;
+    tokenProcessing.status = prismaTokenProcessingInfo.status as TokenStatus;
+    tokenProcessing.timeStamp = new Date(prismaTokenProcessingInfo.timeStamp);
+
+    tokenBaseObject.addTokenProcessingInfo(tokenProcessing);
+  })
+
+  return tokenBaseObject;
+
 }
 
+
 const readNextAvailableTokenNumberInACategoryForToday = async (tokenCategory: string) => {
-  const allTokenBases = await getAllTokenBases();
-  let highestNumber = 0;
-  if (tokenCategory) {
-    allTokenBases.forEach(tokenBase => {
-      if (tokenBase.token.tokenCategory === tokenCategory &&
-        tokenBase.token.date.getDate() === new Date().getDate() &&
-        tokenBase.token.date.getMonth() === new Date().getMonth() &&
-        tokenBase.token.date.getFullYear() === new Date().getFullYear()) {
-        highestNumber = tokenBase.token.tokenNumber > highestNumber ? tokenBase.token.tokenNumber : highestNumber;
+  const highestToken = await prisma.token.findFirst({
+    orderBy: {
+      tokenNumber: 'desc'
+    },
+    where: {
+      tokenCategory: {
+        category: tokenCategory
       }
-    });
-  } else {
-    allTokenBases.forEach(tokenBase => {
-      if (tokenBase.token.date.getDate() === new Date().getDate() &&
-        tokenBase.token.date.getMonth() === new Date().getMonth() &&
-        tokenBase.token.date.getFullYear() === new Date().getFullYear()) {
-        highestNumber = tokenBase.token.tokenNumber > highestNumber ? tokenBase.token.tokenNumber : highestNumber
-      }
-    });
-  }
-  return highestNumber + 1;
+    }
+  });
+
+  return (highestToken.tokenId + 1);
 }
 
 const readTokenBasesByTokenCategory = (tokenBases: TokenBaseObject[], tokenCategory: string) => {
   return tokenBases.filter(tokenBase => tokenBase.token.tokenCategory === tokenCategory);
 }
 
+
 const readTokenBaseByTokenId = async (tokenId: number) => {
-  const allTokenBases = await getAllTokenBases();
-  return allTokenBases.find(tokenBase => tokenBase.token.tokenId === tokenId);
+  const prismaTokenBaseObject = await prisma.tokenBaseObject.findFirst({
+    where: {
+      tokenId: tokenId
+    },
+    include: {
+      token: {
+        include: {
+          tokenCategory: true
+        }
+      },
+      tokenProcessingInfo: {
+        include: {
+          operator: true
+        }
+      }
+    }
+  });
+
+  const token: Token = {
+    date: new Date(prismaTokenBaseObject.token.date),
+    tokenId: prismaTokenBaseObject.tokenId,
+    tokenNumber: prismaTokenBaseObject.token.tokenNumber,
+    tokenCategory: prismaTokenBaseObject.token.tokenCategory.category
+  }
+
+  const tokenBaseObject = new TokenBaseObject(token);
+
+  prismaTokenBaseObject.tokenProcessingInfo.forEach(prismaTokenProcessing => {
+    const tokenProcessingInfo = new TokenProcessing();
+    const operator: Operator = new Operator({
+      id: prismaTokenProcessing.operator.id,
+      password: prismaTokenProcessing.operator.password,
+      username: prismaTokenProcessing.operator.username,
+      role: prismaTokenProcessing.operator.role as UserRoles,
+      counter: prismaTokenProcessing.operator.counter
+    });
+
+    tokenProcessingInfo.operator = operator;
+    tokenProcessingInfo.status = prismaTokenProcessing.status as TokenStatus;
+    tokenProcessingInfo.timeStamp = new Date(prismaTokenProcessing.timeStamp);
+
+    tokenBaseObject.addTokenProcessingInfo(tokenProcessingInfo);
+  });
+
+  return tokenBaseObject;
 }
 
+
 const getNextAvailableTokenId = async () => {
-  let highestTokenId = 0;
-  try {
-    const allTokenBases = await getAllTokenBases();
-    allTokenBases.forEach(tokenBase => {
-      highestTokenId = tokenBase.token.tokenId > highestTokenId ? tokenBase.token.tokenId : highestTokenId;
-    });
-    return highestTokenId + 1;
-  } catch (error) {
-    return 1;
+  const highestIdToken = await prisma.token.findFirst({
+    orderBy: {
+      tokenId: 'desc'
+    }
+  });
+
+  if (!highestIdToken) {
+    return 0;
   }
+
+  return (highestIdToken.tokenId + 1);
 }
 
 const TokenBaseStorageImplementation: TokenBaseStorageAdapter = {

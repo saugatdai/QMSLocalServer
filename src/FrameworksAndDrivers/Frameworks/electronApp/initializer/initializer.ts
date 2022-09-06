@@ -174,6 +174,7 @@ ipcMain.on('beginTokenPrint', async (event: Event, tokenCategory) => {
 });
 
 ipcMain.on('startPrinting', (e: Event, tokenString) => {
+  console.log('Starting to print...');
   printPaper.webContents.print({
     silent: true,
     printBackground: true,

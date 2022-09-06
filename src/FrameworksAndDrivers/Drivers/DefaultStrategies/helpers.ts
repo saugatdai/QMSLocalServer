@@ -83,7 +83,7 @@ const getCategoryUnprocessedTokenBases = async (allUnprocessedTokenBases: TokenB
 
 const getUnprocessedTokenBases = async (allUnprocessedTokenBases: TokenBaseObject[]) => {
   let unprocessedTokenBases: TokenBaseObject[];
-  unprocessedTokenBases = allUnprocessedTokenBases.filter(tokenBase => !tokenBase.token.tokenCategory);
+  unprocessedTokenBases = allUnprocessedTokenBases.filter(tokenBase => tokenBase.token.tokenCategory === '!');
   const tokenCountManager = getTokenCountManager();
   const currentCustomerToken = await tokenCountManager.revcoverTokenCount();
   unprocessedTokenBases = unprocessedTokenBases.filter(tokenBase => tokenBase.token.tokenNumber > currentCustomerToken);

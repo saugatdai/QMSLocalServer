@@ -1,89 +1,157 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import * as util from 'util';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
 
 import Customer from '../../Entities/CustomerCore/Customer';
+import Token from '../../Entities/TokenCore/Token';
 import { CustomerStorageAdapter } from '../../InterfaceAdapters/CustomerStorageInteractorImplementation';
 
-export const readFile = (filename: string) =>
-  util.promisify(fs.readFile)(filename, 'utf-8');
-export const writeFile = (filename: string, data: string) =>
-  util.promisify(fs.writeFile)(filename, data, 'utf-8');
-
-const customerTestStoragePath = path.join(__dirname, '../../../Data/customers.json');
-
 const getCustomers = async () => {
-  const customerJson = await readFile(customerTestStoragePath);
-  if (!customerJson) {
-    throw new Error("No Customer Found");
-  }
-  const allCustomers: Customer[] = JSON.parse(customerJson);
-  return allCustomers;
-}
-const createCustomer = async (customer: Customer) => {
-  let customers: Customer[];
   try {
-    customers = await getCustomers();
-    customers.push(customer);
-  } catch (error) {
-    customers = [customer];
-  }
-  await writeFile(customerTestStoragePath, JSON.stringify(customers));
-}
-
-const readCustomerById = async (customerId: number) => {
-  try {
-    const customers = await getCustomers();
-    return customers.find(customer => customer.customerId === customerId);
-  } catch (error) {
-    console.log(error);
-    return null;
-  }
-}
-
-const updateCustomer = async (customer: Customer) => {
-  const allCustomersList = await getCustomers();
-  const updatedList = allCustomersList.map(loopCustomer => {
-    if (customer.customerId === loopCustomer.customerId) {
-      return customer;
+    const prismaCustomers = await prisma.customer.findMany({
+      include: {
+        token: {
+          include: {
+            tokenCategory: true
+          }
+        }
+      }
+    });
+    if (prismaCustomers.length === 0) {
+      throw new Error("No Customer Found");
     }
-    return loopCustomer;
-  });
-  await writeFile(customerTestStoragePath, JSON.stringify(updatedList));
+
+    const customers: Customer[] = prismaCustomers.map(prismaCustomer => {
+
+      const token: Token = {
+        date: new Date(prismaCustomer.token.date),
+        tokenId: prismaCustomer.token.tokenId,
+        tokenNumber: prismaCustomer.token.tokenNumber,
+        tokenCategory: prismaCustomer.token.tokenCategory.category
+      }
+
+      const temp: Customer = {
+        customerId: prismaCustomer.customerId,
+        customerName: prismaCustomer.customerName,
+        remarks: prismaCustomer.remarks,
+        token: token
+      }
+
+      return temp;
+    })
+    return customers;
+  } catch (error) {
+    console.log(error.toString());
+  }
 }
 
-const deleteCustomerById = async (customerId: number) => {
-  const allCustomersList = await getCustomers();
-  const customersAfterDeletedById = allCustomersList.filter(customer => customer.customerId !== customerId);
-  await writeFile(customerTestStoragePath, JSON.stringify(customersAfterDeletedById));
-}
 
-const getNextAvailableId = async () => {
-  let greatestId = 0;
+const createCustomer = async (customer: Customer) => {
   try {
-    const allCustomers = await getCustomers();
-    allCustomers.forEach(customer => {
-      if (customer.customerId > greatestId) {
-        greatestId = customer.customerId;
+    const prismaCustomer = await prisma.customer.create({
+      data: {
+        customerName: customer.customerName,
+        tokenId: customer.token.tokenId,
+        remarks: customer.remarks
       }
     });
   } catch (error) {
-
+    console.log(error.toString);
   }
-  return greatestId + 1;
+
+}
+const readCustomerById = async (customerId: number) => {
+  const prismaCustomer = await prisma.customer.findFirst({
+    where: {
+      customerId: customerId
+    },
+    include: {
+      token: {
+        include: {
+          tokenCategory: true
+        }
+      }
+    }
+  });
+
+  if (!prismaCustomer) {
+    throw new Error('No customer with given ID');
+  }
+
+  const customer: Customer = {
+    ...prismaCustomer,
+    token: {
+      tokenCategory: prismaCustomer.token.tokenCategory.category,
+      date: new Date(prismaCustomer.token.date),
+      tokenId: prismaCustomer.token.tokenId,
+      tokenNumber: prismaCustomer.token.tokenNumber
+    }
+  }
+
+  return customer;
+}
+
+const updateCustomer = async (customer: Customer) => {
+  try {
+    await prisma.customer.update({
+      where: {
+        customerId: customer.customerId
+      },
+      data: {
+        customerId: customer.customerId,
+        customerName: customer.customerName,
+        remarks: customer.remarks,
+        tokenId: customer.token.tokenId
+      }
+    });
+  } catch (error) {
+    console.log(error.toString);
+  }
+}
+
+const deleteCustomerById = async (customerId: number) => {
+  try {
+    await prisma.customer.delete({
+      where: {
+        customerId: customerId
+      }
+    });
+  } catch (error) {
+    console.log(error.toString());
+  }
+}
+
+
+const getNextAvailableId = async () => {
+  try {
+    const largestCustomerId = await prisma.customer.count();
+    return largestCustomerId + 1;
+  } catch (error) {
+    console.log(error.toString());
+  }
 }
 
 const isIdAvailable = async (id: number) => {
   try {
-    const allCustomers = await getCustomers();
-    return !allCustomers.some(customer => customer.customerId === id);
-  } catch (error) { }
-  return true;
+    const customer = await prisma.customer.findFirst({
+      where: {
+        customerId: id
+      }
+    });
+    return (customer ? false : true);
+  } catch (error) {
+    console.log(error.toString());
+  }
+}
+const resetCustomers = async () => {
+  try {
+    await prisma.customer.deleteMany({});
+  } catch (error) {
+    console.log(error.toString());
+  }
 }
 
-const resetCustomers = async () => {
-  await writeFile(customerTestStoragePath, '');
-}
+
 
 const CustomerStorageImplementation: CustomerStorageAdapter = {
   getCustomers,

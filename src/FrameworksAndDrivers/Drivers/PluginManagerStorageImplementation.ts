@@ -8,10 +8,12 @@ import EventManagerSingleton from '../../UseCases/EventManagementComponent/Event
 import EventTypes from '../../UseCases/EventManagementComponent/EventTypes';
 import PluginConfigElement from '../../UseCases/PluginManagementComponent/PluginModule/PluginConfigElement';
 import PluginFinder from '../../UseCases/PluginManagementComponent/PluginScannerModule/PluginFinder';
-import { readFile } from './TokenCategoryCountStorageImplementation';
 
-const writeFile = (filename: string, data: string) =>
+export const readFile = (filename: string) =>
+  util.promisify(fs.readFile)(filename, 'utf-8');
+export const writeFile = (filename: string, data: string) =>
   util.promisify(fs.writeFile)(filename, data, 'utf-8');
+
 
 const deleteFolderRecursive = (directoryPath: string) => {
   if (fs.existsSync(directoryPath)) {

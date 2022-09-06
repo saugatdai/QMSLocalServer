@@ -1,7 +1,0 @@
-{
-    "name": "TestPlugin2",
-    "version": "1.0.0",
-    "minCoreVersion": "1.0.0",
-    "pluginId": 124,
-    "pluginValidatorID": "124abc"
-}

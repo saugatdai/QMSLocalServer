@@ -30,8 +30,6 @@ const submitButtonHandler = async (event: Event) => {
       showGeneral: generalCheckbox.checked
     }
 
-    console.log(kioskSettings);
-
     await writeFile(path.join(__dirname, '../../../../../Data/serverSettings.json'), JSON.stringify(serverSettings));
     await writeFile(path.join(__dirname, '../../../../../Data/kioskSettings.json'), JSON.stringify(kioskSettings));
     

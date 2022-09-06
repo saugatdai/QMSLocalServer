@@ -1,7 +1,3 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import * as util from 'util';
-
 import { UserData } from '../../Entities/UserCore/User';
 import User from '../../Entities/UserCore/User';
 import Operator from '../../Entities/UserCore/Operator';
@@ -10,31 +6,37 @@ import UserFactory from '../../Entities/UserCore/UserFactory';
 import { Credentials } from '../../InterfaceAdapters/UserStorageInteractorImplementation';
 import { UserStorageAdapter } from '../../InterfaceAdapters/UserStorageInteractorImplementation';
 
-const readFile = (filename: string) =>
-  util.promisify(fs.readFile)(filename, 'utf-8');
-const writeFile = (filename: string, data: string) =>
-  util.promisify(fs.writeFile)(filename, data, 'utf-8');
+import { PrismaClient } from '@prisma/client';
 
-export let testStoragePath = path.join(__dirname, '../../../Data/users.json');
-
-export const changeStoragePath = (storagePath: string) => {
-  testStoragePath = storagePath;
-}
+const prisma = new PrismaClient();
 
 const getAllUserDatas = async (): Promise<UserData[]> => {
-  const userDatasJson = await readFile(testStoragePath);
-  if (userDatasJson) {
-    const userDatas: UserData[] = JSON.parse(userDatasJson);
-    return userDatas;
-  } else {
-    return [];
-  }
+  const prismaUserDatas = await prisma.userData.findMany({});
+
+  const allUserDatas: UserData[] = prismaUserDatas.map(prismaUserData => {
+    const userData: UserData = {
+      id: prismaUserData.id,
+      password: prismaUserData.password,
+      role: prismaUserData.role as UserRoles,
+      username: prismaUserData.username,
+      counter: prismaUserData.counter
+    }
+
+    return userData;
+  });
+
+  return allUserDatas;
 };
 
 const createUser = async (user: User) => {
-  let userDatas = await getAllUserDatas();
-  userDatas.push(user.getUserInfo());
-  await writeFile(testStoragePath, JSON.stringify(userDatas));
+  await prisma.userData.create({
+    data: {
+      password: user.getUserInfo().password,
+      username: user.getUserInfo().username,
+      role: user.getUserInfo().role,
+      counter: user.getUserInfo().counter
+    }
+  });
 };
 
 const getUsers = async (): Promise<User[]> => {
@@ -49,14 +51,11 @@ const getUsers = async (): Promise<User[]> => {
 };
 
 const deleteUser = async (userId: number) => {
-  const allUsers = await getAllUserDatas();
-  const rawUsers = allUsers.filter((user) => {
-    if (user.id !== userId) {
-      return user;
+  await prisma.userData.delete({
+    where: {
+      id: userId
     }
   });
-
-  await writeFile(testStoragePath, JSON.stringify(rawUsers));
 };
 
 const readUser = async (userId: number): Promise<User> => {
@@ -67,16 +66,18 @@ const readUser = async (userId: number): Promise<User> => {
 };
 
 const updateUser = async (user: User): Promise<void> => {
-  const initialUserDataGroup = await getAllUserDatas();
-  const finalUserDataGroup: UserData[] = initialUserDataGroup.map(
-    (loopUserData) => {
-      if (loopUserData.id === user.getUserInfo().id) {
-        loopUserData = user.getUserInfo();
-      }
-      return loopUserData;
+  await prisma.userData.update({
+    where: {
+      id: user.getUserInfo().id
+    },
+    data: {
+      counter: user.getUserInfo().counter,
+      id: user.getUserInfo().id,
+      password: user.getUserInfo().password,
+      role: user.getUserInfo().role,
+      username: user.getUserInfo().username
     }
-  );
-  await writeFile(testStoragePath, JSON.stringify(finalUserDataGroup));
+  });
 };
 
 const checkUserExistsWithUsername = async (user: User | Operator): Promise<boolean> => {
@@ -95,14 +96,14 @@ const checkUserExistsWithId = async (userId: number): Promise<boolean> => {
 };
 
 const setCounter = async (operator: Operator | User) => {
-  let allUserDatas: UserData[] = await getAllUserDatas();
-  allUserDatas = allUserDatas.map((userData) => {
-    if (userData.id === operator.getUserInfo().id) {
-      userData.counter = operator.getUserInfo().counter;
+  await prisma.userData.update({
+    where: {
+      id: operator.getUserInfo().id
+    },
+    data: {
+      counter: operator.getUserInfo().counter
     }
-    return userData;
   });
-  await writeFile(testStoragePath, JSON.stringify(allUserDatas));
 };
 
 const isCounterOccupied = async (counter: string): Promise<boolean> => {

@@ -1,52 +1,78 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import * as util from 'util';
+import { PrismaClient } from '@prisma/client';
 
 import { TokenCountStorageAdapter } from '../../../src/InterfaceAdapters/TokenCountStorageInteractorImplementation';
 
-const readFile = (filename: string) =>
-  util.promisify(fs.readFile)(filename, 'utf-8');
-const writeFile = (filename: string, data: string) =>
-  util.promisify(fs.writeFile)(filename, data, 'utf-8');
+const prisma = new PrismaClient();
 
 type TokenStatusObject = {
   currentTokenCount: number;
   latestCustomerTokenCount: number;
 }
-const tokenCountStatusStoragePath = path.join(__dirname, '../../../Data/tokenCount.json');
-
-const getTokenStatusObject = async () => {
-  const tokenStatusJSON = await readFile(tokenCountStatusStoragePath);
-  const tokenStatusObject = await JSON.parse(tokenStatusJSON) as TokenStatusObject;
-  return tokenStatusObject;
-}
-
 const getCurrentCount = async () => {
-  const tokenStatusObject = await getTokenStatusObject();
-  return tokenStatusObject.currentTokenCount;
+  let categoryObject = await prisma.tokenCategoryCount.findFirst({
+    where: {
+      category: '!'
+    }
+  });
+
+  if(!categoryObject){
+    categoryObject = await prisma.tokenCategoryCount.create({
+      data: {
+        category: '!',
+        categoryName: 'General',
+        currentTokenCount: 0,
+        latestCustomerTokenCount: 0
+      }
+    })
+  }
+
+  return categoryObject.currentTokenCount;
 }
 
 const resetCount = async () => {
-  const tokenStatusObject = await getTokenStatusObject();
-  tokenStatusObject.currentTokenCount = 0;
-  await writeFile(tokenCountStatusStoragePath, JSON.stringify(tokenStatusObject));
+  await prisma.tokenCategoryCount.update({
+    where: {
+      category: '!'
+    },
+    data: {
+      currentTokenCount: 0
+    }
+  });
 }
 
 const updateCurrentCount = async (newCount: number) => {
-  const tokenStatusObject = await getTokenStatusObject();
-  tokenStatusObject.currentTokenCount = newCount;
-  await writeFile(tokenCountStatusStoragePath, JSON.stringify(tokenStatusObject));
+  await prisma.tokenCategoryCount.update({
+    data: {
+      currentTokenCount: newCount
+    },
+    where: {
+      category: '!'
+    }
+  });
 }
 
 const setLatestCustomerTokenCount = async (count: number) => {
-  const tokenStatusObject = await getTokenStatusObject();
-  tokenStatusObject.latestCustomerTokenCount = count;
-  await writeFile(tokenCountStatusStoragePath, JSON.stringify(tokenStatusObject));
+  await prisma.tokenCategoryCount.update({
+    where: {
+      category: '!'
+    },
+    data: {
+      latestCustomerTokenCount: count
+    }
+  });
 }
 
 const getLatestCustomerTokenCount = async () => {
-  const tokenStatusObject = await getTokenStatusObject();
-  return tokenStatusObject.latestCustomerTokenCount;
+  const customerCountObject = await prisma.tokenCategoryCount.findFirst({
+    where: {
+      category: '!'
+    },
+    select: {
+      latestCustomerTokenCount: true
+    }
+  });
+
+  return customerCountObject.latestCustomerTokenCount;
 }
 
 const TokenCountStorageImplementation: TokenCountStorageAdapter = {

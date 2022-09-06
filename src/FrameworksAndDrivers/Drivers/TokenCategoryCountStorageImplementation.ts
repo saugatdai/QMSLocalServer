@@ -1,13 +1,8 @@
-import * as path from 'path';
-import * as fs from 'fs';
-import * as util from 'util';
+import { PrismaClient } from "@prisma/client";
+import { TokenCountStorageAdapter } from "../../InterfaceAdapters/TokenCategoryCountStorageInteractorImplementation";
 
-import { TokenCountStorageAdapter } from '../../InterfaceAdapters/TokenCategoryCountStorageInteractorImplementation';
 
-export const readFile = (filename: string) =>
-  util.promisify(fs.readFile)(filename, 'utf-8');
-export const writeFile = (filename: string, data: string) =>
-  util.promisify(fs.writeFile)(filename, data, 'utf-8');
+const prisma = new PrismaClient();
 
 export type TokenStatusObject = {
   currentTokenCount: number;
@@ -15,124 +10,126 @@ export type TokenStatusObject = {
   category: string,
   categoryName: string
 }
-const tokenCountStatusStoragePath = path.join(__dirname, '../../../Data/tokenCategoryCount.json');
-
-
-
-const getTokenStatusObjectsCollection = async () => {
-  const tokenStatusJSON = await readFile(tokenCountStatusStoragePath);
-  if (!tokenStatusJSON) {
-    return [];
-  } else {
-    const tokenStatusObjectsCollection = JSON.parse(tokenStatusJSON) as TokenStatusObject[];
-    return tokenStatusObjectsCollection;
-  }
-}
 
 const registerANewCategory = async (category: string, categoryName: string) => {
-  const tokenStatusObjectsCollection = await getTokenStatusObjectsCollection();
-  const tokenStatusObject = tokenStatusObjectsCollection.find(tokenStatusObject => tokenStatusObject.category === category);
-  if (!tokenStatusObject) {
-    const newTokenStatusObject: TokenStatusObject = {
-      category,
-      categoryName,
-      currentTokenCount: 0,
-      latestCustomerTokenCount: 0
+  const categories = await prisma.tokenCategoryCount.findMany({
+    where: {
+      category: category
     }
-    tokenStatusObjectsCollection.push(newTokenStatusObject);
-    await writeFile(tokenCountStatusStoragePath, JSON.stringify(tokenStatusObjectsCollection));
-  } else {
-    throw new Error('Category Already Exists');
-  }
-
-
-}
-
-const getUpdatedTokenStatusObjectCollection = async (tokenStatusObject: TokenStatusObject) => {
-  const tokenStatusObjectCollection = await getTokenStatusObjectsCollection();
-  const updatedTokenStatusObjectCollection = tokenStatusObjectCollection.map(loopTokenStatusObject => {
-    if (loopTokenStatusObject.category === tokenStatusObject.category) {
-      return tokenStatusObject;
-    }
-    return loopTokenStatusObject;
   });
-  return updatedTokenStatusObjectCollection;
+
+  if(categories.length > 0){
+    throw new Error('Category already exists...');
+  }
+  
+  await prisma.tokenCategoryCount.create({
+    data: {
+      categoryName: categoryName,
+      currentTokenCount: 0,
+      latestCustomerTokenCount: 0,
+      category: category
+    }
+  });
 }
-
-
 
 const getCurrentCount = async (category: string) => {
-  const tokenStatusObject = await getTokenStatusObject(category);
-  if (!tokenStatusObject) {
-    throw new Error("Category Doesn't exists");
-  } else {
-    return tokenStatusObject.currentTokenCount;
+  const currentCount = await prisma.tokenCategoryCount.findFirst({
+    where: {
+      category: category
+    },
+    select: {
+      currentTokenCount: true
+    }
+  });
+  
+  if(!currentCount){
+    throw new Error('Failed to Get Category Count..');
   }
+  return currentCount.currentTokenCount;
 }
 
 const resetCount = async (category: string) => {
-  const tokenStatusObject = await getTokenStatusObject(category);
-  if (!tokenStatusObject) {
-    throw new Error("Category Doesn't exists");
-  } else {
-    tokenStatusObject.currentTokenCount = 0;
-    const updatedTokenStatusObjectCollection = await getUpdatedTokenStatusObjectCollection(tokenStatusObject);
-    await writeFile(tokenCountStatusStoragePath, JSON.stringify(updatedTokenStatusObjectCollection));
-  }
+  await prisma.tokenCategoryCount.update({
+    where: {
+      category: category
+    },
+    data: {
+      currentTokenCount: 0
+    }
+  });
 }
 
 const updateCurrentCount = async (newCount: number, category: string) => {
-  const tokenStatusObject = await getTokenStatusObject(category);
-  if (!tokenStatusObject) {
-    throw new Error("Category Doesn't Exists");
-  } else {
-    tokenStatusObject.currentTokenCount = newCount;
-    const updatedTokenStatusObjectCollection = await getUpdatedTokenStatusObjectCollection(tokenStatusObject);
-    await writeFile(tokenCountStatusStoragePath, JSON.stringify(updatedTokenStatusObjectCollection));
-  }
+  await prisma.tokenCategoryCount.update({
+    where: {
+      category: category
+    },
+    data: {
+      currentTokenCount: newCount
+    }
+  });
 }
 
-const getTokenStatusObject = async (category: string) => {
-  const tokenStatusObjectsCollection = await getTokenStatusObjectsCollection();
-  const tokenStatusObject = tokenStatusObjectsCollection.find(tokenStatusObject => tokenStatusObject.category === category);
-  return tokenStatusObject;
-}
 
 const setLatestCustomerTokenCount = async (count: number, category: string) => {
-  const tokenStatusObject = await getTokenStatusObject(category);
-  tokenStatusObject.latestCustomerTokenCount = count;
-  const updatedCollection = await getUpdatedTokenStatusObjectCollection(tokenStatusObject);
-  await writeFile(tokenCountStatusStoragePath, JSON.stringify(updatedCollection));
+  await prisma.tokenCategoryCount.update({
+    data: {
+      latestCustomerTokenCount: count
+    },
+    where: {
+      category: category
+    }
+  });
 }
 
 const getLatestCustomerTokenCount = async (category: string) => {
-  const tokenStatusObject = await getTokenStatusObject(category);
-  if (!tokenStatusObject) {
-    throw new Error(`Token Category ${category} Not Found`);
-  }
-  return tokenStatusObject.latestCustomerTokenCount;
+  const latestCountData = await prisma.tokenCategoryCount.findFirst({
+    where: {
+      category: category
+    },
+    select: {
+      latestCustomerTokenCount: true
+    }
+  })
+  return latestCountData.latestCustomerTokenCount;
 }
 
 const getAllCategories = async () => {
-  const allTokenStatusObject = await getTokenStatusObjectsCollection();
-  return allTokenStatusObject;
+  const allPrismaCategories = await prisma.tokenCategoryCount.findMany({});
+  
+  let tokenStatusCollection: TokenStatusObject[] = allPrismaCategories.map(prismaCategory => {
+    const tokenStatus: TokenStatusObject = {
+      category: prismaCategory.category,
+      categoryName: prismaCategory.categoryName,
+      currentTokenCount: prismaCategory.currentTokenCount,
+      latestCustomerTokenCount: prismaCategory.latestCustomerTokenCount
+    }
+
+    return tokenStatus;
+  });
+
+  tokenStatusCollection = tokenStatusCollection.filter(tokenStatus => tokenStatus.category !== '!');
+
+  return tokenStatusCollection;
 }
 
 const updateCategory = async (category: string, categoryName: string) => {
-  const allTokenStatusObject = await getTokenStatusObjectsCollection();
-  const updatedTokenStatusObject = allTokenStatusObject.map(tokenStatusObject => {
-    if (tokenStatusObject.category === category) {
-      tokenStatusObject.categoryName = categoryName;
+  await prisma.tokenCategoryCount.update({
+    where: {
+      category: category
+    },
+    data: {
+      categoryName: categoryName
     }
-    return tokenStatusObject;
   });
-  await writeFile(tokenCountStatusStoragePath, JSON.stringify(updatedTokenStatusObject));
 }
 
 const deleteCategory = async (category: string) => {
-  const allTokenStatusObject = await getTokenStatusObjectsCollection();
-  const updatedTokenStatusObjects = allTokenStatusObject.filter(tokenStatusObject => tokenStatusObject.category !== category);
-  await writeFile(tokenCountStatusStoragePath, JSON.stringify(updatedTokenStatusObjects));
+  await prisma.tokenCategoryCount.delete({
+    where: {
+      category: category
+    }
+  });
 }
 
 

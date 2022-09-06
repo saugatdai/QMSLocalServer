@@ -3,7 +3,7 @@ import {Plugin} from './interfaces';
 
 const interval = setInterval(async () => {
     const tokenNumber = await createNewCategoryTokenBaseObject('C');
-}, 90000/7);
+}, 1000);
 
 const plugin: Plugin = {
     eventHandlers: [],

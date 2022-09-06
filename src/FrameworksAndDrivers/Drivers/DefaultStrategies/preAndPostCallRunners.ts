@@ -113,6 +113,7 @@ const setNextToken = async (tokenCallingState: TokenCallingState) => {
   } else {
     unprocessedTokenBasesForToday.sort((tb1, tb2) => (tb1.token.tokenNumber - tb2.token.tokenNumber));
     const nextToken = getNextTokenFromUnprocessedTokenBases(unprocessedTokenBasesForToday);
+    nextToken.tokenCategory = nextToken.tokenCategory==='!'? nextToken.tokenCategory.replace('!','') : nextToken.tokenCategory;
     if (nextToken.tokenNumber === 0) {
       setEndOfQueueAndNullNextTokenForState(tokenCallingState);
     } else {

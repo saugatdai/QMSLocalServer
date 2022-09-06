@@ -1,12 +1,6 @@
-import * as fs from 'fs';
-import * as util from 'util';
-import * as path from 'path';
+import { PrismaClient } from '@prisma/client';
 
-const readFile = (filename: string) =>
-  util.promisify(fs.readFile)(filename, 'utf-8');
-const writeFile = (filename: string, data: string) =>
-  util.promisify(fs.writeFile)(filename, data, 'utf-8');
-
+const prisma = new PrismaClient();
 
 type tokensHolder = {
   id: number,
@@ -21,57 +15,38 @@ export type tokenHolder = {
 
 export default class AuthTokenHelper {
 
-  constructor(private authFilePath = path.join(__dirname, '/auths.json')) { }
-
   public async storeATokenForUser(tokenHolder: tokenHolder) {
-    const storedTokensHolders = await this.getStoredTokenHolders();
-    if (!storedTokensHolders.length) {
-      await this.writeATokenHolderToBlankFile(tokenHolder);
-    } else {
-      if (storedTokensHolders.find(loopTokenHolder => tokenHolder.id === loopTokenHolder.id)) {
-        await this.insertATokenToExistingTokensHolder(tokenHolder, storedTokensHolders);
-      } else {
-        await this.storeANewTokenHolderIntoExistingTokensHolders(storedTokensHolders, tokenHolder)
+    await prisma.authToken.create({
+      data: {
+        token: tokenHolder.token,
+        userId: tokenHolder.id
       }
-    }
+    })
   }
 
-  private async getStoredTokenHolders() {
-    const tokenHoldersJSON = await readFile(this.authFilePath);
-    let storedTokensHolders: tokensHolder[];
-    if (tokenHoldersJSON) {
-      storedTokensHolders = JSON.parse(tokenHoldersJSON);
-      return storedTokensHolders;
-    } else {
-      return [];
-    }
-  }
-
-  private async writeATokenHolderToBlankFile(tokenHolder: tokenHolder) {
-    const tokenHolderArray: tokensHolder[] = [{
-      id: tokenHolder.id,
-      tokens: [tokenHolder.token]
-    }]
-    await writeFile(this.authFilePath, JSON.stringify(tokenHolderArray));
-  }
-
-  private async insertATokenToExistingTokensHolder(tokenHolder: tokenHolder, storedTokensHolders: tokensHolder[]) {
-    const updatedTokenHolders = storedTokensHolders.map(loopTokenHolder => {
-      if (loopTokenHolder.id === tokenHolder.id) {
-        loopTokenHolder.tokens.push(tokenHolder.token);
+  private async getStoredTokenHolders(): Promise<tokensHolder[]> {
+    const allPrismaTokens = await prisma.authToken.findMany({
+      include: {
+        user: {
+          include: {
+            authTokens: true
+          }
+        }
       }
-      return loopTokenHolder;
     });
-    await writeFile(this.authFilePath, JSON.stringify(updatedTokenHolders));
-  }
 
-  private async storeANewTokenHolderIntoExistingTokensHolders(storedTokensHolders: tokensHolder[], tokenHolder: tokenHolder) {
-    const newTokensHolder: tokensHolder = {
-      id: tokenHolder.id,
-      tokens: [tokenHolder.token]
-    }
-    storedTokensHolders.push(newTokensHolder);
-    await writeFile(this.authFilePath, JSON.stringify(storedTokensHolders));
+    const allTokenHolders: tokensHolder[] = allPrismaTokens.map(prismaToken => {
+      const allTokens: string[] = prismaToken.user.authTokens.map(authToken => authToken.token);
+
+      const tokensHolder: tokensHolder = {
+        id: prismaToken.userId,
+        tokens: allTokens
+      }
+
+      return tokensHolder;
+    });
+    
+    return allTokenHolders
   }
 
   public async getAllTokensHolderById(id: number) {
@@ -89,23 +64,24 @@ export default class AuthTokenHelper {
     }
   }
 
-  public async deleteATokenOfUserId(id: number, token: string) {
-    let storedTokensHolder = await this.getStoredTokenHolders();
-    storedTokensHolder = storedTokensHolder.map(tokensHolder => {
-      if (tokensHolder.id === id) {
-        tokensHolder.tokens = tokensHolder.tokens.filter(loopToken => {
-          return loopToken !== token;
-        });
-      }
-      return tokensHolder;
-    });
+  // continue from here...
 
-    await writeFile(this.authFilePath, JSON.stringify(storedTokensHolder));
+  public async deleteATokenOfUserId(id: number, token: string) {
+    await prisma.authToken.deleteMany({
+      where: {
+        AND: {
+          userId: id,
+          token: token
+        }
+      }
+    });
   }
 
   public async deleteAllTokensOfUserId(id: number) {
-    let storedTokensHolder = await this.getStoredTokenHolders();
-    storedTokensHolder = storedTokensHolder.filter(tokenHolder => tokenHolder.id !== id);
-    await writeFile(this.authFilePath, JSON.stringify(storedTokensHolder));
+    await prisma.authToken.deleteMany({
+      where:{
+        userId: id
+      }
+    });
   }
 }
