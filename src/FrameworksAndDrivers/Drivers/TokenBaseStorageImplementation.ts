@@ -300,6 +300,10 @@ const readTodaysTokenBaseByTokenNumber = async (tokenNumber: number, category?: 
     }
   })
 
+  if(!token){
+    throw new Error(`Token you've submitted was not found in tokenBase`);
+  }
+
   const prismaTokenBase = await prisma.tokenBaseObject.findUnique({
     where: {
       tokenId: token.tokenId
