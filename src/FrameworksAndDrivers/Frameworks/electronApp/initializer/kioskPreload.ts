@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     if (kioskSettings.showGeneral) {
-        createButton('General');
+        createButton('Token');
     }
 
     const allCategories = await TokenCategoryCountStorageImplementation.getAllCategories();
