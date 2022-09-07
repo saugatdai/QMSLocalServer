@@ -1,7 +1,3 @@
-import * as util from 'util';
-import * as fs from 'fs';
-import * as path from 'path';
-
 import { PrismaClient } from '@prisma/client';
 
 import TokenBaseStorageInteractorImplementation from '../../../src/InterfaceAdapters/TokenBaseStorageInteractorImplementation';
@@ -27,7 +23,7 @@ export const clearAction = async () => {
         });
         console.log('All tokens and tokenbases deleted successfully...');
     } else {
-        console.log('Todays token base found...')
+        console.log('Todays token base found...');
     }
 }
 
