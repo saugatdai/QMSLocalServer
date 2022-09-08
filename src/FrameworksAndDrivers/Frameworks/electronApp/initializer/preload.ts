@@ -1,8 +1,8 @@
 import { Server } from 'http';
 import * as path from 'path';
-import * as fs from 'fs';
 
 import { ipcRenderer } from 'electron';
+import { PrismaClient } from '@prisma/client';
 
 import { readFile, ServerSettings } from '../helpers/storageHandler';
 
@@ -12,9 +12,42 @@ import { getIpAddress } from '../helpers/network';
 
 let serverStatus: Server;
 
-window.addEventListener('DOMContentLoaded', () => {
-  assignEventHandlers();
+const prisma = new PrismaClient();
+
+
+// The general category create if not exists must run only once not repeatedly 
+// only at the beginning during the software runtime. Therefore this is placed here
+const createGeneralCategoryIfNotExists = async () => {
+  const generalCategory = await prisma.tokenCategoryCount.findFirst({
+    where : {
+      category: '!'
+    }
+  });
+
+  if(!generalCategory){
+    console.log('General Category Does not exists..');
+    await prisma.tokenCategoryCount.create({
+      data: {
+        categoryName: 'General',
+        currentTokenCount: 0,
+        latestCustomerTokenCount: 0,
+        category: '!'
+      }
+    });
+  }
+
+}
+
+createGeneralCategoryIfNotExists().then(() => {
+  console.log('General Category Created...');
+}).catch((error) => {
+  console.log('Can not create the category');
+  console.log(error.toString());
 });
+
+  window.addEventListener('DOMContentLoaded', () => {
+    assignEventHandlers();
+  });
 
 const assignEventHandlers = () => {
   closeButtonEventListener();
