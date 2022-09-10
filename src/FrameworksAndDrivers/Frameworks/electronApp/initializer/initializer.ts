@@ -108,8 +108,8 @@ ipcMain.on('minimizeClicked', () => {
 
 ipcMain.on('SettingsClicked', () => {
   settingsWindow = new BrowserWindow({
-    height: 210,
-    width: 200,
+    height: 620,
+    width: 500,
     show: false,
     maximizable: false,
     webPreferences: {

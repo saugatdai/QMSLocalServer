@@ -13,6 +13,11 @@ export type ServerSettings = {
 export type KioskSettings = {
   kioskMode: string;
   showGeneral: boolean;
+  footerText: string;
+  buttonColor: string;
+  ButtonTextColor: string;
+  footerBackgroundColor: string;
+  footerForegroundColor: string;
 }
 
 export type printSettings = {
