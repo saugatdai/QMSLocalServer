@@ -7,6 +7,12 @@ import { beginTokenCallTask, processTokenCallingTask } from "../Helpers/TokenCal
 import { TokenStatus } from "../../../../UseCases/TokenBaseManagementComponent/TokenBaseModule";
 import Operator from "../../../../Entities/UserCore/Operator";
 import TokenCallingStateManagerSingleton from "../../../../UseCases/TokenCallingComponent/TokenCallingStateManagerSingleton";
+import TokenCategoryCountManager from "../../../../UseCases/TokenCategoryCountManagementComponent/TokenCategoryCountManager";
+import TokenCategoryCountStorageInteractorImplementation from "../../../../InterfaceAdapters/TokenCategoryCountStorageInteractorImplementation";
+import TokenCategoryCountStorageImplementation from "../../../Drivers/TokenCategoryCountStorageImplementation";
+import TokenCountStorageImplementation from "../../../Drivers/TokenCountStorageImplementation";
+import TokenCountStorageInteractorImplementation from "../../../../InterfaceAdapters/TokenCountStorageInteractorImplementation";
+import TokenCountManager from "../../../../UseCases/TokenCountManagementComponent/TokenCountManager";
 
 @Controller('/tokencaller')
 class TokenCallerRoute {
@@ -80,5 +86,32 @@ class TokenCallerRoute {
     TokenCallingStateManagerSingleton.getInstance().removeAllStateLockerForAnOperator(operator.getUserInfo().username);
     console.log("Locked states removed for : " + operator.getUserInfo().username);
     res.status(200).send({ success: "Removed all State Lockers..." });
+  }
+
+  @get('/getqueuelength/:category')
+  @use(auth)
+  @use(checkOperatorAuthority)
+  public async getQueueLength(req: Request, res: Response) {
+    try {
+      const category = req.params.category;
+
+      if (req.params.category !== '!') {
+        const tokenCategoryCountStorageInteractorAdapter = new TokenCategoryCountStorageInteractorImplementation(TokenCategoryCountStorageImplementation);
+        const tokenCountManager = new TokenCategoryCountManager(tokenCategoryCountStorageInteractorAdapter, category);
+        const latestCount = await tokenCountManager.getLatestCustomerTokenCount();
+        const currentCalling = await tokenCountManager.recoverTokenCount();
+        const remaining = latestCount - currentCalling;
+        res.status(200).send({ queueLength: remaining });
+      } else {
+        const tokenCountStorageInteractorImplementation = new TokenCountStorageInteractorImplementation(TokenCountStorageImplementation);
+        const tokenCountManager = new TokenCountManager(tokenCountStorageInteractorImplementation);
+        const latestCount = await tokenCountManager.getLatestCustomerTokenCount();
+        const currentCalling = await tokenCountManager.revcoverTokenCount();
+        const remaining = latestCount - currentCalling;
+        res.status(200).send({ queueLength: remaining });
+      }
+    } catch (error) {
+      res.status(500).send({ error: error.toString() });
+    }
   }
 }
