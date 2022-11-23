@@ -88,6 +88,18 @@ class TokenCallerRoute {
     res.status(200).send({ success: "Removed all State Lockers..." });
   }
 
+  @post('/removeoperatorlockedState')
+  @use(auth)
+  @use(checkOperatorAuthority)
+  @use(checkForOperatorcounter)
+  public async removeLockedStateForCallPad(req: Request, res: Response) {
+    const operator = req.body.user as Operator;
+
+    TokenCallingStateManagerSingleton.getInstance().removeAllStateLockerForAnOperator(operator.getUserInfo().username);
+    console.log("Locked states removed for : " + operator.getUserInfo().username);
+    res.status(200).send({ success: "Removed all State Lockers..." });
+  }
+
   @get('/getqueuelength/:category')
   @use(auth)
   @use(checkOperatorAuthority)
