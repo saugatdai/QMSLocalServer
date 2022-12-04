@@ -10,29 +10,9 @@ import TokenCallingFacadeSingleton from "../../../../../UseCases/TokenCallingCom
 import TokenForwardListManager, { TokenForwardObject } from "../../../../../UseCases/TokenForwardListManagement/TokenForwardListManager";
 import TokenForwardListStorageInteractorImplementation from "../../../../../InterfaceAdapters/TokenForwardListStorageInteractorImplementation";
 import { tokenForwardListStorageImplementation } from "../../../../Drivers/TokenForwardListStorageImplementation";
-import { storeActedTokenProcessingInfo, ActedTokenProcessingInfoArgument } from "../../../../Drivers/DefaultStrategies/helpers";
 
 export const beginTokenCallTask = async (helperParameters: { req: Request, res: Response, tokenStatus: TokenStatus }) => {
-  if (helperParameters.req.body.processedCategory !== undefined) {
-    const processedTokenNumber = helperParameters.req.body.actedTokenNumber;
-    const processedCategory = helperParameters.req.body.processedCategory;
-    helperParameters.req.body.actedTokenNumber = 0;
-
-    const tokenBaseStorageInteractor = new TokenBaseStorageInteractorImplementation(TokenBaseStorageImplementation);
-    const processedTokenBaseObject = await tokenBaseStorageInteractor.getTodaysTokenBaseByTokenNumber(processedTokenNumber, processedCategory);
-
-    const actedTokenProcessingInfoArgument: ActedTokenProcessingInfoArgument = {
-      actedToken: processedTokenBaseObject.token,
-      operator: helperParameters.req.body.user,
-      tokenStatus: helperParameters.tokenStatus
-    }
-
-    await storeActedTokenProcessingInfo(actedTokenProcessingInfoArgument);
-    await processTokenCallingTask(helperParameters);
-
-  } else {
-    await processTokenCallingTask(helperParameters);
-  }
+  await processTokenCallingTask(helperParameters);
 }
 
 export const processTokenCallingTask = async (helperParameters: { req: Request, res: Response, tokenStatus: TokenStatus }) => {
@@ -69,7 +49,7 @@ export const getTokenAfterRegistrationToTokenCallingState = async (operator: Ope
     const tempToken: Token = {
       date: new Date(),
       tokenId: 0,
-      tokenNumber: tokenInfo.tokenNumber,
+      tokenNumber: Math.ceil(Math.random()*15000) + 50001, //indication of the starting of queue processing from 0 by operator
       tokenCategory: tokenInfo.tokenCategory
     }
 
