@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
-  url      = "file:./dev.db?timeout=20000"
+  url      = "file:./dev.db?timeout=20000&connect_timeout=20000&busy_timeout=20000"
 }
 
 model Customer {
