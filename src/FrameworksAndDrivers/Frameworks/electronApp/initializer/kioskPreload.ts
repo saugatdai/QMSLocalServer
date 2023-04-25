@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     if (kioskSettings.showGeneral) {
-        createButton('General');
+        createButton('Token');
     }
 
     const allCategories = await TokenCategoryCountStorageImplementation.getAllCategories();
@@ -43,13 +43,25 @@ document.addEventListener('DOMContentLoaded', async () => {
         const name = category.categoryName;
 
         createButton(`${name}(${symbol})`);
-    })
+    });
+
+    const footerText = <HTMLElement>document.querySelector('#footerTxt');
+    const footer = <HTMLElement>document.querySelector('#footer');
+
+    footerText.innerHTML = kioskSettings.footerText;
+    footer.style.backgroundColor = kioskSettings.footerBackgroundColor;
+    footer.style.color = kioskSettings.footerForegroundColor;
 });
 
 
-const createButton = (buttonContent: string) => {
+const createButton = async (buttonContent: string) => {
+    const kioskSettingsJson = await readFile(path.join(__dirname, '../../../../../Data/kioskSettings.json'));
+    const kioskSettings: KioskSettings = JSON.parse(kioskSettingsJson);
+
     const main = document.querySelector("#main");
     const holder = document.createElement('section');
+    holder.style.backgroundColor = kioskSettings.buttonColor;
+    holder.style.color = kioskSettings.ButtonTextColor;
     const text = document.createTextNode(buttonContent);
     let tokenCategory: string = '';
     holder.appendChild(text);

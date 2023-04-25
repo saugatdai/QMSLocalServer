@@ -29,11 +29,13 @@
     "electron-builder": "^22.14.5",
     "jest": "^27.3.1",
     "nodemon": "^2.0.14",
+    "prisma": "^4.2.1",
     "supertest": "^6.1.6",
     "ts-jest": "^27.0.7",
     "typescript": "^4.4.4"
   },
   "dependencies": {
+    "@prisma/client": "4.2.1",
     "aedes": "^0.46.1",
     "bcrypt": "^5.0.1",
     "cors": "^2.8.5",
@@ -56,6 +58,11 @@
       "icon": "./views/icons/stechLogo@2x.png",
       "target": "nsis"
     },
+    "extraResources": [
+      "prisma/**/*",
+      "node_modules/.prisma/**/*",
+      "node_modules/@prisma/client/**/*"
+    ],
     "nsis": {
       "oneClick": "false"
     },

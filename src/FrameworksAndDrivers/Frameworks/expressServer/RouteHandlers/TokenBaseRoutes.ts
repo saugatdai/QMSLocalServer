@@ -1,7 +1,3 @@
-import * as util from 'util';
-import * as fs from 'fs';
-import * as path from 'path';
-
 import { Request, Response } from 'express';
 
 import Controller from "../Decorators/Controller";
@@ -17,11 +13,13 @@ import { TokenStatus } from '../../../../UseCases/TokenBaseManagementComponent/T
 import { createNewCategoryTokenBaseObject, createNewNonCategoryTokenBaseObject } from '../Helpers/tokenBaseRouteHelper';
 import TokenCountStorageInteractorImplementation from '../../../../InterfaceAdapters/TokenCategoryCountStorageInteractorImplementation';
 import TokenCategoryCountStorageImplementation, { TokenStatusObject } from '../../../Drivers/TokenCategoryCountStorageImplementation';
+
+import { PrismaClient } from '@prisma/client';
 import CustomerStorageImplementation from '../../../Drivers/CustomerStorageImplementation';
+import TokenCountStorageImplementation from '../../../Drivers/TokenCountStorageImplementation';
 
-const writeFile = (filename: string, data: string) =>
-  util.promisify(fs.writeFile)(filename, data, 'utf-8');
 
+const prisma = new PrismaClient();
 
 @Controller('/tokenbase')
 class TokenBaseRoutes {
@@ -139,7 +137,14 @@ class TokenBaseRoutes {
   public async filterTokenBaseByDate(req: Request, res: Response) {
     try {
       const tokenBaseStorageInteractorImplementation = new TokenBaseStorageInteractorImplementation(TokenBaseStorageImplementation);
-      const filteredTokenBases = await tokenBaseStorageInteractorImplementation.filterTokenBaseByTokenDate(req.params.date);
+      const filteredTokenBases = (await tokenBaseStorageInteractorImplementation.filterTokenBaseByTokenDate(req.params.date)).map(
+        tokenBaseObject => {
+          if (tokenBaseObject.token.tokenCategory === "!")
+            tokenBaseObject.token.tokenCategory = undefined;
+
+          return tokenBaseObject;
+        }
+      );
       res.status(200).send(filteredTokenBases);
     } catch (error) {
       res.status(500).send({ error: error.toString() });
@@ -153,7 +158,7 @@ class TokenBaseRoutes {
     try {
       const tokenBaseStorageInteractorImplementation = new TokenBaseStorageInteractorImplementation(TokenBaseStorageImplementation);
       const allTokenBases = await tokenBaseStorageInteractorImplementation.readAllTokenBases();
-      const noCategoryTokenBases = allTokenBases.filter(tokenBase => !tokenBase.token.tokenCategory);
+      const noCategoryTokenBases = allTokenBases.filter(tokenBase => tokenBase.token.tokenCategory === '!');
       res.status(200).send(noCategoryTokenBases);
     } catch (error) {
       res.status(500).send({ error: error.toString() });
@@ -207,33 +212,15 @@ class TokenBaseRoutes {
     const tokenBaseStorageInteractorImplementation = new TokenBaseStorageInteractorImplementation(TokenBaseStorageImplementation);
     await tokenBaseStorageInteractorImplementation.resetTokenBase();
 
-    const tokenCountStoragePath = path.join(__dirname, '../../../../../Data/tokenCount.json');
-    const tokenCategoryCountStoragePath = path.join(__dirname, '../../../../../Data/tokenCategoryCount.json');
-    const resetCountData = {
-      currentTokenCount: 0,
-      latestCustomerTokenCount: 0
-    }
 
-    await writeFile(tokenCountStoragePath, JSON.stringify(resetCountData));
-    await CustomerStorageImplementation.resetCustomers();
-
-    const tokenCategoryCountStorageInteractorImplementation = new TokenCountStorageInteractorImplementation(TokenCategoryCountStorageImplementation);
-    const allTokenCategories = await tokenCategoryCountStorageInteractorImplementation.getAllCategories();
-
-
-    const tokenStatusObjects: TokenStatusObject[] = [];
-
-    allTokenCategories.forEach(tokenCategory => {
-      const tempStatusObject: TokenStatusObject = {
-        category: tokenCategory.category,
-        categoryName: tokenCategory.categoryName,
+    await prisma.tokenCategoryCount.updateMany({
+      data: {
         currentTokenCount: 0,
         latestCustomerTokenCount: 0
       }
-      tokenStatusObjects.push(tempStatusObject);
-    });
+    })
 
-    await writeFile(tokenCategoryCountStoragePath, JSON.stringify(tokenStatusObjects));
+    await prisma.token.deleteMany({});
 
     res.status(200).send({ messae: 'Successfully deleted all token bases' });
   }

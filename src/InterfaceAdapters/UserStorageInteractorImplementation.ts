@@ -8,7 +8,7 @@ export interface UserStorageAdapter {
   createUser: (user: User) => Promise<void>;
   readUser: (userId: number) => Promise<User | Operator>;
   updateUser: (user: User) => Promise<void>;
-  deleteUser: (userId: number) => void;
+  deleteUser: (userId: number) => Promise<void>;
   getUsers: () => Promise<User[] | Operator[]>;
   checkUserExistsWithUsername: (user: User | Operator) => Promise<boolean>;
   setCounter: (opearator: Operator | User) => Promise<void>;

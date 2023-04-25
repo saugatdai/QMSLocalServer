@@ -4,10 +4,11 @@ import TokenCallingStateManagerSingleton from "../../../UseCases/TokenCallingCom
 import { ActedTokenProcessingInfoArgument, getNextTokenFromUnprocessedTokenBases, getNextTokenNumberAfterUpdatingNextTokenForTokenCallingState, getUnprocessedTokenBasesAfterCurrentCustomer, presetCurrentTokenCountFromNextToken, setEndOfQueueAndNullNextTokenForState, storeActedTokenProcessingInfo, storeOperatorAssignedToken } from "./helpers";
 
 
-export const preCallRunnerForCallNext = async (tokenCallingState: TokenCallingState) => {
-  const tokenCategory = tokenCallingState.currentToken.tokenCategory;
+const handleCurrentProcessedToken = async (tokenCallingState: TokenCallingState) => {
+  const tokenNumber = tokenCallingState.currentToken.tokenNumber;
 
-  if (tokenCallingState.currentToken.tokenNumber !== 0) {
+    // if token call starts with zero, token number will be less than 50,000
+  if (tokenNumber < 50000) {
     const actedTokenProcessingInfo: ActedTokenProcessingInfoArgument = {
       actedToken: tokenCallingState.currentToken,
       operator: tokenCallingState.operator,
@@ -15,64 +16,32 @@ export const preCallRunnerForCallNext = async (tokenCallingState: TokenCallingSt
     }
     await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
   }
+}
+
+export const preCallRunnerForCallNext = async (tokenCallingState: TokenCallingState) => {
+  await handleCurrentProcessedToken(tokenCallingState);
   await setNextToken(tokenCallingState);
 }
 
 export const preCallRunnerForByPass = async (tokenCallingState: TokenCallingState) => {
-  const tokenCategory = tokenCallingState.currentToken.tokenCategory;
-
-  if (tokenCallingState.currentToken.tokenNumber !== 0) {
-    const actedTokenProcessingInfo: ActedTokenProcessingInfoArgument = {
-      actedToken: tokenCallingState.currentToken,
-      operator: tokenCallingState.operator,
-      tokenStatus: TokenStatus.BYPASS
-    }
-    await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
-  }
+  await handleCurrentProcessedToken(tokenCallingState);
   await setNextToken(tokenCallingState);
 }
 
 export const preCallRunnerForCallAgain = async (tokenCallingState: TokenCallingState) => {
-  const tokenCategory = tokenCallingState.currentToken.tokenCategory;
-
-  if (tokenCallingState.currentToken.tokenNumber !== 0) {
-    const actedTokenProcessingInfo: ActedTokenProcessingInfoArgument = {
-      actedToken: tokenCallingState.currentToken,
-      operator: tokenCallingState.operator,
-      tokenStatus: TokenStatus.CALLAGAIN
-    }
-    await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
-  }
+  await handleCurrentProcessedToken(tokenCallingState);
   const operatorName = tokenCallingState.operator.getUserInfo().username;
   TokenCallingStateManagerSingleton.getInstance().setNextTokenOfTokenStateForOperatorName(operatorName, tokenCallingState.currentToken);
 }
 
 export const preCallRunnerForRandomCall = async (tokenCallingState: TokenCallingState) => {
-  const tokenCategory = tokenCallingState.currentToken.tokenCategory;
-
-  if (tokenCallingState.currentToken.tokenNumber !== 0) {
-    const actedTokenProcessingInfo: ActedTokenProcessingInfoArgument = {
-      actedToken: tokenCallingState.currentToken,
-      operator: tokenCallingState.operator,
-      tokenStatus: TokenStatus.RANDOMPROCESSED
-    }
-    await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
-  }
+  await handleCurrentProcessedToken(tokenCallingState);
   const operatorName = tokenCallingState.operator.getUserInfo().username;
   TokenCallingStateManagerSingleton.getInstance().setNextTokenOfTokenStateForOperatorName(operatorName, tokenCallingState.currentToken);
 }
 
 export const preCallRunnerForTokenForward = async (tokenCallingState: TokenCallingState) => {
-  const tokenCategory = tokenCallingState.currentToken.tokenCategory;
-
-  if (tokenCallingState.currentToken.tokenNumber !== 0) {
-    const actedTokenProcessingInfo: ActedTokenProcessingInfoArgument = {
-      actedToken: tokenCallingState.currentToken,
-      operator: tokenCallingState.operator,
-      tokenStatus: TokenStatus.FORWARD
-    }
-    await storeActedTokenProcessingInfo(actedTokenProcessingInfo);
-  }
+  await handleCurrentProcessedToken(tokenCallingState);
   await setNextToken(tokenCallingState);
 }
 
@@ -113,6 +82,7 @@ const setNextToken = async (tokenCallingState: TokenCallingState) => {
   } else {
     unprocessedTokenBasesForToday.sort((tb1, tb2) => (tb1.token.tokenNumber - tb2.token.tokenNumber));
     const nextToken = getNextTokenFromUnprocessedTokenBases(unprocessedTokenBasesForToday);
+    nextToken.tokenCategory = nextToken.tokenCategory === '!' ? nextToken.tokenCategory.replace('!', '') : nextToken.tokenCategory;
     if (nextToken.tokenNumber === 0) {
       setEndOfQueueAndNullNextTokenForState(tokenCallingState);
     } else {

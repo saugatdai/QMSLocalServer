@@ -108,8 +108,8 @@ ipcMain.on('minimizeClicked', () => {
 
 ipcMain.on('SettingsClicked', () => {
   settingsWindow = new BrowserWindow({
-    height: 210,
-    width: 200,
+    height: 620,
+    width: 500,
     show: false,
     maximizable: false,
     webPreferences: {
@@ -174,6 +174,7 @@ ipcMain.on('beginTokenPrint', async (event: Event, tokenCategory) => {
 });
 
 ipcMain.on('startPrinting', (e: Event, tokenString) => {
+  console.log('Starting to print...');
   printPaper.webContents.print({
     silent: true,
     printBackground: true,
