@@ -1,0 +1,6 @@
+-- CreateTable
+CREATE TABLE "AuthToken" (
+    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "userId" INTEGER NOT NULL,
+    CONSTRAINT "AuthToken_userId_fkey" FOREIGN KEY ("userId") REFERENCES "UserData" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+);

@@ -1,0 +1,43 @@
+[
+    {
+        "name": "ConfigOptionsA",
+        "configType": "text",
+        "value": " World"
+    },
+    {
+        "name": "ConfigOptionsB",
+        "configType": "radio",
+        "value": "value3",
+        "choiceOptions": [
+            "value1",
+            "value2",
+            "value3"
+        ]
+    },
+    {
+        "name": "ConfigOptionsC",
+        "configType": "checkbox",
+        "value": [
+            "check1",
+            "check2",
+            "check3"
+        ],
+        "choiceOptions": [
+            "check1",
+            "check2",
+            "check3",
+            "check4"
+        ]
+    },
+    {
+        "name": "ConfigOptionsD",
+        "configType": "select",
+        "value": "option3",
+        "choiceOptions": [
+            "option1",
+            "option2",
+            "option3",
+            "option4"
+        ]
+    }
+]

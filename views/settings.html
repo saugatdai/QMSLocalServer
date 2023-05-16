@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings</title>
+  <style>
+    @font-face {
+      font-family: "condensedFont";
+      src: url("fonts/rclight.woff") format("woff");
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #001a33;
+      padding: .5em;
+      color: #e6f3ff;
+      font-family: "condensedFont";
+      height: 100vh;
+    }
+
+    fieldset {
+      width: 95%;
+      padding: .3em;
+      border: 1px solid #267326;
+    }
+
+    legend {
+      color: #af3245;
+      font-weight: bold;
+    }
+
+    form input,
+    textarea {
+      border: none;
+      border-bottom: 2px solid #af3245;
+      outline: none;
+      background: inherit;
+      outline: none;
+      margin: .5em 0;
+      color: #e6f3ff;
+      padding: .3em;
+      margin-bottom: 1.5em;
+    }
+
+    select {
+      background: inherit;
+      border: none;
+      border-bottom: 2px solid #af3245;
+      padding: .3em;
+      outline: none;
+      color: #af3245;
+    }
+
+    #settingsForm {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+    }
+
+    label#generalLabel {
+      margin-top: 1em;
+    }
+
+    label#multiTokenLabel{
+      margin-top: .8em;
+    }
+
+    input[type="checkbox"] {
+      margin: 0;
+      margin-left: .5em;
+      display: inline-block;
+    }
+
+    #footerTxt {
+      background: inherit;
+      font: inherit;
+      color: inherit;
+      display: flex;
+      align-items: center;
+      margin-top: .5em;
+    }
+
+    #button {
+      margin-top: 1em;
+    }
+
+    button {
+      margin: 0 .5em;
+      color: #e6f3ff;
+      border: none;
+      outline: none;
+      background: #267326;
+      padding: .3em;
+      border-radius: .3em;
+      font-family: condensedFont;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #af3245;
+    }
+
+    #message {
+      margin-top: .5em;
+      color: #e6f3ff;
+    }
+  </style>
+</head>
+
+<body>
+  <form id="settingsForm">
+    <fieldset>
+      <legend>General</legend>
+      <label for="portNumber">
+        Port Number:
+        <input type="number" name="portNumber" id="portNumber" />
+      </label>
+      <label for="kioskMode"><br />
+        Kiosk Mode:
+        <select id="kioskMode">
+          <option value="off">off</option>
+          <option value="auto">Auto</option>
+          <option value="manual">Manual</option>
+        </select>
+      </label>
+      <label for="generalCheckbox" id="generalLabel">
+        Show General : <input type="checkbox" id="generalCheckbox" />
+      </label>
+      <label for="multiTokenMode" id="multiTokenLabel">
+        Multi Token Mode : <input type="checkbox" id="multiTokenMode" />
+      </label>
+    </fieldset>
+    <fieldset>
+      <legend>Footer</legend>
+      <label for="footerText" id="footerTxt">
+        Message :
+        <textarea id="footerText" cols="25" rows="5"></textarea>
+      </label>
+      <label for="footerBackgroundColor">
+        Footer Background :
+        <input type="color" name="footerBackgroundColor" id="footerBackgroundColor" value="#000000">
+      </label>
+      <label for="footerForegroundColor">
+        Footer Text Color:
+        <input type="color" name="footerForegroundColor" id="footerForegroundColor" value="#000000">
+      </label>
+    </fieldset>
+    <fieldset>
+      <legend>Button</legend>
+      <label for="buttonColor">
+        Button Color :
+        <input type="color" name="buttonColor" id="buttonColor" value="#000000">
+      </label>
+      <label for="buttonTextColor">
+        Button text :
+        <input type="color" name="buttonTextColor" id="buttonTextColor" value="#000000">
+      </label>
+    </fieldset>
+
+    <div id="button">
+      <button type="submit">Save</button>
+      <button type="button" id="cancelButton">Cancel</button>
+    </div>
+  </form>
+  <div id="message"></div>
+</body>
+
+</html>

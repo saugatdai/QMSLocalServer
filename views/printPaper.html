@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Print Paper</title>
+    <style>
+        @font-face {
+            font-family: "condensedFont";
+            src: url("fonts/rclight.woff") format("woff");
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "condensedFont";
+            font-weight: 600;
+        }
+
+        body {
+            height: 95mm;
+            width: 80mm;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 1.5em;
+            text-align: center;
+            margin: 0;
+            font-weight: bolder;
+        }
+
+        h2 {
+            font-size: 1.2em;
+            margin-bottom: 1em;
+            text-align: center;
+        }
+
+        #timeContainer {
+            display: flex;
+            font-size: 1em;
+            text-align: center;
+        }
+
+        #tokenContainer {
+            display: flex;
+            flex-direction: row;
+            margin-top: 1.1em;
+            justify-content: space-between;
+        }
+
+        #tokenContainer div {
+            font-size: 1.1em;
+            padding: .3em;
+        }
+
+        #tokenContainer #large{
+            font-size: 4.1em;
+            font-weight: bold;
+        }
+
+        #tokenNumberHolder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1 1 auto;
+        }
+
+        footer{
+            text-align: center;
+            text-decoration: underline;
+            font-weight: bold;
+            font-style: italic;
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1 id="firstLine"></h1>
+    <h2 id="secondLine"></h2>
+    <div id="timeContainer">
+        <span>Date/Time:</span>
+        <span id="time">12/12/2022</span>
+    </div>
+    <div id="tokenContainer">
+        <div id="tokenNumberHolder">
+            <div>Token No.</div>
+            <div id="large">1234</div>
+        </div>
+        <div id="qrcode"></div>
+    </div>
+    <footer>Please Verify Cash Before Leaving the Counter</footer>
+    
+</body>
+
+</html>

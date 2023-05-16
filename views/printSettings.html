@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrintSettings</title>
+    <style>
+        @font-face {
+            font-family: "condensedFont";
+            src: url("fonts/rclight.woff") format("woff");
+        }
+
+
+        :root {
+            --blue: #001a33;
+            --white: #e6f3ff;
+            --green: #267326;
+            --red: #af3245;
+            font-family: "condensedFont";
+        }
+
+        div {
+            color: var(--white);
+            font-size: .9em;
+        }
+
+        textarea,
+        input[type="time"],
+        input[type="number"] {
+            background: inherit;
+            color: inherit;
+            font-size: .9em;
+            font-family: inherit;
+            border: none;
+            outline: none;
+            border-bottom: 2px solid var(--red);
+            margin-bottom: .5em;
+        }
+
+        input[type="time"] {
+            filter: invert(48%) sepia(13%) saturate(3207%) hue-rotate(130deg) brightness(95%) contrast(80%);
+            width: 100%;
+        }
+
+        button {
+            background: var(--green);
+            color: var(--white);
+            border: none;
+            border-radius: .3em;
+            padding: .5em;
+            font: inherit;
+            font-size: .75em;
+            margin: .3em;
+        }
+
+        button:hover {
+            background: var(--red);
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <form>
+        <div>First Line : </div>
+        <div>
+            <textarea id="firstLine" cols="23" rows="2"></textarea>
+        </div>
+        <div>Second Line : </div>
+        <div>
+            <textarea id="secondLine" cols="23" rows="2"></textarea>
+        </div>
+        <br>
+        <div>
+            <input type="checkbox" id="enablePrintTime" />
+            Enable Print time
+        </div>
+        <br>
+        <div>Print Start Time : </div>
+        <div>
+            <input type="time" id="printStartTime" />
+        </div>
+        <div>Print Stop Time : </div>
+        <div>
+            <input type="time" id="printStopTime" />
+        </div>
+        <div>Print Hold Time : </div>
+        <div>
+            <input type="number" id="printHoldTime" />
+        </div>
+        <button id="saveButton" type="button">Save</button>
+        <button id="cancelButton" type="button">Cancel</button>
+    </form>
+    <div id="message"></div>
+</body>
+
+</html>

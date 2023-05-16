@@ -1,0 +1,74 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db?timeout=20000&connect_timeout=20000&busy_timeout=20000"
+}
+
+model Customer {
+  customerId   Int     @id @default(autoincrement())
+  remarks      String?
+  customerName String
+  token        Token   @relation(fields: [tokenId], references: [tokenId], onDelete: Cascade, onUpdate: Cascade)
+  tokenId      Int     @unique
+}
+
+model UserData {
+  id       Int   @id @default(autoincrement())
+  username String
+  role     String
+  password String
+  counter  String?
+  tokenProcessing TokenProcessing[]
+  authTokens AuthToken[]
+}
+
+model TokenProcessing {
+  processingId Int @id @default(autoincrement())
+  operatorId Int 
+  operator UserData @relation(fields: [operatorId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  status String
+  timeStamp String
+  tokenBaseObject tokenBaseObject @relation(fields: [tokenBaseId], references: [tokenBaseId], onDelete: Cascade, onUpdate: Cascade)
+  tokenBaseId Int
+}
+
+model tokenCategoryCount{
+  categoryId Int @id @default(autoincrement())
+  category String? @unique
+  categoryName String
+  currentTokenCount Int
+  latestCustomerTokenCount Int
+  token Token[]
+}
+
+model tokenBaseObject {
+  tokenBaseId Int @id @default(autoincrement())
+  tokenId Int @unique
+  token Token @relation(fields: [tokenId], references: [tokenId], onDelete: Cascade, onUpdate: Cascade)
+  currentStatus String
+  tokenProcessingInfoId Int?
+  tokenProcessingInfo TokenProcessing[]
+}
+
+model Token {
+  tokenId       Int       @id @default(autoincrement())
+  date          String
+  tokenNumber   Int
+  categoryId    Int
+  tokenCategory tokenCategoryCount @relation(fields: [categoryId], references: [categoryId], onDelete: Cascade, onUpdate: Cascade)
+  customer      Customer?
+  tokenBase tokenBaseObject?
+}
+
+model AuthToken {
+  id Int @id @default(autoincrement())
+  token String
+  userId Int
+  user UserData @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
