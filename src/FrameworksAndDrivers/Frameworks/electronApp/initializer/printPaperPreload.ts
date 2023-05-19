@@ -34,26 +34,35 @@ ipcRenderer.on('tokenNumber', async (e: Event, tokenCategory) => {
 
 // TODO MultitokenModeprinting Check
 ipcRenderer.on('multiTokenNumber', async (e: Event, selectedCategories: string[]) => {
-    console.log('Selected Categories : ');
-    console.log(selectedCategories);
-    try {
-        const tokenPromises = selectedCategories.map(selectedCategory => createNewCategoryTokenBaseObject(selectedCategory));
-        const allTokenBases = await Promise.all(tokenPromises);
-        const token = allTokenBases.reduce((acc, element) => acc + element.token.tokenCategory + element.token.tokenNumber + ' ', '');
 
-        const printSettingsJSON = await readFile(path.join(__dirname, '../../../../../Data/printerSettings.json'));
+    let tokenString = '';
 
-        const printSettings = JSON.parse(printSettingsJSON) as PrintSettings;
-        const firstLine = printSettings.firstLine;
-        const secondLine = printSettings.secondLine;
+    const sequentialPromiseResolver = async (index: number) => {
+        try {
+            if (index < selectedCategories.length) {
+                const tokenBase = await createNewCategoryTokenBaseObject(selectedCategories[index]);
+                tokenString += tokenBase.token.tokenCategory + tokenBase.token.tokenNumber + ' ';
+                await sequentialPromiseResolver(++index);
+            } else {
+                const printSettingsJSON = await readFile(path.join(__dirname, '../../../../../Data/printerSettings.json'));
 
-        document.querySelector("#firstLine").innerHTML = firstLine;
-        document.querySelector("#secondLine").innerHTML = secondLine;
-        document.querySelector('#time').innerHTML = new Date().toLocaleString();
-        document.querySelector('#large').innerHTML = token;
+                const printSettings = JSON.parse(printSettingsJSON) as PrintSettings;
+                const firstLine = printSettings.firstLine;
+                const secondLine = printSettings.secondLine;
 
-        ipcRenderer.send('startPrinting', token);
-    }catch(error){
-        ipcRenderer.send('showNotification', error.toString());
+                document.querySelector("#firstLine").innerHTML = firstLine;
+                document.querySelector("#secondLine").innerHTML = secondLine;
+                document.querySelector('#time').innerHTML = new Date().toLocaleString();
+                document.querySelector('#large').innerHTML = tokenString;
+
+                ipcRenderer.send('startPrinting', tokenString);
+            }
+        } catch (error) {
+            ipcRenderer.send('showNotification', error.toString());
+        }
+
     }
+    
+    await sequentialPromiseResolver(0);
+
 });

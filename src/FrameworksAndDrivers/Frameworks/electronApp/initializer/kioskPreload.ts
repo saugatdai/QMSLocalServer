@@ -199,6 +199,11 @@ const createPrintButton = async () => {
 
         setTimeout(() => {
             overLayElement.style.display = "none";
+            selectedElements.forEach(selectedElement => {
+                selectedElement.element.style.backgroundColor = kioskSettings.buttonColor;
+                selectedElement.element.style.color = kioskSettings.ButtonTextColor;
+            });
+            selectedElements = [];
         },printSettings.printHoldTime)
 
         // Add multimode token printing code from here...
